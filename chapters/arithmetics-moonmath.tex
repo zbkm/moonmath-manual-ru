@@ -712,7 +712,7 @@ We get $s=1$ as well as $t=-1$ and have $1 = 1\cdot 6 -1\cdot 5$. From this, it 
 sage: ZZ(6).xgcd(ZZ(5))
 \end{sagecommandline}
 \end{example}
-At this point, the attentive reader might notice that the situation where the modulus is a prime number is of particular interest, because we know from \exercisename{} \ref{exercise_towards_counting_numbers} that, in these cases, all remainder classes must have modular inverses, since $gcd(r,n)=1$ for prime $n$ and any $r<n$. In fact, \concept{Fermat's little theorem} \eqref{fermats-little-theorem} provides a way to compute multiplicative inverses in this situation, since, in case of a prime modulus $p$ and $r<p$, we get the following:
+At this point, the attentive reader might notice that using a modulus of a prime number is of particular interest. As we know from \exercisename{} \ref{exercise_towards_counting_numbers}, if $n$ is prime, then $gcd(r,n)=1$ for every $r<n$. Hence, all non-zero remainder classes modulo $n$ have multiplicative inverses in this setting. In fact, \concept{Fermat's little theorem} \eqref{fermats-little-theorem} provides a way to compute multiplicative inverses in this situation, since, in case of a prime modulus $p$ and $r<p$, we get the following:
 \begin{align*}
 \kongru{r^p}{r}{p} & \Leftrightarrow \\
 \kongru{r^{p-1}}{1}{p} & \Leftrightarrow \\

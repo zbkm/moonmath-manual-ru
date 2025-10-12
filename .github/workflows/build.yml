@@ -18,7 +18,7 @@ jobs:
       contents: write
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
       - name: Update Title
@@ -30,14 +30,14 @@ jobs:
           export TEXT="v $(git describe --tags)"
           mogrify -stroke Black -fill Black -draw "rectangle 1090,2300 1390,2400" -stroke ${TEXT_COLOR} -fill ${TEXT_COLOR} -font ${TEXT_FONT} -pointsize ${TEXT_SIZE} -gravity Center -draw "text 0,600 '${TEXT}'" figures/MMM_cover.jpg
       - name: LaTeX pass 1
-        uses: xu-cheng/latex-action@v2
+        uses: xu-cheng/latex-action@v4
         with:
           pre_compile: ./install_sagetex_sty.sh
           compiler: pdflatex
           args: --shell-escape
           root_file: main-moonmath.tex
       - name: LaTeX pass 2
-        uses: xu-cheng/latex-action@v2
+        uses: xu-cheng/latex-action@v4
         with:
           compiler: pdflatex
           args: --shell-escape
@@ -48,7 +48,7 @@ jobs:
           source_file: main-moonmath.sagetex.sage
       - name: LaTeX final iterations
         id: latex-final
-        uses: xu-cheng/latex-action@v2
+        uses: xu-cheng/latex-action@v4
         with:
           root_file: main-moonmath.tex
       - name: Collect Warnings
@@ -59,12 +59,12 @@ jobs:
           echo "EOF" >> $GITHUB_ENV
         continue-on-error: true
       - name: Upload PDF
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: MoonMath Manual PDF
           path: main-moonmath.pdf
       - name: Upload generated files
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: MoonMath Manual generated files
           path: |

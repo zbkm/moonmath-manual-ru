@@ -318,9 +318,11 @@ The so-called \term{binary positional system} (or binary representation), repres
 n = \sum_{j=0}^{k-1} b_j\cdot 2^j
 \end{equation}
 
+We additionally require that either $n=0$ and $k=1$ with $b_0=0$, or $n>0$ and $b_{k-1}=1$. This rules out leading zeros. 
+
 In this case, we write $Bits(n):= b_{k-1}b_{k-2}\ldots b_{0}$ for the binary representation of $n$, say that $n$ is a $k$-bit number and call $k:= |n|_2$ the \term{bit length} of $n$. 
 
-It can be shown, that the binary representation of any non-negative integer is unique. We call $b_0$ the \term{least significant bit} and $b_{k-1}$ the \term{most significant} bit and define the \term{Hamming weight} of an integer as the number of $1$s in its binary representation.\footnote{For more on binary and general base integer representation see, for example, \chaptname{} 1 in \cite{mignotte-1992}.}
+With this convention, the binary representation of any non-negative integer is unique. We call $b_0$ the \term{least significant bit} and $b_{k-1}$ the \term{most significant} bit and define the \term{Hamming weight} of an integer as the number of $1$s in its binary representation.\footnote{For more on binary and general base integer representation see, for example, \chaptname{} 1 in \cite{mignotte-1992}.}
 
 Another commonly used representation is the so-called \term{hexadecimal positional system}, which represents every integer as a sequence of elements from a set of $16$ digits usually written as $\{0,1,2,3,4,5,6,7,8,9,a,b,c,d,e,f\}$. 
 
@@ -798,7 +800,7 @@ To be more precise, an \term{univariate polynomial}\footnote{In our context, the
 P(x) := \sum _{j = 0} ^{m}{a} _{j}{x} ^{j} ={a} _{m}x^m +{a} _{m-1} x^{m-1} + \dots + a_1 x + a_0 \;,
 \end{equation}
 
-In \eqref{eq:polynomial} $x$ is called the \term{variable}, and each $ a$ is called a \term{coefficient}. If $R$ is the type of the coefficients, then the set of all \hilight{univariate polynomials with coefficients in $R$} is written as $R[x]$. Univariate polynomials are often simply called polynomials, and written as $ P (x) \in R[x]$. The constant term $a_0$ as is also written as $ P(0)$.
+Unless $P$ is the zero polynomial, we require $a_m\neq 0$ and take $m$ to be the largest index with a non-zero coefficient. In \eqref{eq:polynomial} $x$ is called the \term{variable}, and each $ a$ is called a \term{coefficient}. If $R$ is the type of the coefficients, then the set of all \hilight{univariate polynomials with coefficients in $R$} is written as $R[x]$. Univariate polynomials are often simply called polynomials, and written as $ P (x) \in R[x]$. The constant term $a_0$ as is also written as $ P(0)$.
 
 A polynomial is called the \term{zero polynomial} if all its coefficients are zero. A polynomial is called the \term{one polynomial} if the constant term is $1$ and all other coefficients are zero.
 

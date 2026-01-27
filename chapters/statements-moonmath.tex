@@ -117,7 +117,7 @@ Having defined the language $L_{3.fac}$, it then makes sense to claim the statem
 
 Proving the correctness of this statement constructively means to actually find some concrete field elements that satisfy the decision function $R_{3.fac}$, like $x_1= 2$, $x_2 =12$, $x_3=4$ and $x_4 = 5$. The string $<2,12,4,5>$ is therefore a constructive proof for the statement that $L_{3.fac}$ contains words, and the computation $R_{3.fac}(<2,12,4,5>)=true$ is a verification of that proof. In contrast, the string $<2, 12, 4, 7>$ is not a proof of the statement, since the check $R_{3.fac}(<2,12,4,7>)=false$ does not verify the proof.
 \end{example}
-\begin{example}[\curvename{Tiny-jubjub} Membership]\label{ex:tiny-jubjub} In one of our main examples, we derive a SNARK that proves a pair $(x,y)$ of field elements from $\F_{13}$ to be a point on the tiny-{jubjub} curve in its twisted Edwards form as derived in \examplename{} \ref{TJJ13-twisted-edwards}.
+\begin{example}[\curvename{Tiny-jubjub} Membership]\label{ex:tiny-jubjub} In one of our main examples, we derive a SNARK that proves a pair $(x,y)$ of field elements from $\F_{13}$ to be a point on the tiny-{jubjub} curve in its twisted Edwards form as derived in \examplename{} \ref{ex:TJJ13-twisted-edwards}, equation \ref{eq:TJJ13-twisted-edwards}.
 
 In the first step, we define a language such that points on the \curvename{Tiny-jubjub} curve are in 1:1 correspondence with words in that language.
 

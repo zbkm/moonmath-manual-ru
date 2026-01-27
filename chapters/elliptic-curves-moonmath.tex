@@ -945,7 +945,7 @@ On the other hand, a Montgomery curve $By^{2}=x^{3}+Ax^{2}+x$ such that $B\neq 0
 (\frac{A+2}{B})x^2+y^2= 1+(\frac{A-2}{B})x^2y^2
 \end{equation}
 
-\begin{example}Consider the \curvename{Tiny-jubjub} curve from \examplename{} \ref{TJJ13} again. We know from \examplename{} \ref{TJJ13-montgomery} that it is a Montgomery curve, and, since Montgomery curves are equivalent to \concept{twisted Edwards} curves, we want to write this curve in \concept{twisted Edwards} form. We use equation \eqref{eq:montgomery-to-twisted-edwards}, and compute the parameters $a$ and $d$ as follows:
+\begin{example}\label{ex:TJJ13-twisted-edwards}Consider the \curvename{Tiny-jubjub} curve from \examplename{} \ref{TJJ13} again. We know from \examplename{} \ref{TJJ13-montgomery} that it is a Montgomery curve, and, since Montgomery curves are equivalent to \concept{twisted Edwards} curves, we want to write this curve in \concept{twisted Edwards} form. We use equation \eqref{eq:montgomery-to-twisted-edwards}, and compute the parameters $a$ and $d$ as follows:
 \begin{align*}
 a & = \frac{A+2}{B} & \text{\# insert A=6 and B=7}\\
   & = \frac{8}{7} = 3 & \text{\# } 7^{-1}= 2 \\
@@ -969,7 +969,7 @@ Since our goal is to use this curve later in implementations of pen-and-paper SN
 \end{align*}
 
 This proves that \curvename{Tiny-jubjub} is SNARK-friendly. We can write the \curvename{Tiny-jubjub} curve in its affine \concept{twisted Edwards} representation as follows:
-\begin{equation}\label{TJJ13-twisted-edwards}
+\begin{equation}\label{eq:TJJ13-twisted-edwards}
 \mathit{TJJ\_13} = \{(x,y)\in \F_{13}\times \F_{13}\;|\; 3\cdot x^{2} + y^2 =1+ 8\cdot x^{2}\cdot y^2 \}
 \end{equation}
 

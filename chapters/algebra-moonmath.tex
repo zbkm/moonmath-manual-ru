@@ -777,7 +777,7 @@ As we have seen in \secname{} \ref{sec:hashing-to-groups}, various constructions
 
 One of the most widely used applications of hash-into-ring constructions are hash functions that map into the ring $\Z_n$ of modular $n$ arithmetics for some modulus $n$. Different approaches of constructing such a function are known, but probably the most widely used ones are based on the insight that the images of general hash functions can be interpreted as binary representations of integers, as explained in \examplename{} \ref{naive-cyclic-group-hash}.
 
-It follows from this interpretation that one simple method of hashing into $\Z_n$ is constructed by observing that if $n$ is a modulus with a bit length \eqref{def:binary_representation_integer} of $k=|n|$, then every binary string $<b_0,b_1,\ldots,b_{k-2}>$ of length $k-1$ defines an integer $z$ in the rage $0\leq z \leq 2^{k-1}-1< n $:
+It follows from this interpretation that one simple method of hashing into $\Z_n$ is constructed by observing that if $n$ is a modulus with a bit length \eqref{def:binary_representation_integer} of $k=|n|$, then every binary string $<b_0,b_1,\ldots,b_{k-2}>$ of length $k-1$ defines an integer $z$ in the range $0\leq z \leq 2^{k-1}-1< n $:
 \begin{equation}
 z = b_0\cdot 2^0 + b_1\cdot 2^1 + \ldots + b_{k-2}\cdot 2^{k-2}
 \end{equation}

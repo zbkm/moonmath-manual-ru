@@ -1507,7 +1507,7 @@ Consider the curve \curvename{alt\_bn128} from \examplename{} \ref{BN128} and th
 % http://www.pdmi.ras.ru/~lowdimma/BSD/Silverman-Arithmetic_of_EC.pdf
 % p. 396ff
 
-\section{Hashing to Curves} Elliptic curve cryptography frequently requires the ability to hash data onto elliptic curves. If the order of the curve is not a prime number, hashing to prime order subgroups is of importance, too and in the context of pairing-friendly curves, it is sometimes necessary to hash specifically onto the pairing group $\G_1$ or $\G_2$ as introduced in \ref{sec:pairing_groups}.
+\section{Hashing to Curves} Elliptic curve cryptography frequently requires the ability to hash data onto elliptic curves. If the order of the curve is not a prime number, hashing to prime order subgroups is of importance too, and in the context of pairing-friendly curves, it is sometimes necessary to hash specifically onto the pairing group $\G_1$ or $\G_2$ as introduced in \ref{sec:pairing_groups}.
 
 As we have seen in section \ref{sec:hashing-to-groups}, some general methods are known for hashing into finite cyclic groups and since elliptic curves over finite fields are finite and cyclic groups, those methods can be utilized in this case, too. However, in what follows we want to describe some methods specific to elliptic curves that are frequently used in real-world applications. 
 
@@ -1606,7 +1606,7 @@ For example, in the context of SNARK development, it became necessary to design 
 
 Another requirement in the context of many so-called \term{pairing-based zero-knowledge proofing systems} is the existence of a suitable, pairing-friendly curve with a specified security level and a low embedding degree as defined in \ref{def:embedding-degree}. Famous examples are the BLS\_12 and the NMT curves.\sme{add references}
 
-The major goal of this section is to explain the most important method of designing elliptic curves with predefined properties from scratch, called the \term{\concept{complex multiplication method}} (cf. \chaptname{} 6 of \cite{silverman-1994}). We will apply this method in section \ref{BLS6} to synthesize a particular BLS6 curve, which is one of the most insecure curves, that is particular well suited to serve  as the main curve to build our pen-and-paper SNARKs on. As we will see, this curve has a ``large'' prime factor subgroup of order $13$, which implies that we can use our \curvename{Tiny-jubjub} curve to implement certain elliptic curve cryptographic primitives in circuits over that BLS6 curve. 
+The major goal of this section is to explain the most important method of designing elliptic curves with predefined properties from scratch, called the \term{\concept{complex multiplication method}} (cf. \chaptname{} 6 of \cite{silverman-1994}). We will apply this method in section \ref{BLS6} to synthesize a particular BLS6 curve, which is one of the most insecure curves, that is particularly well suited to serve  as the main curve to build our pen-and-paper SNARKs on. As we will see, this curve has a ``large'' prime factor subgroup of order $13$, which implies that we can use our \curvename{Tiny-jubjub} curve to implement certain elliptic curve cryptographic primitives in circuits over that BLS6 curve. 
  
 Before we introduce the \concept{complex multiplication method}, we have to explain a few properties of elliptic curves that are of key importance in understanding that method. 
 

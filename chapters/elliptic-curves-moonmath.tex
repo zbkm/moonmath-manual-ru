@@ -1154,7 +1154,7 @@ We see that \curvename{secp256k1} has no embedding degree $k<1000$, which means 
 \label{ex:embedding_degre_BN128}
 To give an example of a cryptographically secure real-world elliptic curve that does have a small embedding degree, let's look at curve \curvename{alt\_bn128} again. We know from \examplename{} \ref{BN128} that the order of this curve is a prime number, which means that we only have a single embedding degree.
 
-To compute the embedding degrees $k$, we can use Sage and loop through small embedding degrees until we find as match. We compute as follows:
+To compute the embedding degrees $k$, we can use Sage and loop through small embedding degrees until we find a match. We compute as follows:
 \begin{sagecommandline}
 sage: p = ZZ(21888242871839275222246405745257275088696311157297823662689037894645226208583)
 sage: r = ZZ(21888242871839275222246405745257275088548364400416034343698204186575808495617)

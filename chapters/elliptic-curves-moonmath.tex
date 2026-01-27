@@ -1,7 +1,7 @@
 \chapter{Elliptic Curves}\label{chap:elliptic-curves}
 \label{chap:elliptic_curves}
 %references http://infosec.pusan.ac.kr/wp-content/uploads/2019/09/Pairings-For-Beginners.pdf
-Generally speaking, elliptic curves are geometric objects in projective planes (see \secname{} \ref{sec:planes}) over a given field, made up of points that satisfy certain equations. One of their key features from the point of view of cryptography is that, if the underlying field is of positive characteristic, elliptic curves are finite, cyclic groups (\secname{} \ref{sec:finite-groups}). Further, it is believed that, in this case, the \concept{discrete logarithm problem} (\secname{} \ref{def:DL-secure}) on many elliptic curve groups is hard, given that the underlying characteristic is large enough.\footnote{An in-depth introduction to elliptic curves is given, for example, in \cite{silverman-1994}. An introduction from a cryptographic point of view is given in \cite{hoffstein-2008}.}
+Generally speaking, elliptic curves are geometric objects in projective planes (see \secname{} \ref{sec:planes}) over a given field, made up of points that satisfy certain equations. One of their key features from the point of view of cryptography is that, if the underlying field is of positive characteristic, elliptic curves form finite, commutative groups (\secname{} \ref{sec:finite-groups}). In cryptographic applications we typically work in a large cyclic subgroup of such a curve group. Further, it is believed that, in this case, the \concept{discrete logarithm problem} (\secname{} \ref{def:DL-secure}) on many elliptic curve groups is hard, given that the underlying characteristic is large enough.\footnote{An in-depth introduction to elliptic curves is given, for example, in \cite{silverman-1994}. An introduction from a cryptographic point of view is given in \cite{hoffstein-2008}.}
 
 A special class of elliptic curves are so-called pairing-friendly curves, which have a notation of a group pairing (\secname{} \ref{pairing-map}) attached to them, which has cryptographically advantageous properties. 
 
@@ -411,13 +411,13 @@ Consider the commutative group $(\mathit{TJJ\_13},\oplus)$ of the \curvename{Tin
 \end{exercise}
 
 \subsubsection{Scalar Multiplication}
-As we have seen in the previous section, elliptic curves $E(\F)$ have the structure of a commutative group associated to them. It can be shown that this group is finite and cyclic whenever the underlying field $\F$ is finite. As we know from \eqref{scalarmultiplication}, this implies that there is a notation of scalar multiplication associated to any elliptic curve over finite fields.
+As we have seen in the previous section, elliptic curves $E(\F)$ have the structure of a commutative group associated to them. It can be shown that this group is finite whenever the underlying field $\F$ is finite, but it is not necessarily cyclic. As we know from \eqref{scalarmultiplication}, this implies that there is a notion of scalar multiplication associated to any cyclic subgroup of an elliptic curve over finite fields.
 
-To understand this scalar multiplication, recall from \defname{} \ref{cyclic-groups} that every finite cyclic group of order $n$ has a generator $g$ and an associated exponential map $g^{(\cdot)}: \Z_n \to \G$, where $g^x$ is the $x$-fold product of $g$ with itself.  
+To understand this scalar multiplication, recall from \defname{} \ref{cyclic-groups} that every finite cyclic group of order $n$ has a generator $g$ and an associated exponential map $g^{(\cdot)}: \Z_n \to \G$, where $g^x$ is the $x$-fold product of $g$ with itself. For any point $P$ of finite order $n$ on an elliptic curve, the subgroup $\langle P\rangle$ is cyclic and the map $[\,\cdot\,]P:\Z_n\to \langle P\rangle$ is defined analogously.
 
-Elliptic curve scalar multiplication is the exponential map written in additive notation. To be more precise, let $\F$ be a finite field, $E(\F)$ an elliptic curve of order $n$, and $P$ a generator of $E(\F)$. Then the \term{elliptic curve scalar multiplication} with base $P$ is defined as follows (where $[0]P = \Oinf$ and $[m]P = P+P+\ldots + P$ is the $m$-fold sum of $P$ with itself ):
+Elliptic curve scalar multiplication is the exponential map written in additive notation. To be more precise, let $\F$ be a finite field, $E(\F)$ an elliptic curve, and $P\in E(\F)$ a point of order $n$. Then the \term{elliptic curve scalar multiplication} with base $P$ is defined as follows (where $[0]P = \Oinf$ and $[m]P = P+P+\ldots + P$ is the $m$-fold sum of $P$ with itself ):
 $$
-[\cdot]P: \Z_n \to E(\F)\;;\; m \mapsto [m]P
+[\cdot]P: \Z_n \to \langle P\rangle\;;\; m \mapsto [m]P
 $$
 Therefore, elliptic curve scalar multiplication is an instantiation of the general exponential map using additive instead of multiplicative notation.
 
@@ -433,7 +433,7 @@ For small pen-and-paper groups, the logarithmic order greatly simplifies complic
 
 The reader should keep in mind though, that many elliptic curves are believed to be DL-secure (\defname{} \ref{def:DL-secure}), which implies that, for those curves, the logarithmic order can not be computed efficiently.  
 
-In the following example, we look at some implications of the fact that elliptic curves are finite cyclic groups and apply the logarithmic order.
+In the following example, we look at some implications of the fact that this particular elliptic curve group is finite and cyclic and apply the logarithmic order.
 \begin{example}\label{ex:G1G2-subgroups} Consider the elliptic curve group $E_{1,1}(\F_5)$ from \examplename{} \ref{E1F5}. Since it is a finite cyclic group of order $9$, and the prime factorization of $9$ is $3\cdot 3$, we can use the fundamental theorem of finite cyclic groups (\defname{} \ref{def:fundamental_theorem_groups}) to reason about all its subgroups. In fact, since the only  factors of $9$ are $1$, $3$ and $9$, we know that $E_{1,1}(\F_5)$ has the following subgroups:
 \begin{itemize}
 \item $E_{1,1}(\F_5)[9]$ is a subgroup of order $9$. By definition, any group is a subgroup of itself.
@@ -1509,7 +1509,7 @@ Consider the curve \curvename{alt\_bn128} from \examplename{} \ref{BN128} and th
 
 \section{Hashing to Curves} Elliptic curve cryptography frequently requires the ability to hash data onto elliptic curves. If the order of the curve is not a prime number, hashing to prime order subgroups is of importance too, and in the context of pairing-friendly curves, it is sometimes necessary to hash specifically onto the pairing group $\G_1$ or $\G_2$ as introduced in \ref{sec:pairing_groups}.
 
-As we have seen in section \ref{sec:hashing-to-groups}, some general methods are known for hashing into finite cyclic groups and since elliptic curves over finite fields are finite and cyclic groups, those methods can be utilized in this case, too. However, in what follows we want to describe some methods specific to elliptic curves that are frequently used in real-world applications. 
+As we have seen in section \ref{sec:hashing-to-groups}, some general methods are known for hashing into finite cyclic groups. Since elliptic curves over finite fields are finite commutative groups, those methods can be utilized by hashing into a chosen cyclic subgroup (often followed by cofactor clearing). However, in what follows we want to describe some methods specific to elliptic curves that are frequently used in real-world applications. 
 
 \subsection{Try-and-increment Hash Functions}
 One of the most straight-forward ways of hashing onto an elliptic curve point in a secure way is to use a cryptographic hash function together with one of the hashing into modular arithmetics methods as described in section \ref{hash-to-modular-arithmetics}.
@@ -1612,7 +1612,7 @@ Before we introduce the \concept{complex multiplication method}, we have to expl
 
 \subsection{The Trace of Frobenius} To understand the \concept{complex multiplication method} of elliptic curves, we have to define the so-called \term{trace} of an elliptic curve first.
 
-We know that elliptic curves are cyclic groups of finite order. Therefore, an interesting question is whether it is possible to estimate the number of elements that this curve contains. Since an affine \concept{short Weierstrass} curve consists of pairs $(x,y)$ of elements from a finite field $\F_q$ plus the point at infinity, and the field $\F_q$ contains $q$ elements, the number of curve points cannot be arbitrarily large, since it can contain at most $q^2+1$ many elements. 
+We know that elliptic curve groups over finite fields are finite commutative groups. Therefore, an interesting question is whether it is possible to estimate the number of elements that this curve contains. Since an affine \concept{short Weierstrass} curve consists of pairs $(x,y)$ of elements from a finite field $\F_q$ plus the point at infinity, and the field $\F_q$ contains $q$ elements, the number of curve points cannot be arbitrarily large, since it can contain at most $q^2+1$ many elements. 
 
 There is however, a more precise estimation, usually called the \term{Hasse bound}. To understand it, let $E(\F_q)$ be an affine \concept{short Weierstrass} curve over a finite field $\F_q$ of order $q$, and let $|E(\F_q)|$ be the order of the curve. Then there is an integer $t\in \Z$, called the \term{trace of Frobenius} of the curve, such that $|t| \leq 2\sqrt{q}$ and the following equation holds:
 \begin{equation}\label{hasse-bound}
@@ -2637,5 +2637,3 @@ $$TinyMD5_{\mathbb{G}_2}("")= H_2(MD5(s)_{11},\ldots MD5(s)_{0}) = H_2(001001111
 
 
 %\end{remark}
-
-

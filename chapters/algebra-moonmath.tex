@@ -615,9 +615,9 @@ Consider the \capitalisewords{Pedersen hash} from \exercisename{} \ref{exercise:
 As noted in \ref{def:Pedersen_hash}, the family of Pederson's hash functions, parameterized by a set of generators $\{g_1,\ldots,g_j\}$ does not qualify as a family of pseudorandom functions, and should therefore not be instantiated as such. To see an example of a proper family of pseudorandom functions in groups where the decisional Diffie--Hellman assumption (see \secname \ref{def:DDH-secure}) is assumed to hold true, let $\G$ be a DDH-secure cyclic group of order $n$ with generator $g$, and let $\{a_0,a_1,\ldots,a_k\}\subset \Z_{n}^*$ be a uniform randomly generated set of numbers invertible in modular $n$ arithmetics. Then a family of pseudorandom functions, parameterized by the \uterm{seed} $\{a_0,a_1,\ldots,a_k\}$ is given as follows:
 \begin{equation}
 \label{prf_in_cyclic_group}
-F_{\{a_0,a_1,\ldots,a_k\}}: \{0,1\}^{k+1} \to \G:\; (b_0,\ldots,b_k)\mapsto g^{a_0\cdot \Pi_{i=1}^k a_i^{b_i}}
+F_{\{a_0,a_1,\ldots,a_k\}}: \{0,1\}^{k+1} \to \G:\; (b_0,\ldots,b_k)\mapsto g^{\Pi_{i=0}^k a_i^{b_i}}
 \end{equation}
-\begin{exercise} Consider the multiplicative group $\Z_{13}^*$ of modular $13$ arithmetic from \examplename{} \ref{ex:Zn*} and the parameter $k=3$. Choose a generator of $\Z_{13}^*$, a seed and \uterm{instantiate} a member of the family given in \eqref{prf_in_cyclic_group} for that seed. Evaluate that member on the binary string $<1,0,1>$.
+\begin{exercise} Consider the multiplicative group $\Z_{13}^*$ of modular $13$ arithmetic from \examplename{} \ref{ex:Zn*} and the parameter $k=2$. Choose a generator of $\Z_{13}^*$, a seed and \uterm{instantiate} a member of the family given in \eqref{prf_in_cyclic_group} for that seed. Evaluate that member on the binary string $<1,0,1>$.
 \end{exercise}
 %\begin{example}[p\&{}p-$\F_{13}$-drop-hash]We can consider the same pen\&paper hash function from XXX and define another hash into $\F_{13}$, by deleting the first leading bit from the hash. The result is then a $3$-digit number and therefore guaranteed to be smaller then $13$, since $13$ is equal to $(1101)$ in base $2$.
 

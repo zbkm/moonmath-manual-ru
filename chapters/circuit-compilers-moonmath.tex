@@ -249,7 +249,7 @@ snarkjs r1cs info circuit.r1cs
 \end{lstlisting}
 \end{example}
 
-\section{Common Programing concepts}
+\section{Common Programing Concepts}
 In this section, we cover concepts that appear in almost every programming language, and see how they can be implemented in circuit compilers. 
 \subsection{Primitive Types} 
 % https://zeroknowledge.fm/172-2/ reference for all the languages
@@ -257,7 +257,7 @@ Primitive data types like booleans, (unsigned) integers, or strings are the most
 
 In this section, we look at some common ways to achieve this. After a review of the atomic type for the base field where the circuit is defined on, we start with an implementation of the boolean type and its associated boolean algebra as circuits. After that, we define unsigned integers based on the boolean type, and leave the implementation of signed integers as an exercise to the reader. 
 
-\subsubsection{The base-field type} 
+\subsubsection{The Base-field Type} 
 \label{def:base_field_type}
 Since both algebraic circuits and their associated Rank-1 Constraint Systems are defined over a finite field, elements from that field are the atomic informational units in those models. In this sense, field elements $x\in \F$ are for algebraic circuits what bits are for computers. 
 
@@ -719,7 +719,7 @@ We then proceed inductively choosing circuits for the outer most operators, whic
 \end{comment}
 \sme{Is the comment group hidden on purpose?}
 
-\subsubsection{The boolean Type} 
+\subsubsection{The Boolean Type} 
 % implementations can be found here: https://github.com/filecoin-project/zexe/tree/master/snark-gadgets/src/bits
 Booleans are a classical primitive type, implemented by virtually every higher programing language. It is therefore important to implement booleans in circuits. One of the most common ways to do this is by interpreting the additive and multiplicative neutral element $\{0,1\}\subset \F$ as the two boolean values such that $0$ represents $false$ and $1$ represents $true$. Boolean operators like $and$, $or$, or $xor$ are then expressible as algebraic circuits over $\F$. 
 
@@ -2146,7 +2146,7 @@ To see how the associated circuit works, we want to enforce the binary represent
 \end{example}
 \subsection{Cryptographic Primitives}
 In applications, it is often required to do cryptography in a circuit. To do this, basic cryptographic primitives like hash functions or elliptic curve cryptography needs to be implemented as circuits. In this section, we give a few basic examples of how to implement such primitives. 
-\subsubsection{Twisted Edwards curves} Implementing elliptic curve cryptography in circuits means to implement the defining curve equations as well as the algebraic operations, like the group law or the scalar multiplication as circuits. To do this efficiently, the curve must be defined over the same base field as the field that is used in the circuit. 
+\subsubsection{Twisted Edwards Curves} Implementing elliptic curve cryptography in circuits means to implement the defining curve equations as well as the algebraic operations, like the group law or the scalar multiplication as circuits. To do this efficiently, the curve must be defined over the same base field as the field that is used in the circuit. 
 
 For efficiency reasons, it is advantageous to choose an elliptic curve such that that all required constraints and operations can be implemented with as few gates as possible. Twisted Edwards curves are particularly useful for that matter, since their group law is particularly simple and the same calculation can be used for all curve points including the point at infinity. This simplifies the circuit a lot.
 % implementations https://github.com/iden3/circomlib/blob/master/circuits/babyjub.circom

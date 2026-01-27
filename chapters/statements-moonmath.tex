@@ -295,7 +295,7 @@ Although decision functions are expressible in various ways, many contemporary p
 
 In this section, we will have a closer look at a particular type of quadratic equations called \term{Rank-1 (quadratic) Constraint Systems} (R1CS), which are a common standard in zero-knowledge proof systems (cf. appendix E of \cite{sasson-2013}). We will start with a general introduction to those constraint systems and then look at their relation to formal languages. Then we will look into a common way to compute solutions to those systems. 
 
-\subsubsection{R1CS representation} To understand what \term{Rank-1 (quadratic) Constraint Systems}) (R1CS) are in detail, let $\F$ be a field, $n$, $m$ and $k\in\N$ three numbers and $a_j^i$, $b_j^i$ and $c_j^i\in\F$ constants from $\F$ for every index $0\leq j \leq n+m$ and $1\leq i \leq k$. Then a \concept{rank-1 constraint system} is defined as the following set of $k$ many equations:\tbdsm{font size too small} 
+\subsubsection{R1CS Representation} To understand what \term{Rank-1 (quadratic) Constraint Systems}) (R1CS) are in detail, let $\F$ be a field, $n$, $m$ and $k\in\N$ three numbers and $a_j^i$, $b_j^i$ and $c_j^i\in\F$ constants from $\F$ for every index $0\leq j \leq n+m$ and $1\leq i \leq k$. Then a \concept{rank-1 constraint system} is defined as the following set of $k$ many equations:\tbdsm{font size too small} 
 
 \begin{definition}[\deftitle{Rank-1 (quadratic) Constraint System}]\label{R1CS}
 \begin{equation}\label{eq:R1CS}
@@ -493,7 +493,7 @@ Methods which compute R1CS solutions are sometimes called \term{witness generato
 It can be shown that every space- and time-bounded computation is expressible as an algebraic circuit. Transforming high-level computer programs into those circuits is a process often called \term{flattening}. We will look at those transformations in \chaptname{} \ref{chap:circuit-compilers}.
 
 In this section we will introduce our model for algebraic circuits and look at the concept of circuit execution and valid assignments. After that, we will show how to derive \concept{rank-1 constraint systems} from circuits and how circuits are useful to compute solutions to associated R1CS efficiently.
-\subsubsection{Algebraic circuit representation} To see what algebraic circuits are, let $\F$ be a field. An algebraic circuit is then a directed acyclic multi-graph that computes a polynomial function over $\F$. Nodes with only outgoing edges (source nodes) represent the variables and constants of the function and nodes with only incoming edges (sink nodes) represent the outcome of the function. All other nodes have exactly two incoming edges and represent the field operations \term{addition} as well as \term{multiplication}. Graph edges are directed and represent the flow of the computation along the nodes.
+\subsubsection{Algebraic Circuit Representation} To see what algebraic circuits are, let $\F$ be a field. An algebraic circuit is then a directed acyclic multi-graph that computes a polynomial function over $\F$. Nodes with only outgoing edges (source nodes) represent the variables and constants of the function and nodes with only incoming edges (sink nodes) represent the outcome of the function. All other nodes have exactly two incoming edges and represent the field operations \term{addition} as well as \term{multiplication}. Graph edges are directed and represent the flow of the computation along the nodes.
 
 To be more precise, in this book, we call a directed acyclic multi-graph $C(\F)$  an \term{algebraic circuit} over $\F$ if the following conditions hold:
 
@@ -1257,7 +1257,7 @@ One reason why those systems are useful in the context of succinct zero-knowledg
 
 As we will see, proving statements for languages that have decision functions defined by Quadratic Arithmetic Programs can be achieved by providing certain polynomials, and those proofs can be verified by checking a particular divisibility property of those polynomials.
  
-\subsubsection{QAP representation} To understand what Quadratic Arithmetic Programs are in detail, let $\F$ be a field and $R$ a \concept{rank-1 constraint system} over $\F$ such that the number of non-zero elements in $\F$ is strictly greater than the number $k$ of constraints in $R$. Moreover, let $a_j^i$, $b_j^i$ and $c_j^i\in\F$ for every index $0\leq j \leq n+m$ and $1\leq i \leq k$, be the defining constants of the R1CS and $m_1$, $\ldots$, $m_k$ be arbitrary, invertible and distinct elements from $\F$.
+\subsubsection{QAP Representation} To understand what Quadratic Arithmetic Programs are in detail, let $\F$ be a field and $R$ a \concept{rank-1 constraint system} over $\F$ such that the number of non-zero elements in $\F$ is strictly greater than the number $k$ of constraints in $R$. Moreover, let $a_j^i$, $b_j^i$ and $c_j^i\in\F$ for every index $0\leq j \leq n+m$ and $1\leq i \leq k$, be the defining constants of the R1CS and $m_1$, $\ldots$, $m_k$ be arbitrary, invertible and distinct elements from $\F$.
   
 Then a \term{Quadratic Arithmetic Program} associated to the R1CS $R$ is the following set of polynomials over $\F$:
 \begin{equation}

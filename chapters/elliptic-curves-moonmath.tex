@@ -7,7 +7,7 @@ A special class of elliptic curves are so-called pairing-friendly curves, which 
 
 In this chapter, we introduce elliptic curves as they are used in pairing-based approaches to the construction of SNARKs. The elliptic curves we consider are all defined over prime fields or prime field extensions, meaning that we rely heavily on the concepts and notations from \chaptname{} \ref{chap:algebra}. 
 
-\section{\concept{short Weierstrass} Curves}
+\section{\concept{Short Weierstrass} Curves}
 \label{sec:short_weierstrass_curve}
 In this section, we introduce \term{\concept{short Weierstrass} curves}, which are the most general types of curves over finite fields of characteristics greater than $3$ (see \chaptname{} \ref{def:characteristic}), and start with their so-called \term{affine representation}.\sme{do we still need the explanation of projective planes from the previous chapter? or can they be moved to this one?}\footnote{Introducing elliptic curves in their affine representation is probably not the most common and conceptually cleanest way, but we believe that such an introduction makes elliptic curves more understandable to beginners, since an elliptic curve in the affine representation is just a set of pairs of numbers, so it is more accessible to readers unfamiliar with projective coordinates. However, the affine representation has the disadvantage that a special ``point at infinity'' that is not a point on the curve, is necessary to describe the curve's group structure.}
 
@@ -15,7 +15,7 @@ We then introduce the elliptic curve group law, and describe elliptic curve scal
 
 We finish this section with an explicit equivalence that transforms the affine representations into projective representations and vice versa.
 
-\subsection{Affine \concept{short Weierstrass} form} Probably the least abstract and most straight-forward way to introduce elliptic curves for non-mathematicians and beginners is the so-called \term{affine representation} of a \term{\concept{short Weierstrass} curve}. To see what this is, let $\F$ be a finite field of characteristic $q$ with $q>3$, and let $a,b\in \F$ be two field elements such that the so-called \term{discriminant} $4a^3+ 27b^2$ is not equal to zero. Then a \term{\concept{short Weierstrass} elliptic curve} $E_{a,b}(\F)$ over $\F$ in its affine representation is the set of all pairs of field elements $(x,y)\in \F\times \F$ that satisfy the \concept{short Weierstrass} cubic equation $y^2=x^3+a\cdot x+b$, together with a distinguished symbol $\Oinf$, called the \term{point at infinity}:
+\subsection{Affine \concept{Short Weierstrass} Form} Probably the least abstract and most straight-forward way to introduce elliptic curves for non-mathematicians and beginners is the so-called \term{affine representation} of a \term{\concept{short Weierstrass} curve}. To see what this is, let $\F$ be a finite field of characteristic $q$ with $q>3$, and let $a,b\in \F$ be two field elements such that the so-called \term{discriminant} $4a^3+ 27b^2$ is not equal to zero. Then a \term{\concept{short Weierstrass} elliptic curve} $E_{a,b}(\F)$ over $\F$ in its affine representation is the set of all pairs of field elements $(x,y)\in \F\times \F$ that satisfy the \concept{short Weierstrass} cubic equation $y^2=x^3+a\cdot x+b$, together with a distinguished symbol $\Oinf$, called the \term{point at infinity}:
 
 \begin{equation}
 \label{def_short_weierstrass_curve}
@@ -178,7 +178,7 @@ sage: r.nbits()
 \begin{exercise}
 Look up the definition of curve \curvename{BLS12-381}, implement it in Sage, and compute the number of all curve points.
 \end{exercise}
-\subsubsection{Isomorphic affine \concept{short Weierstrass} curves}
+\subsubsection{Isomorphic Affine \concept{Short Weierstrass} Curves}
 \label{sec:isomorphic_curves} As explained previously in this chapter, elliptic curves are defined by pairs of parameters $(a, b)\in \F\times \F$ for some field $\F$. An important question in classifying elliptic curves is to decide which pairs of parameters $(a,b)$ and $(a',b')$ instantiate equivalent curves in the sense that there is a 1:1 correspondence between the set of curve points.
 
 To be more precise, let $\F$ be a field, and let $(a,b)$ and $(a',b')$ be two pairs of parameters such that there is an invertible field element $c\in \F^*$ such that $a' = a\cdot c^4$ and $b' = b\cdot c^6$ hold. Then the elliptic curves $E_{a,b}(\F)$ and $E_{a',b'}(\F)$ are \term{isomorphic}, and there is a map that maps the curve points of $E_{a,b}(\F)$ onto the curve points of $E_{a',b'}(\F)$:
@@ -216,7 +216,7 @@ E_{7,5}(\F_{13}) = \{ (x,y)\in \F_{13}\times \F_{13}\;|\; y^2 = x^3 + 7x +5\}
 Show that $TJJ\_13$ and $E_{7,5}(\F_{13})$ are isomorphic. Then compute the set of all points from $E_{7,5}(\F_{13})$, construct $I$ and map all points of $TJJ\_13$ onto $E_{7,5}(\F_{13})$.
 \end{exercise}
 
-\subsubsection{Affine compressed representation}
+\subsubsection{Affine Compressed Representation}
 \label{sec:affine_point_compression}
 As we have seen in \examplename{} \ref{secp256k1}, cryptographically secure elliptic curves are defined over large prime fields, where elements of those fields typically need more than $255$ bits of storage on a computer. Since elliptic curve points consist of pairs of those field elements, they need double that amount of storage.
 
@@ -259,7 +259,7 @@ sage: ZZ(PCOMPRESSED[0]).nbits()+ZZ(PCOMPRESSED[1]).nbits()
 \end{example}\sme{add explanation of how this shows what we claim}
 \end{comment}
 
-\subsection{\concept{Affine group law}}
+\subsection{\concept{Affine Group Law}}
 \label{sec:affine_group_law}
 %group law
 % http://wwwmayr.informatik.tu-muenchen.de/konferenzen/Jass07/courses/1/Lukyanenko/Lukyanenk_Paper.pdf
@@ -410,7 +410,7 @@ Consider the commutative group $(\mathit{TJJ\_13},\oplus)$ of the \curvename{Tin
 \end{enumerate}
 \end{exercise}
 
-\subsubsection{Scalar multiplication}
+\subsubsection{Scalar Multiplication}
 As we have seen in the previous section, elliptic curves $E(\F)$ have the structure of a commutative group associated to them. It can be shown that this group is finite and cyclic whenever the underlying field $\F$ is finite. As we know from \eqref{scalarmultiplication}, this implies that there is a notation of scalar multiplication associated to any elliptic curve over finite fields.
 
 To understand this scalar multiplication, recall from \defname{} \ref{cyclic-groups} that every finite cyclic group of order $n$ has a generator $g$ and an associated exponential map $g^{(\cdot)}: \Z_n \to \G$, where $g^x$ is the $x$-fold product of $g$ with itself.  
@@ -531,7 +531,7 @@ $\{[1](0,1), [2](0,1),\ldots,[8](0,1,[9](0,1)\}$ using the tangent rule only.
 \end{exercise}
 \begin{exercise} Consider \examplename{} \ref{ex:TJJ13-cofactor-clearing} and compute the scalar multiplications $[10](5,11)$ as well as $[10](9,4)$ and $[4](9,4)$ with pen and paper using the algorithm from exercise \ref{alg_double-and-add}.
 \end{exercise}
-\subsection{Projective \concept{short Weierstrass} form}
+\subsection{Projective \concept{Short Weierstrass} Form}
 % https://www.cosic.esat.kuleuven.be/bcrypt/lecture%20slides/wouter.pdf
 As we have seen in the previous section, describing elliptic curves as pairs of points that satisfy a certain equation is relatively straight-forward. However, in order to define a group structure on the set of points, we had to add a special point at infinity to act as the neutral element. 
 
@@ -606,7 +606,7 @@ Consider \examplename{} \ref{ex:E1F5-projective} and compute the set \eqref{E1F5
 Compute the projective representation of the \curvename{Tiny-jubjub} curve (\examplename{} \ref{TJJ13}) and the logarithmic order of its large prime-order subgroup with respect to the generator $[7:11:1]$ in projective coordinates.
 \end{exercise}
 
-\subsubsection{Projective Group law}
+\subsubsection{Projective Group Law}
 \label{sec:projective_group_law}
 As we saw in section \ref{sec:affine_group_law}, one of the key properties of an elliptic curve is that it comes with a definition of a group law on the set of its points, described geometrically by the chord-and-tangent rule (\defname{} \ref{def:chord-and-tangent}). This rule was fairly intuitive, with the exception of the distinguished point at infinity, which appeared whenever the chord or the tangent did not have a third intersection point with the curve.
 
@@ -816,7 +816,7 @@ Consider the elliptic curve $E_{1,1}(\F_5)$ from \examplename{} \ref{E1F5} and s
 Consider the elliptic curve \curvename{secp256k1} from \examplename{} \ref{secp256k1} and show that \curvename{secp256k1} is not a Montgomery curve.
 \end{exercise}
 
-\subsection{Affine Montgomery coordinate transformation} Comparing the Montgomery representation in \eqref{eq:TJJ13-montgomery-representation} with the \concept{short Weierstrass} representation of the same curve in \eqref{eq:TJJ13-weierstrass}, we see that there is a 1:1 correspondence between the curve points in these two examples. This is no accident. In fact, if $M_{A,B}$ is a Montgomery curve, and $E_{a,b}$ a \concept{short Weierstrass} curve with $a = \frac{3-A^2}{3B^2}$ and $b= \frac{2A^2 -9A}{27B^3}$, then the following function maps all points in Montgomery representation onto the points in \concept{short Weierstrass} representation:
+\subsection{Affine Montgomery Coordinate Transformation} Comparing the Montgomery representation in \eqref{eq:TJJ13-montgomery-representation} with the \concept{short Weierstrass} representation of the same curve in \eqref{eq:TJJ13-weierstrass}, we see that there is a 1:1 correspondence between the curve points in these two examples. This is no accident. In fact, if $M_{A,B}$ is a Montgomery curve, and $E_{a,b}$ a \concept{short Weierstrass} curve with $a = \frac{3-A^2}{3B^2}$ and $b= \frac{2A^2 -9A}{27B^3}$, then the following function maps all points in Montgomery representation onto the points in \concept{short Weierstrass} representation:
 \begin{equation}
 I: M_{A,B} \to E_{a,b}\; : \; (x,y) \mapsto \left(\frac{3x + A}{3B}, \frac{y}{B}\right)
 \end{equation}
@@ -869,7 +869,7 @@ sage: MTJJ == IINV_WTJJ
 \end{sagecommandline}
 \end{example}
 
-\subsection{Montgomery group law} We have seen that Montgomery curves are special cases of \concept{short Weierstrass} curves. As such, they have a group structure defined on the set of their points, which can also be derived from the chord-and-tangent rule. In accordance with \concept{short Weierstrass} curves, it can be shown that the identity $x_1=x_2$ implies $y_2=\pm y_1$, meaning that the following rules are a complete description of the elliptic curve group law:
+\subsection{Montgomery Group Law} We have seen that Montgomery curves are special cases of \concept{short Weierstrass} curves. As such, they have a group structure defined on the set of their points, which can also be derived from the chord-and-tangent rule. In accordance with \concept{short Weierstrass} curves, it can be shown that the identity $x_1=x_2$ implies $y_2=\pm y_1$, meaning that the following rules are a complete description of the elliptic curve group law:
 
 \begin{definition}[\deftitle{Montgomery group law}]\label{def:montgomery-group-law}
 \defvsep{}
@@ -993,7 +993,7 @@ sage: L_ETJJ = []
 sage: ETJJ = Set(L_ETJJ)
 \end{sagecommandline}
 \end{example}
-\subsection{Twisted Edwards group law}
+\subsection{Twisted Edwards Group Law}
 \label{sec:twisted_ed_group_law} As we have seen, \concept{twisted Edwards} curves are equivalent to Montgomery curves, and, as such, they also have a group law. However, in contrast to Montgomery and \concept{short Weierstrass} curves, the group law of SNARK-friendly \concept{twisted Edwards} curves can be described by a single computation that works in all cases, even if we add the neutral element, the inverse, or if we have to double a point. 
 
 To see what the \concept{twisted Edwards} group law looks like, let $(x_1, y_1)$, $(x_2, y_2)$ be two points on an Edwards curve $E(\F)$. The sum of those points is then given by the following equation:
@@ -1170,7 +1170,7 @@ sage: k
 
 
 
-\subsubsection{Elliptic Curves over extension fields}
+\subsubsection{Elliptic Curves over Extension Fields}
 \label{sec:curve-extensions}
 \sme{TODO:Rewrite intro together with Sven} Suppose that $p$ is a prime number, and $\F_p$ its associated prime field. We know from equation \eqref{eq:prime-extension-field} that the fields $\F_{p^m}$ are extensions of $\F_p$ in the sense that $\F_{p}$ is a subfield of $\F_{p^m}$. This implies that we can extend the affine plane that an elliptic curve is defined on by changing the base field to any extension field. To be more precise, let 
 $E(\F)=\{ (x,y)\in \F \times \F \;|\; y^2 = x^3 +a\cdot x +b \}$ be an affine \concept{short Weierstrass} curve, with parameters $a$ and $b$ taken from $\F$. If $\F'$ is an extension field of $\F$, then we extend the domain of the curve by defining $E(\F')$ as follows:
@@ -1216,7 +1216,7 @@ As we can see, the set of points from the elliptic curve $E_{1,1}(\F_5)$ is a su
 \label{exercise:BN128-extension}
 Consider the \curvename{alt\_bn128} curve and its associated base field $\F_p$ from \examplename{} \ref{BN128}. As we know from example \ref{ex:embedding_degre_BN128} this curve has an embedding degree of $12$. Use Sage to find an irreducible polynomial $P\in \F_p[t]$ and write a sage program to implement the finite field extension $\F_{p^{12}}$ and to implement the curve extension $alt\_bn128(\F_{p^{12}})$ and compute the number of curve points.
 \end{exercise}
-\subsection{Full torsion groups}
+\subsection{Full Torsion Groups}
 \label{sec:full-torsion} As we will see in what follows, cryptographically interesting pairings are defined on so-called torsion subgroups of elliptic curves. To define \term{torsion groups} of an elliptic curve, let $\F$ be a finite field, $E(\F)$ an elliptic curve of order $n$ and $r$ a factor of $n$. Then the \term{$r$-torsion group} of the elliptic curve $E(\F)$ is defined as the set
 \begin{equation}
 \label{def:torsion_group}
@@ -1319,7 +1319,7 @@ This means that the embedding degree is very large, which implies that the field
  Consider the curve \curvename{alt\_bn128} from \examplename{} \ref{BN128} and its curve extension from exercise \ref{exercise:BN128-extension}. Write a Sage program that computes a generator from the curves full torsion group.
 \end{exercise}
 
-\subsection{Pairing groups}
+\subsection{Pairing Groups}
 \label{sec:pairing_groups}
  As we have stated above, any full $r$-torsion group contains $r+1$ cyclic subgroups, two of which are of particular interest in pairing-based elliptic curve cryptography. To characterize these groups, we need to consider the so-called \term{Frobenius endomorphism} of an elliptic curve $E(\F)$ over some finite field $\F$ of characteristic $p$:
 \begin{equation}\label{eq:frobenius-enomorphism}
@@ -1420,7 +1420,7 @@ Consider the small prime factor $2$ of the \curvename{Tiny-jubjub} curve. Comput
 \end{exercise}
 
 
-\subsection{The Weil pairing}
+\subsection{The Weil Pairing}
 \label{sec:weil-pairing} Recall the definition of a non-degenerate group pairing from \ref{pairing-map}. In this part, we consider a pairing function defined on
 the subgroups $\G_1[r]$ and $\G_2[r]$ of the full $r$-torsion $E[r]$ of a \concept{short Weierstrass} elliptic curve. To be more precise, let $E(\F_p)$ be an elliptic curve of embedding degree $k$ such that $r$ is a prime factor of its order. Then the \term{Weil pairing} is defined as the following bilinear, non-degenerate map:
 
@@ -1511,7 +1511,7 @@ Consider the curve \curvename{alt\_bn128} from \examplename{} \ref{BN128} and th
 
 As we have seen in section \ref{sec:hashing-to-groups}, some general methods are known for hashing into finite cyclic groups and since elliptic curves over finite fields are finite and cyclic groups, those methods can be utilized in this case, too. However, in what follows we want to describe some methods specific to elliptic curves that are frequently used in real-world applications. 
 
-\subsection{Try-and-increment hash functions}
+\subsection{Try-and-increment Hash Functions}
 One of the most straight-forward ways of hashing onto an elliptic curve point in a secure way is to use a cryptographic hash function together with one of the hashing into modular arithmetics methods as described in section \ref{hash-to-modular-arithmetics}.
 
 Both constructions can be combined in such a way that the image provides an element of the base field of the elliptic curve together with a single auxiliary bit. The base field element can then be interpreted as the $x$-coordinate of a potential curve point, and the auxiliary bit can be used to determine one of the two possible $y$ coordinates of that curve point as explained in \ref{sec:affine_point_compression}.
@@ -1600,7 +1600,7 @@ Use our definition of the $try\_hash$ algorithm to implement a hash function $H_
 \begin{exercise}
 Implement a cryptographic hash function $H_{secp256k1} : \{0,1\}^*\to secp256k1$ that maps binary strings of arbitrary length onto the elliptic curve \curvename{secp256k1}. 
 \end{exercise}
-\section{Constructing elliptic curves} Cryptographically secure elliptic curves like \curvename{secp256k1} \ref{secp256k1} have been known for quite some time. Given the latest advancements in cryptography, however, it is often necessary to design and instantiate elliptic curves from scratch that satisfy certain very specific properties. 
+\section{Constructing Elliptic Curves} Cryptographically secure elliptic curves like \curvename{secp256k1} \ref{secp256k1} have been known for quite some time. Given the latest advancements in cryptography, however, it is often necessary to design and instantiate elliptic curves from scratch that satisfy certain very specific properties. 
 
 For example, in the context of SNARK development, it became necessary to design elliptic curves that can be efficiently implemented inside of a so-called \uterm{algebraic circuit} in order to enable primitives like elliptic curve \uterm{signature schemes} in a zero-knowledge proof. Such a curve is given by the Baby-jubjub curve as defined in \cite{whitehat-21}, and we have paralleled its definition by introducing the \curvename{Tiny-jubjub} curve from \examplename{} \ref{TJJ13}. As we have seen, those curves are instances of so-called \concept{twisted Edwards} curves, and as such have easy to implement addition laws that work without branching. However, we introduced the \curvename{Tiny-jubjub} curve out of thin air, as we just gave the curve parameters without explaining how we came up with them.
 
@@ -1704,7 +1704,7 @@ sage: j == F(0)
 \label{exercise:BN128-j-inv}
 Consider the curve \curvename{alt\_bn128} from \examplename{} \ref{BN128}. Write a Sage program that computes the $j$-invariant for \curvename{alt\_bn128}.
 \end{exercise}
-\subsection{The \concept{complex multiplication method}}\label{complex-multiplication-method}
+\subsection{The \concept{Complex Multiplication Method}}\label{complex-multiplication-method}
 As we have seen in the previous sections, elliptic curves have various defining properties, like their order, their prime factors, the embedding degree, or the order of the base field. The \term{\concept{complex multiplication method}} (CM) provides a practical way of constructing elliptic curves with pre-defined restrictions on the order of the curve and the base field.\footnote{A detailed explanation of the complex multiplication
 method and its derivation can be found, for example, in \cite{grech-2012}.}
 
@@ -2027,7 +2027,7 @@ y^2 = x^3 + 7
 $,
 which we might call \curvename{secp256k1}. As we have just seen, the \concept{complex multiplication method} is powerful enough to derive cryptographically secure curves like \curvename{secp256k1} from scratch.
 \end{example}
-%\section{twists}
+%\section{Twists}
 %I think this has to wait for Volume 2, due to timing constraints...
 \begin{exercise}
 \label{ex:Low_order_Hilbert_polys} Show that the Hilbert class polynomials for the CM-discriminants $D=-3$ and $D=-4$ are given by  $H_{-3,q}(x)=x$ and $H_{-4,q}= x-(\Zmod{1728}{q})$.
@@ -2042,7 +2042,7 @@ Use the complex multiplication method to compute all isomorphism classes of all 
 \label{exercise:BN128-cm-method}
 Consider the prime modulus $p$ of curve \curvename{alt\_bn128} from \examplename{} \ref{BN128} and its trace $t$ from exercise \ref{exercise:BN128-cm-method}. Use the complex multiplication method to synthesize an elliptic curve over $F_p$ that is isomorphic to \curvename{alt\_bn128} and compute an explicit isomorphism between these two curves.
 \end{exercise}
-\subsection{The $BLS6\_6$ pen-and-paper curve}\label{BLS6}
+\subsection{The $BLS6\_6$ Pen-and-paper Curve}\label{BLS6}
 
 % https://arxiv.org/pdf/1207.6983.pdf
 % construction 6.6 in https://eprint.iacr.org/2006/372.pdf
@@ -2151,7 +2151,7 @@ BLS63p = BLS63.plot()
 
 As we can see, our curve has some desirable properties: it does not contain self-inverse points, that is, points with $y=0$. It follows that the addition law can be optimized, since the branch for those cases can be eliminated. 
 
-\subsubsection{The large prime order subgroup}
+\subsubsection{The Large Prime Order Subgroup}
 Summarizing the previous procedure, we have used the method of Barreto, Lynn and Scott\sme{add reference} to construct a pairing-friendly elliptic curve of embedding degree $6$. However, in order to do elliptic curve cryptography on this curve, note that, since the order of $BLS6\_6$ is $39$, its group is not of prime order. We therefore have to find a suitable subgroup as our main target. Since $39=13\cdot 3$, we know that the curve must contain a ``large'' prime-order group of size $13$ called $BLS6\_6(\F_{43})[13]$ according to definition \ref{def:torsion_group} and a small cofactor group of order $3$. We use the following notation for the large prime order group
 \begin{equation}
 \label{def:BLS6613}
@@ -2244,7 +2244,7 @@ Compute the following expressions: $-(26,34)$, $(26,9)\oplus(13,28)$, $(35,15)\o
 %To see how the small prime-order group of $BLS6\_6$ looks like we can apply the same approach but for the cofactor $13$ instead (EXERCISE). We get 
 %$$BLS6\_6[3]=\{\mathcal{O},(0,7),(0,36)\}$$
 %Now that we ha
-\subsubsection{Pairing groups}
+\subsubsection{Pairing Groups}
 \label{sec:bls66-pairing-groups}
 We know that $BLS6\_6$ is a pairing-friendly curve by design, since it has a small embedding degree $k=6$. It is therefore possible to compute Weil pairings efficiently. However, in order to do so, we have to decide the pairing groups $\G_1$ and $\G_2$ as defined in section \ref{sec:pairing_groups}. 
 
@@ -2326,7 +2326,7 @@ Again, having a logarithmic description of $\G_2[13]$ is helpful in pen-and-pape
 \end{align*}
 As this computation shows \ref{BLS6-G2-log} is really all we need to do computations in $\G_2[13]$ efficiently. The groups $\G_1[13]$ and $\G_2[13]$ are therefore suitable as pen-and-paper cryptographic pairing groups. 
 
-\subsubsection{The Weil pairing}
+\subsubsection{The Weil Pairing}
 In \ref{sec:bls66-pairing-groups} we computed two different groups, $\G_1[13]$ and $\G_2[13]$, which are subgroups of the full $13$-torsion group of the extended moon-math-curve $BLS6\_6(\F_{43^6})$. As explained in \ref{sec:weil-pairing}, this implies that there is a Weil pairing 
 \begin{equation}
 \label{BLS6-weil-pairing}
@@ -2361,7 +2361,7 @@ Consider the extended $BLS6\_6$ curve as defined in \ref{def:extended-bls6} and 
 $e(g1,g2)$ using definition \ref{eq:weil-pairing} and Miller's algorithm \ref{alg:millersalgo}.
 \end{exercise}
 \begin{comment}
-\subsection{Hashing to pairing groups}
+\subsection{Hashing to Pairing Groups}
 We give various constructions to hash into $\mathbb{G}_1$ and $\mathbb{G}_2$. 
 
 We start with hashing to the scalar field... \smelong{TO APPEAR}\sme{finish writing this up}

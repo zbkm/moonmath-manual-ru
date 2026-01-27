@@ -4,7 +4,7 @@
 
 The goal of this chapter is to bring a reader with only basic school-level algebra up to speed in arithmetic. We start with a brief recapitulation of basic integer arithmetics, discussing long division, the greatest common divisor and \concept{Euclidean division}. After that, we introduce modular arithmetic as \hilight{the most important} skill to compute our pen-and-paper examples. We then introduce polynomials, compute their analogs to integer arithmetics and introduce the important concept of \concept{Lagrange interpolation}.
 
-\section{Integer arithmetic}
+\section{Integer Arithmetic}
 \label{integer_arithmetic}
 In a sense, integer arithmetic is at the heart of large parts of modern cryptography. Fortunately, most readers will probably remember integer arithmetic from school. It is, however, important that you can confidently apply those concepts to understand and execute computations in the many pen-and-paper examples that form an integral part of the MoonMath Manual. We will therefore recapitulate basic arithmetic concepts to refresh your memory and fill any knowledge gaps.
 
@@ -12,7 +12,7 @@ Even though the terms and concepts in this chapter might not appear in the liter
 
 Many of the ideas presented in this chapter are taught in basic mathematical education in most schools around the globe. Much of the ideas presented in this section can be found in \cite{wu-1}. An approach more oriented towards computer science can be found in \cite{mignotte-1992}.
 
-\subsection{Integers, natural numbers and rational numbers}
+\subsection{Integers, Natural Numbers and Rational Numbers}
 
 Integers are also known as \term{whole numbers}, that is, numbers that can be written without fractional parts. Examples of numbers that are \hilight{not} integers are $\frac{2}{3}$, $1.2$ and $-1280.006$.\footnote{Whole numbers, along with their basic laws of operations, are introduced for example in chapters 1 – 6 of \cite{wu-1}.}
 
@@ -113,7 +113,7 @@ Compute the set of all solutions $x$ under the following assumptions:
 \end{enumerate}
 \end{exercise}
 
-\subsection{\concept{Euclidean division}}
+\subsection{\concept{Euclidean Division}}
 \label{Euclidean_division}
 As we know from high school mathematics, integers can be added, subtracted and multiplied, and the result of these operations is guaranteed to always be an integer as well.
 On the contrary, division (in the commonly understood sense) is not defined for integers, as, for example, $7$ divided by $3$ will not result in an integer. However, it is always possible to divide any two integers if we consider \term{division with a remainder}. For example, $7$ divided by $3$ is equal to $2$ with a remainder of $1$, since $7 = 2\cdot 3 + 1$.
@@ -363,7 +363,7 @@ n = & \sum_{i=0}^4 j_i\cdot 16^{i} \\
 \begin{exercise}Consider the \term{octal} positional system, which represents integers with 8 digits, usually written as $\{0,1,2,3,4,5,6,7\}$. Numbers in this system are characterized by the prefix $0o$. Write the numbers $0o1354$ and $0o777$ into their decimal representation.
 \end{exercise}
 
-\section{Modular arithmetic}
+\section{Modular Arithmetic}
 \label{modular_arithmetic}
 \term{Modular arithmetic} is a system of integer arithmetic where numbers ``wrap around'' when reaching a certain value, much like calculations on a clock wrap around whenever the value exceeds the number $12$. For example, if the clock shows that it is $11$ o'clock, then $20$ hours later it will be $7$ o'clock, not $31$ o'clock. The number $31$ has no meaning on a normal clock that shows hours.
 
@@ -473,7 +473,7 @@ sage: (ZZ(7)* (ZZ(2)*ZZ(4) + ZZ(21)) + ZZ(11))  % ZZ(6) == (ZZ(4) - ZZ(102))  % 
 sage: (ZZ(7)* (ZZ(2)*ZZ(76) + ZZ(21)) + ZZ(11))  % ZZ(6) == (ZZ(76) - ZZ(102))  % ZZ(6)
 \end{sagecommandline}
 \end{example}
-If you had not been familiar with modular arithmetic until now and who might be discouraged by how complicated modular arithmetic seems at this point, you should keep two things in mind. First, computing congruences in modular arithmetic is not really more complicated than computations in more familiar number systems (e.g. rational numbers), it is just a matter of getting used to it. Second, once we introduce the idea of remainder class representations in \ref{def:remainder_class_representation}, computations become conceptually cleaner and easier to handle.
+If you are not yet familiar with modular arithmetic and feel discouraged by how complicated modular arithmetic seems at this point, you should keep two things in mind. First, computing congruences in modular arithmetic is not really more complicated than computations in more familiar number systems (e.g. rational numbers), it's just a matter of getting used to it. Second, once we introduce the idea of remainder class representations in \ref{def:remainder_class_representation}, computations become conceptually cleaner and easier to handle.
 \begin{exercise}
 \label{exercise_congruence_in_F13}
 Consider the modulus $13$ and find all solutions $x\in \Z$ to the following congruence: $$\kongru{5x+4}{28+2x}{13}$$
@@ -789,7 +789,7 @@ Find the set of all solutions to the congruence $\kongru{17(2x+5)-4}{2x+4}{5}$. 
 \begin{exercise}
 Find the set of all solutions to the congruence $\kongru{17(2x+5)-4}{2x+4}{6}$. Then project the congruence into $\Z_6$ and try to solve the resulting equation in $\Z_6$.
 \end{exercise}
-\section{Polynomial arithmetic}
+\section{Polynomial Arithmetic}
 \label{sec:polynomial_arithmetics}
 A polynomial is an expression consisting of variables (also called indeterminates) and coefficients that involves only the operations of addition, subtraction and multiplication. All coefficients of a polynomial must have the same type, e.g. they must all be integers or they must all be rational numbers, etc.\footnote{An introduction to the theory of polynomials can be found, for example, in \chaptname{} 3 of \cite{mignotte-1992} and a detailed description of many algorithms used in computations on polynomials are given in \chaptname{} 3 of \cite{cohen-2010}.}
 
@@ -928,7 +928,7 @@ sage: p1(Z6(2)) == Z6(5)
 \begin{exercise}
 Compare both expansions of $P_7$ from $\Z[x]$ in \examplename{} \ref{example:integer_polynomials} and from  from $\Z_6[x]$ in \examplename{} \ref{example:integer_mod_6_polynomials} , and consider the definition of $\Z_6$ as given in \examplename{} \ref{def_residue_ring_z_6}. Can you see how the definition of $P_7$ over $\Z$ projects to the definition over $\Z_6$ if you consider the residue classes of $\Z_6$?\sme{the task could be defined more clearly}
 \end{exercise}
-\subsection{Polynomial arithmetic}\sme{this is the same as the section title}
+\subsection{Polynomial Arithmetic}\sme{this is the same as the section title}
 Polynomials behave like integers in many ways. In particular, they can be added, subtracted and multiplied. In addition, they have their own notion of \concept{Euclidean division}. Informally speaking, we can add two polynomials  by simply adding the coefficients of the same index, and we can multiply them by applying the distributive property, that is, by multiplying every term of the left factor with every term of the right factor and adding the results together.
 
 To be more precise, let $ \sum _{n = 0} ^{m_1}{a} _{n}{x} ^{n} $ and
@@ -988,7 +988,7 @@ sage: P*Q == Z6x(5*x^5 +4*x^4 +4*x^3+3*x^2+4*x +4)
 \begin{exercise}
 Compare the sum $P+Q$ and the product $P\cdot Q$ from the previous two examples \ref{example:integer_polynomial_arithmetic_1} and \ref{example:integer_mod_6_polynomial_arithmetic_1}, and consider the definition of $\Z_6$ as given in \examplename{} \ref{def_residue_ring_z_6}. How can we derive the computations in $\Z_6[x]$ from the computations in $\Z[x]$?
 \end{exercise}
-\subsection{\concept{Euclidean division} with polynomials}
+\subsection{\concept{Euclidean Division} with Polynomials}
 The arithmetic of polynomials shares a lot of properties with the arithmetic of integers. As a consequence, the concept of \concept{Euclidean division} and the algorithm of long division is also defined for polynomials. Recalling the \concept{Euclidean division} of integers \ref{Euclidean_division}, we know that, given two integers $a$ and $b\neq 0$, there is always another integer $m$ and a natural number $r$ with $r<|b|$ such that $a = m\cdot b +r$ holds.
 
 We can generalize this to polynomials whenever the leading coefficient of the dividend polynomial has a notion of multiplicative inverse. In fact, given two polynomials $A$ and $B\neq 0$ from $R[x]$ such that $Lc(B)^{-1}$ exists in $R$, there exist two polynomials $Q$ (the quotient) and $P$ (the remainder), such that the following equation holds and $deg(P) < deg(B)$:
@@ -1121,11 +1121,11 @@ Show that if the sum of the multiplicity of all roots of a polynomial $P\in R[x]
 \begin{exercise}
 Consider the polynomial $P=x^7 + 3 x^6 + 3 x^5 + x^4 - x^3 - 3 x^2 - 3 x - 1\in \Z_6[x]$. Compute the set of all roots of $R_0(P)$ and then compute the prime factorization of $P$.
 \end{exercise}
-\subsection{\concept{Lagrange interpolation}}
+\subsection{\concept{Lagrange Interpolation}}
 One particularly useful property of polynomials is that a polynomial of degree $m$ is completely determined on $m+1$ evaluation points, which implies that we can uniquely derive a polynomial of degree $m$ from a set $S$:
 \begin{equation}
 \label{def_lagrange_interpolation_set}
-S= \{(x_0,y_0), (x_1,y_1),\ldots,(x_m,y_m)\;|\; x_i\neq x_j\text{ for all indices i and j}\}
+S= \{(x_0,y_0), (x_1,y_1),\ldots,(x_m,y_m)\;|\; x_i\neq x_j\text{ for all indices $ i $ and $ j $}\}
 \end{equation}
 Polynomials therefore have the property that $m+1$ pairs of points $(x_i,y_i)$ for $x_i\neq x_j$ are enough to determine the set of pairs $(x,P(x))$ for all $x\in R$. This ``few too many'' property of polynomials is widely used, including in SNARKs. Therefore, we need to understand the method to actually compute a polynomial from a set of points.
 
@@ -1135,7 +1135,7 @@ If the coefficients of the polynomial we want to find have a notion of multiplic
 \label{alg_lagrange_interplation}
 \begin{algorithmic}[0]
 \Require $R$ must have multiplicative inverses
-\Require $S= \{(x_0,y_0), (x_1,y_1),\ldots,(x_m,y_m)\;|\; x_i,y_i\in R, x_i\neq x_j\text{ for all indices i and j}\}$
+\Require $S= \{(x_0,y_0), (x_1,y_1),\ldots,(x_m,y_m)\;|\; x_i,y_i\in R, x_i\neq x_j\text{ for all indices $ i $ and $ j $}\}$
 \Procedure{Lagrange-Interpolation}{$S$}
 \For{$j \in (0\ldots m)$}
 \State  $l_j(x) \gets \Pi_{i=0;i\neq j}^{m}\frac{x-x_i}{x_j-x_i} = \frac{(x-x_0)}{(x_j-x_0)} \cdots \frac{(x-x_{j-1})}{(x_j-x_{j - 1})} \frac{(x-x_{j+1})}{(x_j-x_{j+1})} \cdots \frac{(x-x_m)}{(x_j-x_m)}$

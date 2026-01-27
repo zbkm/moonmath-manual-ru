@@ -23,10 +23,10 @@ A \term{commutative group} $(\G,\cdot) $ consists of a set $\G$ and a \term{map}
 \item \hilight{Commutativity}: For all $g_1,g_2\in\G$, the equation $g_1\cdot g_2=g_2\cdot g_1$ holds.
 \item \hilight{Associativity}: For every $g_1,g_2,g_3\in\G$ the equation
 $g_1\cdot(g_2\cdot g_3) = (g_1\cdot g_2)\cdot g_3$ holds.
-\item \hilight{Existence of a neutral element}:  For every $g\in\G$, there is an $e\in\G$ such that $e\cdot g=g$.
+\item \hilight{Existence of a neutral element}: For every $g\in\G$, there is an $e\in\G$ such that $e\cdot g=g$.
 \item \hilight{Existence of an inverse}: For every $g\in\G$, there is an $g^{-1}\in\G$ such that $g\cdot g^{-1}=e$.
 \end{itemize}
-If $(\G,\cdot)$ is a group, and $\G'\subset\G$ is a subset of $\G$ such that the \term{restriction} of the group law $\cdot: \G'\times \G' \to \G'$ is a group law on $\G'$, then $(\G',\cdot)$ is called a \term{subgroup} of $(\G,\cdot)$.
+If $(\G,\cdot)$ is a group, and $\G'\subseteq\G$ is a subset of $\G$ such that the \term{restriction} of the group law $\cdot: \G'\times \G' \to \G'$ is a group law on $\G'$, then $(\G',\cdot)$ is called a \term{subgroup} of $(\G,\cdot)$.
 \end{definition}
 
 Rephrasing the abstract definition in layman's terms, a group is something where we can do computations in a way that resembles the behavior of the addition of integers. Specifically, this means we can combine some element with another element into a new element in a way that is reversible and where the order of combining elements doesn't matter.
@@ -68,7 +68,7 @@ The previous example of a commutative group is a very important one for this boo
 
 Find a condition such that $(\Z^*_n,\cdot)$ is a commutative group, compute the neutral element, give a closed form for the inverse of any element and prove the commutative group axioms.
 \end{exercise}
-\subsection{Finite groups}
+\subsection{Finite Groups}
 \label{sec:finite-groups}
  As we have seen in the previous examples, groups can either contain infinitely many elements (such as integers) or finitely many elements (as for example the remainder class groups $(\Z_n,+)$). To capture this distinction, a group is called a \term{finite group} if the underlying set of elements is finite. In that case, the number of elements of that group is called its \term{order}.\footnote{An introduction to finite groups is given in \chaptname{} 1 of \cite{fuchs-2015}. An introduction from the perspective of cryptography can be found in \chaptname{} 3, \secname{} 8.3.1 of \cite{katz-2007}.}
 \begin{notation}
@@ -85,7 +85,7 @@ Consider the remainder class groups $(\Z_6,+)$ from example \ref{def_residue_rin
 Of course, every group $\G$ has a trivial set of generators, when we just consider every element of the group to be in the generator set. The more interesting question is to find smallest possible generator set for a given group. Of particular interest in this regard are groups that have a generator set that contains a single element only. In this case, there exists a (not necessarily unique) element $g\in\G$ such that every other element from $\G$ can be computed by the repeated combination of $g$ and its inverse $g^{-1}$ only. 
 
 \begin{definition}[\deftitle{Cyclic groups}]\label{cyclic-groups}
-Groups with single, not necessarily unique, generators are called \term{cyclic groups} and any element $g\in \G$ that is able to generate $\G$ is called a \term{generator}.
+A group $\G$ is called a \term{cyclic group} if there exists at least one element $g\in \G$, referred to as a \term{generator}, such that it can generate every element of $G$.
 \end{definition}
 
 \begin{example}
@@ -103,7 +103,7 @@ Consider the group $(\Z_6,+)$ of modular 6 addition from example \ref{def_residu
 \begin{exercise}\label{ex:modulus-prime-group} Let $p\in\mathbb{P}$ be prime number and $(\Z_p^*,\cdot)$ the finite group from exercise \ref{ex:Zn*}. Show that $(\Z_p^*,\cdot)$ is cyclic.
 \end{exercise}
 
-\subsection{The exponential map}
+\subsection{Exponential Maps}
 Observe that, when $\G$ is a cyclic group of order $n$ and $g\in \G$ is a generator of $\G$, then there exists a so-called \textbf{exponential map}, which maps the additive group law of the remainder class group $(\Z_n,+)$ onto the group law of $\G$ in a one-to-one correspondence. The exponential map can be formalized as in \eqref{exponentialmap} below (where $g^x$ means ``multiply $g$ by itself $x$ times'' and $g^0=e_{\G}$).
 
 \begin{equation}\label{exponentialmap}
@@ -146,7 +146,7 @@ Cryptographic applications often utilize finite cyclic groups of a very large or
 \end{algorithm}
 
 Because the exponential map respects the group law, it doesn't matter if we do our computation in $\Z_n$ before we write the result into the exponent of $g$ or afterwards: the result will be the same in both cases. The latter method is usually referred to as doing computations ``in the exponent''. In cryptography in general, and in SNARK development in particular, we often perform computations ``in the exponent'' of a generator.
-\begin{example}\label{ex:in-the-exponent} Consider the multiplicative group $(\Z_{5}^*,\cdot)$ from exercise \ref{fstar}. We know from \ref{ex:modulus-prime-group} that $\Z_{5}^*$ is a cyclic group of order $4$, and that the element $3\in\Z_5^*$ is a generator. This means that we also know that the following map respects the group law of addition in $\Z_4$ and the group law of multiplication in $\Z_5^*$:
+\begin{example}\label{ex:in-the-exponent} Consider the multiplicative group $(\Z_{5}^*,\cdot)$ from exercise \ref{fstar}. We know from \exercisename{} \ref{ex:modulus-prime-group} that $\Z_{5}^*$ is a cyclic group of order $4$, and that the element $3\in\Z_5^*$ is a generator. This means that we also know that the following map respects the group law of addition in $\Z_4$ and the group law of multiplication in $\Z_5^*$:
 $$
 3^{(\cdot)}: \Z_4 \to \Z_5^* \;;\; x \mapsto 3^x
 $$
@@ -385,7 +385,7 @@ From this, it follows that whenever $p$ is a Fermat's prime, the discrete logari
 \end{example}
 \end{comment}
 
-\subsubsection{The decisional Diffie--Hellman assumption}
+\subsubsection{The Decisional Diffie--Hellman Assumption}
 \label{def:DDH-secure}
 
 \begin{definition}
@@ -440,7 +440,7 @@ Several variations and special cases of CDH exist. For example, the \term{square
 
 \subsection{Hashing to Groups}\label{sec:hashing-to-groups}
 % https://crypto.stackexchange.com/questions/78017/simple-hash-into-a-prime-field
-\subsubsection{Hash functions}\label{sec:hash-functions} Generally speaking, a hash function is any function that can be used to map data of arbitrary size to fixed-size values. Since binary strings of arbitrary length are a way to represent data in general, we can understand a \textbf{hash function} as the following map where $\{0,1\}^*$ represents the set of all binary strings of arbitrary but finite length and $\{0,1\}^k$ represents the set of all binary strings that have a length of exactly $k$ bits:
+\subsubsection{Hash Functions}\label{sec:hash-functions} Generally speaking, a hash function is any function that can be used to map data of arbitrary size to fixed-size values. Since binary strings of arbitrary length are a way to represent data in general, we can understand a \textbf{hash function} as the following map where $\{0,1\}^*$ represents the set of all binary strings of arbitrary but finite length and $\{0,1\}^k$ represents the set of all binary strings that have a length of exactly $k$ bits:
 \begin{equation}
 \label{def:hash_function}
 H: \{0,1\}^* \to \{0,1\}^k
@@ -457,18 +457,18 @@ $s||s'=<b_1,b_2,\ldots,b_k,b'_1,b'_2,\ldots,b'_l>$.
 If $H$ is a hash function that maps binary strings of arbitrary length onto binary strings of length $k$, and $s\in\{0,1\}^*$ is a binary string, we write $H(s)_j$ for the bit at position $j$ in the image $H(s)$.
 \end{notation}
 
-\begin{example}[$k$-truncation hash]\label{ex:k-truncation-hash} One of the most basic hash functions $H_k:\{0,1\}^*\to \{0,1\}^k$ is given by simply truncating every binary string $s$ of size $|s|> k$ to a string of size $k$ and by filling any string $s'$ of size $|s'|<k$ with zeros. To make this hash function deterministic, we define that both truncation and filling should happen on the highest bits, or ``on the left''.
+\begin{example}[$k$-truncation hash]\label{ex:k-truncation-hash} One of the most basic hash functions $H_k:\{0,1\}^*\to \{0,1\}^k$ is given by simply truncating every binary string $s$ of size $|s|> k$ to a string of size $k$ and by padding any string $s'$ of size $|s'|<k$ with zeros. To make this hash function deterministic, we define that both truncation and padding should happen on the highest bits, or ``on the left''.
 
-For example, if the parameter $k$ is given by $k=3$, $s_1=<0,0,0,0,1,0,1,0,1,1,1,0>$ and $s_2=1$, then $H_3(s_1)=<1,1,0>$ and $H_3(s_2)=<0,0,1>$.
+For example, if the parameter $k$ is given by $k=3$, $s_1=<0,0,0,0,1,0,1,0,1,1,1,0>$ and $s_2=<1>$, then $H_3(s_1)=<1,1,0>$ and $H_3(s_2)=<0,0,1>$.
 \end{example}
 
 A desirable property of a hash function is \term{uniformity}, which means that it should map input values as evenly as possible over its output range. In mathematical terms, every string of length $k$  from $\{0,1\}^k$ should be generated with roughly the same probability.
 
-Of particular interest are so-called \term{cryptographic} hash functions, which are hash functions that are also \term{one-way functions}, which essentially means that, given a string $y$ from $\{0,1\}^k$ it is infeasible to find a string $x\in\{0,1\}^*$ such that $H(x)=y$ holds. This property is usually called \term{preimage-resistance}.
+Of particular interest are so-called \term{cryptographic} hash functions, which are hash functions that are also \term{one-way functions}, which essentially means that, given a string $y$ from $\{0,1\}^k$ it is infeasible to find a string $x\in\{0,1\}^*$ such that $H(x)=y$ holds. This property is usually called \term{preimage resistance}.
 
-Moreover, if a string $x_1\in\{0,1\}^*$ is given, then it should be infeasible to find another string $x_2\in\{0,1\}^*$ with $x_1\neq x_2$ and $H(x_1)=H_(x_2)$
+Moreover, if a string $x_1\in\{0,1\}^*$ is given, then it should be infeasible to find another string $x_2\in\{0,1\}^*$ with $x_1\neq x_2$ and $H(x_1)=H(x_2)$. This is often referred to as \term{second preimage resistance} property.
 
-In addition, it should be infeasible to find two strings $x_1,x_2 \in\{0,1\}^*$ such that $H(x_1)=H(x_2)$, which is called \term{collision resistance}. It is important to note, though, that collisions always exist, since a function $H: \{0,1\}^* \to \{0,1\}^k$ inevitably maps infinitely many values onto the same hash. In fact, for any hash function with digests of length $k$, finding a preimage to a given digest can always be done using a brute force search in $2^k$ evaluation steps. It should just be practically impossible to compute those values, and statistically very unlikely to generate two of them by chance.
+In addition, it should be infeasible to find two distinct strings $x_1,x_2 \in\{0,1\}^*$ such that $H(x_1)=H(x_2)$, which is called \term{collision resistance}. It is important to note, though, that collisions always exist, since a function $H: \{0,1\}^* \to \{0,1\}^k$ inevitably maps infinitely many values onto the same hash. In fact, for any hash function with digests of length $k$, finding a preimage to a given digest can always be done using a brute force search in $2^k$ evaluation steps. It should just be practically impossible to compute those values, and statistically very unlikely to generate two of them by chance.
 
 A third property of a cryptographic hash function is that small changes in the input string, like changing a single bit, should generate hash values that look completely different from each other. This is called \term{diffusion} or the avalanche effect.
 
@@ -486,7 +486,7 @@ Finally, this hash function does not have a lot of diffusion, as changing bits t
 
 Computing cryptographically secure hash functions in pen-and-paper style is possible but tedious. Fortunately, Sage can import the \term{\code{hashlib}} library, which is intended to provide a reliable and stable base for writing Python programs that require cryptographic functions. The following examples explain how to use \code{hashlib} in Sage.
 
-\begin{example}\label{ex:SHA256}An example of a hash function that is generally believed to be a cryptographically secure hash function is the so-called \term{SHA256} hash, which, in our notation, is a function that maps binary strings of arbitrary length onto binary strings of length $256$:
+\begin{example}\label{ex:SHA256}An example of a hash function that is generally believed to be cryptographically secure is the so-called \term{SHA256}, which, in our notation, is a function that maps binary strings of arbitrary length onto binary strings of length $256$:
 \begin{equation}
 SHA256: \{0,1\}^* \to \{0,1\}^{256}
 \end{equation}
@@ -514,12 +514,12 @@ sage: d.str(10) # decimal representation
 \end{sagecommandline}
 \end{example}
 
-\subsubsection{Hashing to cyclic groups} As we have seen in the previous section, general hash functions map binary strings of arbitrary length onto binary strings of some fixed length. However, it is desirable in various cryptographic primitives to not simply hash to binary strings of fixed length, but to hash into algebraic structures like groups, while keeping (some of) the properties of the hash function, like preimage resistance or collision resistance.
+\subsubsection{Hashing to Cyclic Groups} As we have seen in the previous section, general hash functions map binary strings of arbitrary length onto binary strings of some fixed length. However, it is desirable in various cryptographic primitives to not simply hash to binary strings of fixed length, but to hash into algebraic structures like groups, while keeping (some of) the properties of the hash function, like preimage resistance or collision resistance.
 
 
 Hash functions like this can be defined for various algebraic structures, but, in a sense, the most fundamental ones are hash functions that map into groups, because they can be easily extended to map into other structures like rings or fields.
 
-To give a more precise definition, let $\G$ be a group and $\{0,1\}^*$ the set of all finite, binary strings, then a \term{hash-to-group} function is a deterministic map
+To give a more precise definition, let $\G$ be a group and $\{0,1\}^*$ the set of all finite, binary strings, then a \term{hash-to-group} function is a deterministic map:
 \begin{equation}
 H : \{0,1\}^* \to \G
 \end{equation}
@@ -570,7 +570,7 @@ It can be shown that Pedersen’s  hash  function  is  collision-resistant under
 \{H_{\{g_1,\ldots,g_j\}}\;|\;g_1,\ldots,g_j\in \G\}
 \end{equation}
 
-From an implementation perspective, it is important to derive the set of generators $\{g_1,\ldots,g_k\}$ in such a way that they are as uniform and random as possible. In particular, any known discrete log relation between two generators, that is, any known $x\in \Z_n$ with $g_h = (g_i)^x$, must be avoided.
+From an implementation perspective, it is important to derive the set of generators $\{g_1,\ldots,g_k\}$ in such a way that they are as uniform and as random as possible. In particular, any known discrete log relation between two generators, that is, any known $x\in \Z_n$ with $g_h = (g_i)^x$, must be avoided.
 
 \begin{example} To compute an actual Pedersen’s  hash, consider the cyclic group $\Z^*_{5}$ from \examplename{} \ref{example:cyclic_group_F5*}. We know from \examplename{} \ref{example:factor_groupds_of_F*5} that the elements $2$ and $3$ are generators of  $\Z^*_{5}$, and it follows that the following map is a Pedersen's hash function:
 \begin{equation}
@@ -609,7 +609,7 @@ Consider the \capitalisewords{Pedersen hash} from \exercisename{} \ref{exercise:
 \end{exercise}
 
 %\citep{cryptoeprint:2016:492}
-\subsubsection{Pseudorandom Function Families in DDH-secure groups}
+\subsubsection{Pseudorandom Function Families in DDH-secure Groups}
 % https://fmouhart.epheme.re/Crypto-1617/TD08.pdf
 % Proper description in https://eprint.iacr.org/2016/492.pdf sec 3.3
 As noted in \ref{def:Pedersen_hash}, the family of Pederson's hash functions, parameterized by a set of generators $\{g_1,\ldots,g_j\}$ does not qualify as a family of pseudorandom functions, and should therefore not be instantiated as such. To see an example of a proper family of pseudorandom functions in groups where the decisional Diffie--Hellman assumption (see \secname \ref{def:DDH-secure}) is assumed to hold true, let $\G$ be a DDH-secure cyclic group of order $n$ with generator $g$, and let $\{a_0,a_1,\ldots,a_k\}\subset \Z_{n}^*$ be a uniform randomly generated set of numbers invertible in modular $n$ arithmetics. Then a family of pseudorandom functions, parameterized by the \uterm{seed} $\{a_0,a_1,\ldots,a_k\}$ is given as follows:
@@ -637,10 +637,10 @@ A \term{commutative ring with unit} $ (R, +, \cdot, 1) $ is a set $R$ with two m
 \item \hilight{Multiplicative neutral unit }: $1\cdot g=g$ for all $g\in R$.
 \item \hilight{Associativity}: For every $g_1,g_2,g_3\in\R$, the equation
 $g_1\cdot(g_2\cdot g_3) = (g_1\cdot g_2)\cdot g_3$ holds.
-\item \hilight{Distributivity}: For all $ g_1, g_2, g_3 \in R $, the distributive law
+\item \hilight{Distributivity}: For all $ g_1, g_2, g_3 \in\R $, the distributive law
 $ g_1 \cdot \left (g_2 + g_3 \right) = g_1 \cdot g_2 + g_1 \cdot g_3$ holds.
 \end{itemize}
-If $(R,+,\cdot,1)$ is a commutative ring with unit, and $R'\subset R$ is a subset of $R$ such that the restriction of addition and multiplication to $R'$ define a commutative ring with addition $+: R'\times R' \to R'$, multiplication $\cdot: R'\times R' \to R'$ and unit $1$ on $R'$, then $(R',+,\cdot,1)$ is called a \term{subring} of $(R,+,\cdot,1)$.
+If $(R,+,\cdot,1)$ is a commutative ring with unit, and $R'\subseteq R$ is a subset of $R$ such that the restriction of addition and multiplication to $R'$ define a commutative ring with addition $+: R'\times R' \to R'$, multiplication $\cdot: R'\times R' \to R'$ and unit $1$ on $R'$, then $(R',+,\cdot,1)$ is called a \term{subring} of $(R,+,\cdot,1)$.
 \end{definition}
 \begin{notation}Since we are exclusively concerned with commutative rings in this book, we often just call them rings, keeping the notation of commutativity implicit.
 A set $R$ with two maps, $+$ and $\cdot$, which satisfies all previously mentioned rules except for the commutativity law of multiplication, is called a non-commutative ring. 
@@ -896,7 +896,7 @@ H6 = list_plot(arr4, ymin=0,ymax=10000,color='black', legend_label='k2=16')
 \end{center}
 \end{example}
 
-\subsubsection{The ``try-and-increment'' method}\label{def:try_and_increment_hash}
+\subsubsection{The ``Try-and-increment'' Method}\label{def:try_and_increment_hash}
 
 A third method that can sometimes be found in implementations is the so-called \term{``try-and-increment'' method}. To understand this method, we define an integer $z\in\Z$ from any hash value $H(s)$ as we did in the previous methods:
 
@@ -978,7 +978,7 @@ Consider the ring of modular $5$ arithmetics $(\Z_5,+,\cdot)$ from \examplename{
 Consider the ring of modular $6$ arithmetics $(\Z_6,+,\cdot)$ from \examplename{} \ref{def_residue_ring_z_6}. Show that $(\Z_6,+,\cdot)$ is not a field.
 \end{exercise}
 
-\subsection{Prime fields}
+\subsection{Prime Fields}
 \label{prime_fields}
 As we have seen in many of the examples in previous sections, modular arithmetic behaves similarly to the ordinary arithmetics of integers  in many ways. This is due to the fact that remainder class sets $\Z_n$ are commutative rings with units (see \examplename{} \ref{def:ring_of_mod_n_arithmetics}).
 
@@ -1140,13 +1140,13 @@ Consider the prime field $\F_{13}$ from \exercisename{} \ref{prime_field_F13}. C
 %\end{definition}
 
 %\begin{remark}The algorithm (\ref{def: Tonelli-Shanks}) works in prime fields for any odd prime numbers. From a practical point of view, however, it is efficient only if the prime number is congruent to $ 1 $ modulo $ 4 $, since in the other case the formula from the proposition \ref{theorem: square_roots}, which can be calculated more quickly, can be used.\end{remark}
-\subsubsection{Hashing into prime fields}\label{hashing-prime-fields}
+\subsubsection{Hashing into Prime Fields}\label{hashing-prime-fields}
 An important problem in cryptography is the ability to hash to (various subsets) of elliptic curves. As we will see in \chaptname{} \ref{chap:elliptic_curves}, those curves are often defined over prime fields, and hashing to a curve might start with hashing to the prime field. It is therefore important to understand how to hash into prime fields.
 
 In \secname{} \ref{hash-to-modular-arithmetics}, we looked at a few methods of hashing into the modular arithmetic rings $\Z_n$ for arbitrary $n>1$. As prime fields are just special instances of those rings, all methods for hashing into $\Z_n$ functions can be used for hashing into prime fields, too.
 
 \begin{comment}
-\subsection{MiMC Hash functions} As we will see in XXX, 
+\subsection{MiMC Hash Functions} As we will see in XXX, 
 
 To define a MiMC hash function, let $\F_p$ be a prime field with prime modulus $p\in\Prim$, let $n$ be the smallest natural number such that  $gcd(n, p-1) = 1$. Let $r$ be the smallest integer greater than or equal to $\frac{log(p)}{log_2(3)}$ and let $C=\{c_i\in \F_p \;|\; 0\leq i \leq r\}$ be a set of randomly generated field elements. The definition of the MiMC hash function then starts with an invertible map
 \begin{equation}
@@ -1303,7 +1303,7 @@ y^2 = x^3 + 4
 \end{exercise}
 
 \begin{comment}
-\subsection{Hashing into extension fields} On page \pageref{hashing-prime-fields},\sme{check reference} we have seen how to hash into prime fields. As elements of extension fields can be seen as polynomials over prime fields, hashing into extension fields is therefore possible if every coefficient of the polynomial is hashed independently.
+\subsection{Hashing into Extension Fields} On page \pageref{hashing-prime-fields},\sme{check reference} we have seen how to hash into prime fields. As elements of extension fields can be seen as polynomials over prime fields, hashing into extension fields is therefore possible if every coefficient of the polynomial is hashed independently.
 \end{comment}
 \section{Projective Planes}\label{sec:planes}
 Projective planes are particular geometric constructs defined over a given field. In a sense, projective planes extend the concept of the ordinary Euclidean plane by including ``points at infinity.''\footnote{A detailed explanation of the ideas that lead to the definition of projective planes can be found, for example, in \chaptname{} 2 of \cite{ellis-1992} or in appendix A of \cite{silverman-1994}.}

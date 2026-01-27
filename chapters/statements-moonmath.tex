@@ -280,7 +280,7 @@ L_1 \cap L_2 := \{x\;|\; x\in L_1 \text{ and } x\in L_2\}
 If both languages are defined by decision functions $R_1$ and $R_2$, the following function is a decision function for the intersection language $L_1 \cap L_2$:
 \begin{equation}
 R_{L_1 \cap L_2}: \Sigma_I^* \times \Sigma_W^* \to \{true, false\}\;;\;
-(i,w) \mapsto R_1(i,w) \text{ and } R_2(i,w)
+(i,w) \mapsto R_1(i;w) \text{ and } R_2(i;w)
 \end{equation}
 
 Thus, the intersection of two decision-function-based languages is also decision-function-based language. This is important from an implementation point of view: it allows us to construct complex decision functions, their languages and associated statements from simple building blocks. Given a publicly known instance $I\in \Sigma_I^*$, a statement in an intersection language claims knowledge of a witness that satisfies all relations simultaneously. 

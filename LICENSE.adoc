@@ -321,7 +321,7 @@ link://creativecommons.org/[creativecommons.org].
 
 == Sideletter for Contributions to the MoonMath Manual To zk-SNARKs (the "_Sideletter_")
 
-between Least Authority TFA GmbH, Thaerstraße 28a, 10249 Berlin (hereinafter referred to as
+between Least Authority TFA GmbH, Warschauer Straße 58A, 10243 Berlin (hereinafter referred to as
 "**Least Authority**") and any natural person or legal entity submitting Contributions to the MoonMath
 Manual (hereinafter referred to as "**You**" or "**Your**").
 

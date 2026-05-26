@@ -1556,8 +1556,9 @@ In fact,
 
 Чтобы конкретизировать это, пусть $s=<1,1,1,0,0,1,0,0,0,0>$ — наша двоичная строка, которую мы хотим хешировать в $TJJ\_13[5]$. Мы используем двоичную строку-счётчик, начиная с нуля, то есть выбираем $c=<0>$. Обратившись к Sage, мы определяем функцию try-hash следующим образом:
 \begin{sagecommandline}
-sage: import hashlib
+sage: global try_hash
 sage: def try_hash(s,c):
+....:     import hashlib
 ....:     s_1 = s+c # string concatenation
 ....:     hasher = hashlib.sha256(s_1.encode('utf-8')) # compute SHA256
 ....:     digest = hasher.hexdigest()

@@ -584,8 +584,9 @@ $$
 
 Конечно, вычисление $SHA256\_H_{\{2,3\}}$ в стиле <<бумага и ручка>> затруднительно. Однако мы можем легко реализовать эту функцию в Sage следующим образом:
 \begin{sagecommandline}
-sage: import hashlib
+sage: global SHA256_H
 sage: def SHA256_H(x):
+....:     import hashlib
 ....:     Z5 = Integers(5) # определяем групповой тип
 ....:     hasher = hashlib.sha256(x) # вычисляем SHA256
 ....:     digest = hasher.hexdigest()
@@ -787,8 +788,9 @@ SHA256(s)_0\cdot 2^0 + SHA256(s)_1\cdot 2^1 + \ldots + SHA256(s)_3\cdot 2^3
 $$
 Поскольку $k=|16|_2=5$ и $16-2^{k-1}=0$, этот хеш отображает равномерно на $\Z_{16}$. Мы можем использовать Sage для её реализации:
 \begin{sagecommandline}
-sage: import hashlib
+sage: global Hash5
 sage: def Hash5(x):
+....:     import hashlib
 ....:     hasher = hashlib.sha256(x) # вычисляем SHA256
 ....:     digest = hasher.hexdigest()
 ....:     d = ZZ(digest, base=16) # приводим к целому
@@ -845,9 +847,10 @@ s\mapsto
 \end{multline*}
 Мы хотим использовать различные инстанциации $k_2$ для визуализации влияния длины усечения на распределение хешей в $\Z_{23}$. Мы можем использовать Sage для её реализации следующим образом:
 \begin{sagecommandline}
-sage: import hashlib
 sage: Z23 = Integers(23)
+sage: global Hash_mod23
 sage: def Hash_mod23(x, k2):
+....:     import hashlib
 ....:     hasher = hashlib.sha256(x.encode('utf-8')) # Вычисляем SHA256
 ....:     digest = hasher.hexdigest()
 ....:     d = ZZ(digest, base=16) # приводим к целому

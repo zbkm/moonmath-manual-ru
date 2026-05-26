@@ -35,12 +35,13 @@
 \usepackage{listings}
 
 %fonts
-% times is the font I (Mirco) thinks looks the most calm, ordered and math-textbook like
-\usepackage{times}
+% tempora provides Times-like font with cyrillic support
+\usepackage{tempora}
 % use times style for mathmode, too
-\usepackage{mathptmx}
-\usepackage[T1]{fontenc}
+\usepackage{newtxmath}
+\usepackage[T2A,T1]{fontenc}
 \usepackage[utf8]{inputenc}
+\usepackage[russian]{babel}
 
 % integer long division
 \usepackage{longdivision}
@@ -165,30 +166,30 @@ backgroundcolor= \color{white},
 
 % theorem styles
 \theoremstyle{remark}
-\newtheorem{theorem}{Theorem}[subsection]
+\newtheorem{theorem}{Теорема}[subsection]
 %\newtheorem{prop}[theorem]{Proposition}
 %\newtheorem{lemma}[theorem]{Lemma}
 %\newtheorem{corollary}[theorem]{Corollary}
-\newtheorem{definition}[theorem]{Definition}
+\newtheorem{definition}[theorem]{Определение}
 \newcommand{\deftitle}[1]{\textbf{#1}}%used in the optional title of definitions
-\newcommand{\defname}{definition}%word used for cross-referencing definitions in the text
+\newcommand{\defname}{определение}%word used for cross-referencing definitions in the text
 \newcommand{\defvsep}{\hspace{0ex}\newline{}\vspace{-4ex}}% vertical space after definitions that start with a list
-\newtheorem{conjecture}{Conjecture}
-\newtheorem{remark}{Remark}
-\newtheorem{notation}{Notation and Symbols}
+\newtheorem{conjecture}{Гипотеза}
+\newtheorem{remark}{Замечание}
+\newtheorem{notation}{Обозначения и символы}
 
 % Examples get their own counter
 \newcounter{ExampleCounter}
-\newtheorem{example}[ExampleCounter]{Example}
+\newtheorem{example}[ExampleCounter]{Пример}
 
 
 % Exercises get their own counter
 \newcounter{ExerciseCounter}
-\newtheorem{exercise}[ExerciseCounter]{Exercise}
+\newtheorem{exercise}[ExerciseCounter]{Упражнение}
 
 % Jargon get their own counter
 \newcounter{JargonCounter}
-\newtheorem{jargon}[JargonCounter]{Jargon}
+\newtheorem{jargon}[JargonCounter]{Термин}
 
 % algorithmicx commands
 %\algnewcommand\algorithmicinput{\textbf{Statement:}}
@@ -242,12 +243,12 @@ backgroundcolor= \color{white},
 \newcommand{\hilight}[1]{\textbf{#1}}%basically, our own version of \emph. we can decide later if it'll be italic, boldface or a highlight color
 \newcommand{\code}[1]{\texttt{#1}}%parts of code, names of files or libraries
 \newcommand{\curvename}[1]{\textsf{\small #1}}%names of elliptic curves
-\newcommand{\examplename}{example}%word used for cross-referencing examples in the text
-\newcommand{\secname}{section}%word used for cross-referencing (sub)*sections in the text
-\newcommand{\chaptname}{chapter}%word used for cross-referencing chapters in the text
-\newcommand{\algname}{algorithm}%word used for cross-referencing algorithms in the text
-\newcommand{\exercisename}{exercise}%word used for cross-referencing excercises in the text
-\newcommand{\notationname}{notation}%word used for cross-referencing notations in the text
+\newcommand{\examplename}{пример}%word used for cross-referencing examples in the text
+\newcommand{\secname}{раздел}%word used for cross-referencing (sub)*sections in the text
+\newcommand{\chaptname}{глава}%word used for cross-referencing chapters in the text
+\newcommand{\algname}{алгоритм}%word used for cross-referencing algorithms in the text
+\newcommand{\exercisename}{упражнение}%word used for cross-referencing excercises in the text
+\newcommand{\notationname}{обозначение}%word used for cross-referencing notations in the text
 \newcommand{\concept}[1]{\capitalisewords{#1}}%fixed terms for mathematical concepts, methods, etc.
 \newcommand{\TJJ}{\curvename{${TJJ\_13}$}}%the name of the TJJ13 curve
 \newcommand{\lgname}[1]{\texttt{#1}}%names of formal languages
@@ -312,11 +313,11 @@ backgroundcolor= \color{white},
 \backmatter
 
 \cleardoublepage\phantomsection
-\addcontentsline{toc}{chapter}{Index}
+\addcontentsline{toc}{chapter}{Предметный указатель}
 \printindex
 
 \cleardoublepage\phantomsection
-\addcontentsline{toc}{chapter}{Bibliography}
+\addcontentsline{toc}{chapter}{Литература}
 \bibliography{moonmath}%use `moonmath.bib` to look for references, and print bibliography at this point in the document
 \include{chapters/license-moonmath}
 

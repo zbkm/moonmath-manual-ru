@@ -1,25 +1,25 @@
-\chapter{Circuit Compilers}\label{chap:circuit-compilers}
+\chapter{Компиляторы схем}\label{chap:circuit-compilers}
 % finite field arithmetics https://johnkerl.org/doc/ffcomp.pdf
-As previously demonstrated in Chapter \ref{sec:statements}, statements in formal languages can be formalized as membership or knowledge claims, with algebraic circuits and Rank-1 Constraint Systems being two crucial means of defining these languages.
+Как было показано ранее в главе~\ref{sec:statements}, утверждения в формальных языках могут быть формализованы как утверждения о принадлежности или знании, при этом алгебраические схемы (algebraic circuits) и системы ограничений ранга~1 (Rank-1 Constraint Systems) являются двумя ключевыми средствами определения таких языков.
 
-However, both algebraic circuits and Rank-1 Constraint Systems present substantial deviations from conventional programming paradigms and present difficulties for developers. The task of writing real-world applications as circuits and verifying them through Rank-1 Constraint Systems is as challenging as writing code in low-level languages such as assembly. To facilitate complex statement design, it is necessary to have a compiler framework that can translate high-level languages into arithmetic circuits and associated Rank-1 Constraint Systems.
+Однако как алгебраические схемы, так и системы ограничений ранга~1 существенно отличаются от традиционных парадигм программирования и создают трудности для разработчиков. Задача написания реальных приложений в виде схем и проверки их через системы ограничений ранга~1 столь же сложна, как написание кода на низкоуровневых языках, таких как ассемблер (assembly). Для упрощения проектирования сложных утверждений необходим фреймворк компилятора (compiler), который может переводить языки высокого уровня (high-level languages) в арифметические схемы и связанные с ними системы ограничений ранга~1.
 
-These programming languages allow for more intuitive and efficient creation and testing of arithmetic circuits, freeing developers from the intricacies of R1CS representations. As a result, they can concentrate on the logic of the circuits they intend to build while the compiler handles the rest.
+Эти языки программирования позволяют более интуитивно и эффективно создавать и тестировать арифметические схемы, освобождая разработчиков от сложностей представлений R1CS. В результате они могут сосредоточиться на логике схем, которые они собираются построить, в то время как компилятор (compiler) берёт на себя всё остальное.
 
-An additional benefit of R1CS compiling programming languages is that they can generate not only R1CS representations but also other programs that can efficiently compute the values of the circuit's assignment. This facilitates integration of the circuits into various platforms and environments, without the need to consider underlying implementation details.
+Дополнительным преимуществом языков программирования, компилируемых в R1CS, является то, что они могут генерировать не только представления R1CS, но и другие программы, способные эффективно вычислять значения присваиваний (assignment) схемы. Это облегчает интеграцию схем в различные платформы и среды без необходимости учитывать детали нижележащей реализации.
 
-As demonstrated in Chapter \ref{sec:statements} through sections \ref{sec:R1CS} and \ref{sec:circuits}, both arithmetic circuits and Rank-1 Constraint Systems exhibit a modular property \ref{sec:R1CS_modularity}, allowing for synthesis of complex circuits from simpler ones. Many circuit/R1CS compilers adopt a basic approach of providing a library of atomic and simple circuits, with a means of combining these building blocks into more complex systems.
+Как было показано в главе~\ref{sec:statements} в разделах~\ref{sec:R1CS} и~\ref{sec:circuits}, как арифметические схемы, так и системы ограничений ранга~1 обладают свойством модульности (modularity) \ref{sec:R1CS_modularity}, что позволяет синтезировать сложные схемы из более простых. Многие компиляторы схем/R1CS придерживаются базового подхода, предоставляя библиотеку атомарных и простых схем вместе со средствами объединения этих строительных блоков в более сложные системы.
 
-This chapter provides an overview of basic concepts in the field of circuit compilers, presenting a toy language which can be manually "compiled" into graphical representations of algebraic circuits and their associated Rank-1 Constraint Systems. The chapter then examines real-world compilers and the higher-level languages they support.
+Эта глава даёт обзор базовых концепций в области компиляторов схем (circuit compilers), представляя игрушечный язык, который можно вручную ``скомпилировать'' в графические представления алгебраических схем (algebraic circuits) и связанных с ними систем ограничений ранга~1. Затем в главе рассматриваются реальные компиляторы и языки более высокого уровня, которые они поддерживают.
 
-The chapter begins with a general introduction to the toy programming language and to the real world languages, followed by a discussion of atomic types such as booleans and unsigned integers. Control flow primitives, including the if-then-else conditional and the bounded loop, are then defined. The chapter concludes with a review of basic functionality primitives, such as elliptic curve cryptography, commonly referred to as "gadgets" in literature.
+Глава начинается с общего введения в игрушечный язык программирования и в реальные языки, за которым следует обсуждение атомарных типов, таких как булевы значения (booleans) и целые числа без знака (unsigned integers). Затем определяются примитивы управления потоком выполнения, включая условный оператор if-then-else и ограниченный цикл. Глава завершается обзором базовых функциональных примитивов, таких как криптография на эллиптических кривых, обычно называемых в литературе ``гаджетами'' (gadgets).
 
-\section{A Pen-and-Paper Language} To explain basic concepts of circuit compilers and their associated high-level languages, we derive an informal toy language and associated ``brain-compiler'' which we name \lgname{PAPER} (\textbf{P}en-\textbf{A}nd-\textbf{P}aper \textbf{E}xecution \textbf{R}ules). \lgname{PAPER} allows programmers to define statements in Rust-like pseudo-code. The language is inspired by \lgname{zokrates} and \lgname{circom}.
+\section{Язык ``ручки и бумаги''} Чтобы объяснить базовые концепции компиляторов схем (circuit compilers) и связанных с ними языков высокого уровня, мы выведем неформальный игрушечный язык и связанный с ним ``мозговой'' компилятор (brain-compiler), который назовём \lgname{PAPER} (\textbf{P}en-\textbf{A}nd-\textbf{P}aper \textbf{E}xecution \textbf{R}ules). \lgname{PAPER} позволяет программистам определять утверждения в псевдокоде, похожем на Rust. Язык вдохновлён \lgname{zokrates} и \lgname{circom}.
  
-\subsection{The Grammar}
-In \lgname{PAPER}, any statement is defined as an ordered list of functions, where any function has to be declared in the list before it is called in another function of that list. The last entry in a statement has to be a special function, called \texttt{main}. Functions take a list of typed parameters as inputs and compute a tuple of typed variables as output, where type\_functions are special functions that define how to transform one type into another type, ultimately transforming any type into elements of the base field where the circuit is defined over. 
+\subsection{Грамматика}
+В \lgname{PAPER} любое утверждение определяется как упорядоченный список функций, где любая функция должна быть объявлена в списке до того, как она будет вызвана в другой функции этого списка. Последняя запись в утверждении должна быть специальной функцией, называемой \texttt{main}. Функции принимают список типизированных параметров в качестве входных данных и вычисляют кортеж типизированных переменных (variables) в качестве выходных, где type\_functions --- это специальные функции, определяющие, как преобразовать один тип в другой, в конечном итоге преобразуя любой тип в элементы базового поля, над которым определена схема.
 
-Any statement is parameterized over the field that the circuit will be defined on, and has additional optional parameters of unsigned type, needed to define the size of arrays or the counter of bounded loops. The following definition makes the grammar of a statement precise using a command line language like description: 
+Любое утверждение параметризовано полем, над которым будет определена схема, и имеет дополнительные необязательные параметры беззнакового типа, необходимые для определения размера массивов или счётчика ограниченных циклов. Следующее определение делает грамматику утверждения точной с помощью описания в стиле командной строки:
 % used the command line style formalized e.g. here: http://docopt.org/
 \begin{lstlisting}
 statement <Name> {F:<Field> [ , <N_1: unsigned>,... ] } {
@@ -37,15 +37,15 @@ statement <Name> {F:<Field> [ , <N_1: unsigned>,... ] } {
   } ;
 }
 \end{lstlisting}
-Function arguments and variables are witness variables by default, but can be declared as instance by the \texttt{pub} specifier. Declaring arguments and variables as instances always overwrites any previous or conflicting witness declarations. Every argument, constant or variable has a type, and every type is defined as a function that transforms that type into another type. In order for a \lgname{PAPER} program to compile successfully, all type transformations must be composed in such a way that the final type is the base field where the circuit is defined over: 
+Аргументы функций и переменные (variables) по умолчанию являются witness-переменными, но могут быть объявлены как instance с помощью спецификатора \texttt{pub}. Объявление аргументов и переменных как instance всегда перезаписывает любые предыдущие или конфликтующие witness-объявления. Каждый аргумент, константа (constant) или переменная (variable) имеет тип, и каждый тип определяется как функция, преобразующая этот тип в другой тип. Для того чтобы программа на \lgname{PAPER} успешно скомпилировалась, все преобразования типов должны быть составлены таким образом, чтобы конечный тип был базовым полем, над которым определена схема:
 \begin{lstlisting}
 type_function <TYPE>( t1 : <TYPE_1>) -> TYPE_2{
   let t2: TYPE_2 <== fn(TYPE_1)
   return t2
 }
 \end{lstlisting}
-Many real-world circuit languages are based on a similar, but of course more sophisticated approach than \lgname{PAPER}. The purpose of \lgname{PAPER} is to show basic principles of circuit compilers and their associated high-level languages.
-\begin{example}To get a better understanding of the grammar of \lgname{PAPER}, the following constitutes proper high-level code that follows the grammar of the \lgname{PAPER} language, assuming that all types in that code have been defined elsewhere. 
+Многие реальные языки схем основаны на подобном, но, конечно, более изощренном подходе, чем \lgname{PAPER}. Цель \lgname{PAPER} --- показать базовые принципы компиляторов схем (circuit compilers) и связанных с ними языков высокого уровня (high-level languages).
+\begin{example}Чтобы лучше понять грамматику \lgname{PAPER}, следующий код является корректным высокоуровневым кодом, соответствующим грамматике языка \lgname{PAPER}, при условии, что все типы в этом коде определены где-либо ещё.
 \begin{lstlisting}
 statement MOCK_CODE {F: F_43, N_1 = 1024, N_2 = 8} {
   fn foo(in_1 : F, pub in_2 : TYPE_2) -> F {
@@ -76,33 +76,33 @@ statement MOCK_CODE {F: F_43, N_1 = 1024, N_2 = 8} {
 }
 \end{lstlisting}
 \end{example}
-\subsection{The Execution Phases} In contrast to normal executable programs, programs for circuit compilers have two modes of execution. The first mode, usually called the  \term{setup phase}, is executed in order to generate the circuit and its associated Rank-1 Constraint System, the latter of which is then usually used as input to some zero-knowledge proof system as explained in \ref{chapter:zk-protocols}.
+\subsection{Фазы выполнения} В отличие от обычных исполняемых программ, программы для компиляторов схем (circuit compilers) имеют два режима выполнения. Первый режим, обычно называемый \term{setup phase} (фаза настройки), выполняется для генерации схемы (circuit) и связанной с ней системы ограничений ранга~1 (Rank-1 Constraint System), которая затем обычно используется как вход для некоторой системы доказательств с нулевым разглашением (zero-knowledge proof system), как объясняется в~\ref{chapter:zk-protocols}.
 
-The second mode of execution is usually called the \term{prover phase}. In this phase, some assignment to all instance variables of the circuit is usually given as input and the task of a prover is to compute a valid assignment to all witness variables of the circuit. Depending on the use case, this valid assignment is then either directly used as constructive proof for proper circuit execution or is transferred as input to the proof generation algorithm of some zero-knowledge proof system, where the full-sized, non hiding constructive proof is processed into a succinct proof with various levels of zero knowledge.
+Второй режим выполнения обычно называется \term{prover phase} (фаза доказывающего). На этом этапе некоторое присваивание (assignment) всем instance-переменным схемы обычно задаётся как вход, и задача доказывающего (prover) состоит в том, чтобы вычислить корректное присваивание (assignment) всем witness-переменным схемы. В зависимости от случая использования, это корректное присваивание затем либо напрямую используется как конструктивное доказательство правильного выполнения схемы, либо передаётся как вход в алгоритм генерации доказательства некоторой системы доказательств с нулевым разглашением, где полноразмерное, не скрывающее конструктивное доказательство обрабатывается в краткое доказательство с различными уровнями нулевого разглашения.
 
-Modern circuit languages and their associated compilers abstract over those two phases and provide a unified \term{interphase} to the developer, who then writes a single program that can be used in both phases.
+Современные языки схем и связанные с ними компиляторы (compilers) абстрагируют эти две фазы и предоставляют разработчику единый \term{interphase} (интерфейс), который затем пишет единую программу, которую можно использовать в обеих фазах.
 
-To give the reader a clear, conceptual distinction between the two phases, \lgname{PAPER} keeps them separated. \lgname{PAPER}-code can be ``brain-compiled'' during the \term{setup-phase} in a pen-and-paper approach into a graphical circuit representation. Once a circuit is derived, it can be executed in a \term{prover phase} to generate a valid assignment. The valid assignment is then interpreted as a constructive proof for a knowledge claim in the associated language.
-\paragraph{The Setup Phase} In \lgname{PAPER}, the task of the setup phase is to compile code in the \lgname{PAPER} language into a visual representation of an algebraic circuit. Deriving the circuit from the code in a pen-and-paper style is what we call \term{brain-compiling}.
+Чтобы дать читателю чёткое концептуальное различие между двумя фазами, \lgname{PAPER} сохраняет их раздельными. Код на \lgname{PAPER} может быть ``мозговым компилятором'' (brain-compiled) во время \term{setup-phase} (фазы настройки) в подходе ``ручка и бумага'' в графическое представление схемы. Как только схема выведена, она может быть выполнена в \term{prover phase} (фазе доказывающего) для генерации корректного присваивания (assignment). Корректное присваивание затем интерпретируется как конструктивное доказательство знания в связанном языке.
+\paragraph{Фаза настройки} В \lgname{PAPER} задача фазы настройки (setup phase) состоит в компиляции кода на языке \lgname{PAPER} в визуальное представление алгебраической схемы (algebraic circuit). Выведение схемы из кода в стиле ``ручка и бумага'' --- это то, что мы называем \term{brain-compiling} (``мозговая'' компиляция).
 
-Given some statement description that adheres to the correct grammar, we start the graphical circuit compilation process with an empty circuit, compile the main function first and then inductively compile all other functions as they are called during the process. 
+Дано некоторое описание утверждения, соответствующее правильной грамматике, мы начинаем процесс графической компиляции схемы с пустой схемы, сначала компилируем функцию main, а затем индуктивно компилируем все остальные функции по мере их вызова в процессе.
 
-For every function that we currently compile, we draw a box-node for every input argument, every variable and every constant of that function. If the node represents a variable, we label it with that variable's name, and if it represents a constant, we label it with that constant's value. We group arguments into a subgraph labeled ``inputs'' and return values into a subgraph labeled ``outputs". We then group everything into a subgraph and label that subgraph with the function's name.
+Для каждой функции, которую мы в данный момент компилируем, мы рисуем прямоугольный узел для каждого входного аргумента, каждой переменной (variable) и каждой константы (constant) этой функции. Если узел представляет переменную (variable), мы помечаем его именем этой переменной, а если он представляет константу (constant), мы помечаем его значением этой константы. Мы группируем аргументы в подграф, помеченный ``inputs'' (входы), и возвращаемые значения в подграф, помеченный ``outputs'' (выходы). Затем мы группируем всё в подграф и помечаем этот подграф именем функции.
 
-After this is done, we have to do a consistency and type check for every occurrence of the assignment operator \texttt{<==}. We have to ensure that the expression on the right side of the operator is well defined and that the types of both side match.
+После этого мы должны выполнить проверку согласованности и типов для каждого вхождения оператора присваивания (assignment) \texttt{<==}. Мы должны убедиться, что выражение в правой части оператора корректно определено и что типы обеих сторон совпадают.
 
-Then we compile the right side of every occurrence of the assignment operator \texttt{<==}. If the right side is a constant or variable defined in this function, we draw a dotted line from the box-node that represents the right side of \texttt{<==} to the box node that represents the left side of the same operator. If the right side represents an argument of that function we draw a line from the box-node that represents the left side of \texttt{<==} to the box node that represents the right side of the same operator. 
+Затем мы компилируем правую сторону каждого вхождения оператора присваивания (assignment) \texttt{<==}. Если правая сторона является константой или переменной (variable), определённой в этой функции, мы рисуем пунктирную линию от прямоугольного узла, представляющего правую сторону \texttt{<==}, к прямоугольному узлу, представляющему левую сторону того же оператора. Если правая сторона представляет аргумент этой функции, мы рисуем линию от прямоугольного узла, представляющего левую сторону \texttt{<==}, к прямоугольному узлу, представляющему правую сторону того же оператора.
 
-If the right side of the \texttt{<==} operator is a function, we look into our database, find its associated circuit and draw it. If no circuit is  associated to that function yet, we repeat the compilation process for that function, drawing edges from the function's argument to its input nodes and from the functions output nodes to the nodes on the right side of \texttt{<==}.
+Если правая сторона оператора \texttt{<==} является функцией, мы заглядываем в нашу базу данных, находим связанную с ней схему и рисуем её. Если с этой функцией ещё не связана ни одна схема, мы повторяем процесс компиляции для этой функции, рисуя рёбра от аргументов функции к её входным узлам и от выходных узлов функции к узлам в правой части \texttt{<==}.
 
-During that process, edge labels are drawn according to the defining rules of algebraic circuits from \ref{def:algebraic-circuit}. If the associated variable represents a witness variable, we use the $W$ label to indicate a witness, and if it represents a instance variable, we use the $I$ label to indicate an instance. Variables are witnesses by default and the $pub$ specifier indicates that the variable is an instance.
+В процессе этого метки рёбер рисуются в соответствии с определяющими правилами алгебраических схем из~\ref{def:algebraic-circuit}. Если связанная переменная представляет witness-переменную, мы используем метку $W$ для обозначения witness, а если она представляет instance-переменную, мы используем метку $I$ для обозначения instance. Переменные (variables) по умолчанию являются witness, а спецификатор $pub$ указывает, что переменная является instance.
 
-Once this is done, we compile all occurring types of all variables in a function, by compiling the type\_function of each type. We do this inductively until we reach the type of the base field. Circuits have no notion of types, only of field elements; hence, every type needs to be compiled to the field type in a sequence of compilation steps.
+После завершения этого мы компилируем все встречающиеся типы всех переменных в функции, компилируя type\_function каждого типа. Мы делаем это индуктивно, пока не достигнем типа базового поля. Схемы не имеют понятия типов, только элементов поля; следовательно, каждый тип должен быть скомпилирован в полевой тип в последовательности шагов компиляции.
 
-The compilation stops once we have inductively replaced all functions by their circuits. The result is a circuit that contains many unnecessary box nodes. In a final \term{optimization step}, all box nodes that are directly linked to each other are collapsed into a single node, and all box nodes that represent the same constants are collapsed into a single node. 
+Компиляция останавливается, как только мы индуктивно заменили все функции их схемами. Результат --- это схема, содержащая множество ненужных прямоугольных узлов. На заключительном шаге \term{optimization} (оптимизации) все прямоугольные узлы, напрямую связанные друг с другом, сворачиваются в один узел, а все прямоугольные узлы, представляющие одинаковые константы (constants), сворачиваются в один узел.
 
-Of course, \lgname{PAPER}'s brain-compiler is not properly defined in any formal manner. Its purpose is to highlight important steps that real-world compilers undergo in their setup phases. 
-\begin{example}[A trivial Circuit]\label{ex:trivial-circuit} To give an intuition of how to write and compile circuits in the \lgname{PAPER} language, consider the following statement description:
+Конечно, ``мозговой'' компилятор (brain-compiler) \lgname{PAPER} не определён должным образом в формальном смысле. Его цель --- выделить важные шаги, которые проходят реальные компиляторы (compilers) в своих фазах настройки (setup phases).
+\begin{example}[Тривиальная схема]\label{ex:trivial-circuit} Чтобы дать интуицию о том, как писать и компилировать схемы на языке \lgname{PAPER}, рассмотрим следующее описание утверждения:
 \begin{lstlisting}
 statement trivial_circuit {F:F_13} {
   fn main{F}(in1 : F, pub in2 : F) -> (F,F){
@@ -117,11 +117,11 @@ statement trivial_circuit {F:F_13} {
   }
 }
 \end{lstlisting} 
-To brain-compile this statement into an algebraic circuit with \lgname{PAPER}, we start with an empty circuit and evaluate function \texttt{main}, which is the only function in this statement. 
+Чтобы ``мозговым компилятором'' (brain-compile) скомпилировать это утверждение в алгебраическую схему (algebraic circuit) с помощью \lgname{PAPER}, мы начинаем с пустой схемы и вычисляем функцию \texttt{main}, которая является единственной функцией в этом утверждении.
 
-We draw box-nodes for every argument, every constant and every variable of the function and label them with their names or values, respectively.  Then we do a consistency and type check for every \texttt{<==} operator in the function. Since the circuit only wires inputs to outputs and all elements have the same type, the check is valid.
+Мы рисуем прямоугольные узлы для каждого аргумента, каждой константы (constant) и каждой переменной (variable) функции и помечаем их их именами или значениями соответственно. Затем мы выполняем проверку согласованности и типов для каждого оператора \texttt{<==} в функции. Поскольку схема просто соединяет входы с выходами и все элементы имеют одинаковый тип, проверка корректна.
 
-Then we evaluate the right side of the assignment operators. Since, in our case, the right side of each operator is not a function, we draw edges from the box-nodes on the right side to the associated box node on the left side. To label those edges, we use the general rules of algebraic circuits as defined in \ref{def:algebraic-circuit}. According to those rules, every incoming edge of a sink node has a label and every outgoing edge of a source node has a label, if the node is labeled with a variable. Since nodes that represent constants are implicitly assumed to be private, and since the public specifier determines if an edge is labeled with $W$ or $I$, we get the following circuit:
+Затем мы вычисляем правую сторону операторов присваивания (assignment). Поскольку в нашем случае правая сторона каждого оператора не является функцией, мы рисуем рёбра от прямоугольных узлов в правой части к связанному прямоугольному узлу в левой части. Чтобы пометить эти рёбра, мы используем общие правила алгебраических схем, как определено в~\ref{def:algebraic-circuit}. Согласно этим правилам, каждое входящее ребро стокового узла имеет метку и каждое исходящее ребро от источникового узла имеет метку, если узел помечен переменной. Поскольку узлы, представляющие константы (constants), неявно предполагаются частными, а спецификатор public определяет, помечено ли ребро $W$ или $I$, мы получаем следующую схему:
 \begin{center}
 \digraph[scale=0.4]{TRIVIAL1}{
 	forcelabels=true;
@@ -153,28 +153,28 @@ Then we evaluate the right side of the assignment operators. Since, in our case,
 }
 \end{center}
 \end{example}
-\paragraph{The Prover Phase} In \lgname{PAPER}, a so-called \term{prover phase} can be executed once the setup phase has generated a graphic circuit representation from its associated high-level code. This is done by executing the circuit while assigning proper values to all input nodes of the circuit. However, in contrast to most real-world compilers, \lgname{PAPER} does not tell the prover how to find proper input values to a given circuit. Real-world programing languages usually provide this data by computations that are done outside of the circuit.
-\begin{example} Consider the circuit from \examplename{} \ref{ex:TJJ-circuit_2}. Valid assignments to this circuit are constructive proofs that the pair of inputs $<I_1,I_2>$ is a point on the tiny-jubjub curve. However, the circuit does not provide a way to actually compute proper values for $I_1$ and $I_2$. Any real-world system therefore needs an auxiliary computation that provides those values.
+\paragraph{Фаза доказывающего} В \lgname{PAPER} так называемая \term{prover phase} (фаза доказывающего) может быть выполнена, как только фаза настройки (setup phase) сгенерировала графическое представление схемы из связанного с ней высокоуровневого кода. Это делается путём выполнения схемы с присваиванием правильных значений всем входным узлам схемы. Однако, в отличие от большинства реальных компиляторов, \lgname{PAPER} не сообщает доказывающему (prover), как найти правильные входные значения для данной схемы. Реальные языки программирования обычно предоставляют эти данные посредством вычислений, выполняемых вне схемы.
+\begin{example} Рассмотрим схему из~\examplename{}~\ref{ex:TJJ-circuit_2}. Корректные присваивания (assignments) к этой схеме являются конструктивными доказательствами того, что пара входов $<I_1,I_2>$ является точкой на кривой tiny-jubjub. Однако схема не предоставляет способа фактически вычислить правильные значения для $I_1$ и $I_2$. Поэтому любая реальная система нуждается во вспомогательном вычислении, предоставляющем эти значения.
 \end{example}
-\section{Real World Circuit Languages}
-Programming languages that compile to rank-1 constraint systems are becoming increasingly popular in the fields of cryptography and blockchain. These languages provide a higher-level abstraction for designing and implementing arithmetic circuits, which are fundamental building blocks in zero-knowledge proof systems. By using these programming languages, developers can focus on the logic of the circuits they want to build, while the compiler takes care of the low-level details of R1CS representations. Additionally, these languages can output not only the R1CS representation, but also other programs, that can efficiently compute all values of a valid circuit assignment. 
+\section{Реальные языки схем}
+Языки программирования, компилируемые в системы ограничений ранга~1, становятся всё более популярными в областях криптографии и блокчейна. Эти языки предоставляют абстракцию более высокого уровня для проектирования и реализации арифметических схем, которые являются фундаментальными строительными блоками в системах доказательств с нулевым разглашением. Используя эти языки программирования, разработчики могут сосредоточиться на логике схем, которые они хотят построить, в то время как компилятор (compiler) берёт на себя низкоуровневые детали представлений R1CS. Кроме того, эти языки могут выводить не только представление R1CS, но и другие программы, способные эффективно вычислять все значения корректного присваивания (assignment) схемы.
 
 \subsection{Circom}
-Circom is a domain-specific programming language for designing arithmetic circuits. It is used to build circuits that can be compiled to rank-1 constraint systems and outputted as WebAssembly and C++ programs for efficient evaluation.
+Circom --- это предметно-ориентированный язык программирования для проектирования арифметических схем. Он используется для построения схем, которые могут быть скомпилированы в системы ограничений ранга~1 и выведены как программы WebAssembly и C++ для эффективного вычисления.
 
-In this section, we will gives examples of how to write basic circuits in Circom. We will use those examples later to compute associated proof in snarkjs. 
+В этом разделе мы приведём примеры написания базовых схем в Circom. Мы будем использовать эти примеры позже для вычисления связанных доказательств в snarkjs.
 
-To understand Circom, we first have to provide definitions for the terms \hilight{signals},\hilight{templates}, and \hilight{components} to facilitate a better understanding of the examples discussed.
+Чтобы понять Circom, мы сначала должны дать определения терминам \hilight{signals} (сигналы), \hilight{templates} (шаблоны) и \hilight{components} (компоненты), чтобы облегчить лучшее понимание обсуждаемых примеров.
 
-A \term{signal} refers to an element in the underlying finite field $\F$ of a circuit. The arithmetic circuits created using Circom operate on signals, which are immutable and can be defined as inputs or outputs. Input signals are private, unless specified as public, and all output signals are publicly accessible. The remaining signals are private and cannot be made public. Public signals are part of the instance and private signals are part of the witness in any valid assignment of a circuit.
+\term{Signal} (сигнал) относится к элементу в лежащем в основе конечном поле $\F$ схемы. Арифметические схемы, созданные с помощью Circom, оперируют сигналами (signals), которые неизменяемы и могут быть определены как входы или выходы. Входные сигналы являются приватными, если не указано иное как public, и все выходные сигналы являются публично доступными. Остальные сигналы являются приватными и не могут быть сделаны публичными. Публичные сигналы являются частью instance, а приватные сигналы --- частью witness в любом корректном присваивании (assignment) схемы.
 
-A \term{template} is an algorithm that creates generic circuits in Circom. The template is a new circuit object that can be utilized to construct other circuits.
+\term{Template} (шаблон) --- это алгоритм, создающий обобщённые схемы в Circom. Шаблон --- это новый объект схемы, который может использоваться для построения других схем.
 
-\term{Components} define an arithmetic circuit by receiving input signals and producing output signals and intermediate signals, as well as a set of constraints. Components, like signals, are also immutable.
+\term{Components} (компоненты) определяют арифметическую схему, получая входные сигналы и производя выходные сигналы и промежуточные сигналы, а также набор ограничений (constraints). Компоненты, как и сигналы, также неизменяемы.
 
 \begin{example}
 \label{ex:trivial-circuit-circom}
-As a demonstration of the generation of circuits in the Circom language, we revisit the trivial circuit from example \ref{ex:trivial-circuit} as previously defined in \lgname{PAPER}. The following code provides one representation of this circuit in the Circom language:
+В качестве демонстрации генерации схем на языке Circom мы вновь рассмотрим тривиальную схему из примера~\ref{ex:trivial-circuit}, ранее определённую в \lgname{PAPER}. Следующий код предоставляет одно представление этой схемы на языке Circom:
 
 \begin{lstlisting}
 template trivial_circuit() {
@@ -195,17 +195,17 @@ template trivial_circuit() {
 component main = trivial_circuit() ;
 \end{lstlisting}
 
-It should be noted that the underlying field is not made explicit in Circom, thus the constants $0$ and $7$ have no immediate significance. To compile the Circom language into an R1CS representation, the code must be saved as a text file. We refer to it as \fname{trivial\_circuit.circom}. This file can then be compiled using the following command:
+Следует отметить, что лежащее в основе поле не указывается явно в Circom, поэтому константы $0$ и $7$ не имеют непосредственного значения. Для компиляции языка Circom в представление R1CS код должен быть сохранён в текстовый файл. Мы будем называть его \fname{trivial\_circuit.circom}. Этот файл затем может быть скомпилирован с помощью следующей команды:
 \begin{lstlisting}
 circom trivial_circuit.circom --r1cs --wasm --sym
 \end{lstlisting}
 
-The Circom compiler generates three distinct files. The first file, \fname{trivial\_circuit.r1cs}, contains the R1CS constraint system of the circuit in a custom binary format. The second file, \fname{trivial\_circuit.wasm}, is a wasm code that computes a witness from a given instance, thereby yielding a solution to the R1CS. Finally, the third file, \fname{trivial\_circuit.sym}, is a symbols text file necessary for debugging or annotated printing of the constraint system.
+Компилятор Circom генерирует три различных файла. Первый файл, \fname{trivial\_circuit.r1cs}, содержит систему ограничений R1CS схемы в пользовательском бинарном формате. Второй файл, \fname{trivial\_circuit.wasm}, является wasm-кодом, который вычисляет witness из данного instance, тем самым давая решение для R1CS. Наконец, третий файл, \fname{trivial\_circuit.sym}, является текстовым файлом символов, необходимым для отладки или аннотированного вывода системы ограничений.
 \end{example}
 
-\begin{example}[The 3-factorization problem in Circom]
+\begin{example}[Задача 3-факторизации в Circom]
 \label{ex:3-fac-circom}
-In this example we implement the 3-factorization problem \ref{ex:3-factorization} in Circom's language and compile into an R1CS and statement generator. In order to show how Circom handles modularity \ref{modularity}, we write the code as follows:
+В этом примере мы реализуем задачу 3-факторизации \ref{ex:3-factorization} на языке Circom и компилируем в R1CS и генератор утверждения. Чтобы показать, как Circom обрабатывает модульность (modularity) \ref{modularity}, мы напишем код следующим образом:
 \begin{lstlisting}
 template Multiplier() {
     signal input a ;
@@ -231,11 +231,11 @@ template three_fac () {
 
 component main = three_fac() ;
 \end{lstlisting}
-To compile this Circom implementation into an R1CS representation and statement generator, the code must be saved as a text file. We refer to it as \fname{three\_fac.circom}. This file can then be compiled using the following command:
+Чтобы скомпилировать эту реализацию на Circom в представление R1CS и генератор утверждения, код должен быть сохранён в текстовый файл. Мы будем называть его \fname{three\_fac.circom}. Этот файл затем может быть скомпилирован с помощью следующей команды:
 \begin{lstlisting}
 circom three_fac.circom --r1cs --wasm --sym
 \end{lstlisting}
-Once the file is compiled, the \texttt{info} command can be used to print circuit stats, including the number of constraints:
+После компиляции файла команда \texttt{info} может использоваться для вывода статистики схемы, включая количество ограничений (constraints):
 \begin{lstlisting}
 snarkjs r1cs info circuit.r1cs
 
@@ -249,35 +249,35 @@ snarkjs r1cs info circuit.r1cs
 \end{lstlisting}
 \end{example}
 
-\section{Common Programing Concepts}
-In this section, we cover concepts that appear in almost every programming language, and see how they can be implemented in circuit compilers. 
-\subsection{Primitive Types} 
+\section{Общие концепции программирования}
+В этом разделе мы рассмотрим концепции, которые встречаются почти в каждом языке программирования, и увидим, как они могут быть реализованы в компиляторах схем (circuit compilers).
+\subsection{Примитивные типы}
 % https://zeroknowledge.fm/172-2/ reference for all the languages
-Primitive data types like booleans, (unsigned) integers, or strings are the most basic building blocks one can expect to find in every general high-level programing language. In order to write statements as computer programs that compile into circuits, it is therefore necessary to implement primitive types as constraint systems, and define their associated operations as circuits.
+Примитивные типы данных, такие как булевы значения (booleans), (беззнаковые) целые числа (unsigned integers) или строки, являются самыми базовыми строительными блоками, которые можно ожидать в каждом универсальном языке программирования высокого уровня. Чтобы писать утверждения в виде компьютерных программ, компилируемых в схемы, необходимо реализовать примитивные типы как системы ограничений (constraint systems) и определить связанные с ними операции как схемы.
 
-In this section, we look at some common ways to achieve this. After a review of the atomic type for the base field where the circuit is defined on, we start with an implementation of the boolean type and its associated boolean algebra as circuits. After that, we define unsigned integers based on the boolean type, and leave the implementation of signed integers as an exercise to the reader. 
+В этом разделе мы рассмотрим некоторые распространённые способы достижения этого. После обзора атомарного типа для базового поля, над которым определена схема, мы начнём с реализации булева типа (boolean type) и связанной с ним булевой алгебры как схем. После этого мы определим беззнаковые целые числа (unsigned integers) на основе булева типа и оставим реализацию знаковых целых чисел как упражнение (exercise) для читателя.
 
-\subsubsection{The Base-field Type} 
+\subsubsection{Базовый полевой тип}
 \label{def:base_field_type}
-Since both algebraic circuits and their associated Rank-1 Constraint Systems are defined over a finite field, elements from that field are the atomic informational units in those models. In this sense, field elements $x\in \F$ are for algebraic circuits what bits are for computers. 
+Поскольку и алгебраические схемы (algebraic circuits), и связанные с ними системы ограничений ранга~1 определены над конечным полем, элементы этого поля являются атомарными единицами информации в этих моделях. В этом смысле элементы поля $x\in \F$ для алгебраических схем являются тем же, чем биты для компьютеров.
 
-In \lgname{PAPER}, we write \texttt{F} for this type and specify the actual instance of the field type in curly brackets after the name of a given statement. Two functions are associated to this type, which are induced by the \term{addition} and \term{multiplication} law in the field \texttt{F}. We write
+В \lgname{PAPER} мы пишем \texttt{F} для этого типа и указываем фактический экземпляр полевого типа в фигурных скобках после имени данного утверждения. С этим типом связаны две функции, индуцированные операциями \term{addition} (сложения) и \term{multiplication} (умножения) в поле \texttt{F}. Мы пишем
 \begin{equation}
 \mathtt{MUL}:\; \mathtt{F} \times \mathtt{F} \to \mathtt{F}\;;\; (x,y) \mapsto \mathtt{MUL}(x,y)
 \end{equation}
 \begin{equation}
 \mathtt{ADD}:\; \mathtt{F} \times \mathtt{F} \to \mathtt{F}\;;\; (x,y) \mapsto \mathtt{ADD}(x,y)
 \end{equation}
-Circuit compilers have to compile these functions into arithmetic gates, as explained in \ref{algebraic-gates}. Every other function has to be expressed in terms of these two atomic functions.
+Компиляторы схем (circuit compilers) должны компилировать эти функции в арифметические вентили (gates), как объясняется в~\ref{algebraic-gates}. Каждая другая функция должна быть выражена через эти две атомарные функции.
 
-To represent addition and multiplication in the \lgname{PAPER} language, we define the following two functions:
+Чтобы представить сложение и умножение на языке \lgname{PAPER}, мы определяем следующие две функции:
 \begin{lstlisting}
 fn MUL(x : F, y : F) -> F{}
 \end{lstlisting}  
 \begin{lstlisting}
 fn ADD(x : F, y : F) -> F{}
 \end{lstlisting}
-The compiler then compiles every occurrence of the $\mathtt{MUL}$ or the $\mathtt{ADD}$ function into the following graphical circuit representations:
+Компилятор затем компилирует каждое вхождение функций $\mathtt{MUL}$ или $\mathtt{ADD}$ в следующие графические представления схем:
 \begin{center}
 \digraph[scale=0.5]{FNMUL}{
 	forcelabels=true;
@@ -303,7 +303,7 @@ The compiler then compiles every occurrence of the $\mathtt{MUL}$ or the $\matht
 	n7 -> n8 [xlabel="W_3"] ;
 }
 \end{center}
-\begin{example}[Basic gates] To give an intuition of how a real-world compiler might transform addition and multiplication in algebraic expressions into a circuit, consider the following \lgname{PAPER} statement:
+\begin{example}[Базовые вентили] Чтобы дать интуицию о том, как реальный компилятор (compiler) может преобразовать сложение и умножение в алгебраических выражениях в схему, рассмотрим следующее утверждение на \lgname{PAPER}:
 \begin{lstlisting}
 statement basic_ops {F:F_13} {
   fn main(in_1 : F, pub in_2 : F) -> (F, F){
@@ -315,13 +315,13 @@ statement basic_ops {F:F_13} {
   }
 }
 \end{lstlisting} 
-To compile this into an algebraic circuit, we start with an empty circuit and evaluate the function \texttt{main}, which is the only function in this statement. We draw an inputs subgraph containing box-nodes for every argument of the function, and an outputs subgraph containing box-nodes for every factor in the return value. Since all of these nodes represent variables of the \texttt{field} type, we don't have to add any type constraints to the circuit.
+Чтобы скомпилировать это в алгебраическую схему (algebraic circuit), мы начинаем с пустой схемы и вычисляем функцию \texttt{main}, которая является единственной функцией в этом утверждении. Мы рисуем подграф входов, содержащий прямоугольные узлы для каждого аргумента функции, и подграф выходов, содержащий прямоугольные узлы для каждого фактора в возвращаемом значении. Поскольку все эти узлы представляют переменные (variables) типа \texttt{field}, нам не нужно добавлять никаких ограничений типов к схеме.
 
-We check the validity of every expression on the right side of every \texttt{<==} operator including a type check. In our case, every variable is of the \texttt{field} type and hence the types match the types of the \texttt{MUL} as well as the \texttt{ADD} function and the type of the left sides of \texttt{<==} operators. 
+Мы проверяем корректность каждого выражения в правой части каждого оператора \texttt{<==}, включая проверку типов. В нашем случае каждая переменная имеет тип \texttt{field}, и поэтому типы совпадают с типами функций \texttt{MUL} и \texttt{ADD}, а также с типами левых частей операторов \texttt{<==}.
 
-We evaluate the expressions on the right side of every \texttt{<==} operator inductively, replacing every occurrence of a function with a subgraph that represents its associated circuit.
+Мы вычисляем выражения в правой части каждого оператора \texttt{<==} индуктивно, заменяя каждое вхождение функции подграфом, представляющим её связанную схему.
 
-According to \lgname{PAPER}, every occurrence of the instance specifier \texttt{pub} overwrites the associate witness default value. Using the appropriate edge labels we get: 
+Согласно \lgname{PAPER}, каждое вхождение спецификатора instance \texttt{pub} перезаписывает связанное значение witness по умолчанию. Используя соответствующие метки рёбер, мы получаем:
 \begin{center}
 \digraph[scale=0.5]{BASICOPS}{
     forcelabels=true;
@@ -375,9 +375,9 @@ According to \lgname{PAPER}, every occurrence of the instance specifier \texttt{
     nadd4 -> nout2 [headlabel="W_4 ", style=dashed, color=grey] ;    
 }
 \end{center}
-Any real-world compiler might process its associated high-level language in a similar way, replacing functions, or gadgets by predefined associated circuits. This process is often followed by various optimization steps that try to reduce the number of constraints as much as possible.
+Любой реальный компилятор (compiler) может обрабатывать связанный с ним высокоуровневый язык подобным образом, заменяя функции или гаджеты (gadgets) предопределёнными связанными схемами. Этот процесс часто сопровождается различными шагами оптимизации (optimization), которые пытаются максимально уменьшить количество ограничений (constraints).
 
-In \lgname{PAPER}, we optimize this circuit by collapsing all box nodes that are directly connected to other box nodes, adhering to the rule that a variable's \texttt{pub} specifier overwrites any witness specifier. Reindexing edge labels, we get the following circuit as our pen and paper compiler output: 
+В \lgname{PAPER} мы оптимизируем эту схему, сворачивая все прямоугольные узлы, напрямую связанные с другими прямоугольными узлами, соблюдая правило, что спецификатор \texttt{pub} переменной перезаписывает любой спецификатор witness. Переиндексируя метки рёбер, мы получаем следующую схему как вывод нашего компилятора ``ручка и бумага'':
 \begin{center}
 \digraph[scale=0.5]{BASICOPSOPTI}{
     forcelabels=true;
@@ -398,8 +398,8 @@ In \lgname{PAPER}, we optimize this circuit by collapsing all box nodes that are
     n6 -> n4 [label=" W_3"] ;
 }
 \end{center}
-\end{example} 
-\begin{example}[$3$-factorization] Consider our $3$-factorization problem from \examplename{} \ref{ex:3-factorization} and the associated circuit $C_{3.fac\_zk}(\F_{13})$ we provided in \examplename{} \ref{ex:TJJ-circuit_1}. To understand the process of replacing high-level functions by their associated circuits inductively, we want to define a \lgname{PAPER} statement that we brain-compile into an algebraic circuit equivalent to $C_{3.fac\_zk}(\F_{13})$:
+\end{example}
+\begin{example}[$3$-факторизация] Рассмотрим нашу задачу $3$-факторизации из~\examplename{}~\ref{ex:3-factorization} и связанную с ней схему $C_{3.fac\_zk}(\F_{13})$, которую мы предоставили в~\examplename{}~\ref{ex:TJJ-circuit_1}. Чтобы понять процесс индуктивной замены высокоуровневых функций их связанными схемами, мы хотим определить утверждение на \lgname{PAPER}, которое ``мозговым компилятором'' (brain-compile) компилируется в алгебраическую схему (algebraic circuit), эквивалентную $C_{3.fac\_zk}(\F_{13})$:
 \begin{lstlisting}
 statement 3_fac_zk {F:F_13} {
   fn main(x_1 : F, x_2 : F, x_3 : F) -> F{
@@ -409,11 +409,11 @@ statement 3_fac_zk {F:F_13} {
   }
 }
 \end{lstlisting} 
-Using \lgname{PAPER}, we start with an empty circuit and then add $3$ input nodes to the input subgraph as well as $1$ output node to the output subgraph. All these nodes are decorated with the associated variable names. Since all of these nodes represent variables of the \texttt{field} type, we don't have to add any type constraints to the circuit.
+Используя \lgname{PAPER}, мы начинаем с пустой схемы, а затем добавляем $3$ входных узла в подграф входов, а также $1$ выходной узел в подграф выходов. Все эти узлы помечены связанными именами переменных. Поскольку все эти узлы представляют переменные (variables) типа \texttt{field}, нам не нужно добавлять никаких ограничений типов к схеме.
 
-We check the validity of every expression on the right side of the single \texttt{<==} operator including a type check. 
+Мы проверяем корректность каждого выражения в правой части единственного оператора \texttt{<==}, включая проверку типов.
 
-We evaluate the expressions on the right side of every \texttt{<==} operator inductively. We have two nested multiplication functions and we replace them by the associated multiplication circuits, starting with the most outer function. We get: 
+Мы вычисляем выражения в правой части каждого оператора \texttt{<==} индуктивно. У нас есть две вложенные функции умножения, и мы заменяем их связанными схемами умножения, начиная с самой внешней функции. Мы получаем:
 \begin{center}
 \digraph[scale=0.5]{PAPER3FUC}{
     forcelabels=true;
@@ -468,7 +468,7 @@ We evaluate the expressions on the right side of every \texttt{<==} operator ind
     nmul24 -> nout1 [xlabel="I_1", style=dashed, color=grey] ;   
 }
 \end{center} 
-In a final optimization step, we collapse all box nodes directly connected to other box nodes, adhering to the rule that a variables \texttt{public} specifier overwrites any \texttt{private} specifier. Reindexing edge labels we get the following circuit:
+На заключительном шаге оптимизации (optimization) мы сворачиваем все прямоугольные узлы, напрямую связанные с другими прямоугольными узлами, соблюдая правило, что спецификатор \texttt{public} переменной перезаписывает любой спецификатор \texttt{private}. Переиндексируя метки рёбер, мы получаем следующую схему:
 \begin{center}
 \digraph[scale=0.5]{PAPER3FUCOPTI}{
 	forcelabels=true;
@@ -490,9 +490,9 @@ In a final optimization step, we collapse all box nodes directly connected to ot
 }
 \end{center} 
 \end{example}
-\paragraph{The Subtraction Constraint System} By definition, algebraic circuits only contain addition and multiplication gates, and it follows that there is no single gate for field subtraction, despite the fact that subtraction is a native operation in every field.
+\paragraph{Система ограничений вычитания} По определению, алгебраические схемы содержат только вентили (gates) сложения и умножения, и следовательно, не существует единого вентиля для вычитания в поле, несмотря на то, что вычитание является встроенной операцией в любом поле.
 
-High-level languages and their associated circuit compilers, therefore, need another way to deal with subtraction. To see how this can be achieved, recall that subtraction is defined by addition with the additive inverse, and that the inverse can be computed efficiently by multiplication with $-1$. A circuit for field subtraction is therefore given by
+Языки высокого уровня и связанные с ними компиляторы схем (circuit compilers), следовательно, нуждаются в другом способе работы с вычитанием. Чтобы увидеть, как это может быть достигнуто, вспомним, что вычитание определяется сложением с аддитивной обратной, и что обратная может быть эффективно вычислена умножением на $-1$. Схема для полевого вычитания поэтому задаётся
 \begin{center}
 \digraph[scale=0.4]{BTSUB}{
 	forcelabels=true;
@@ -512,14 +512,14 @@ High-level languages and their associated circuit compilers, therefore, need ano
 	n6 [shape=box, label="SUB(x,y)"]
 }
 \end{center}
-Using the general method from \ref{sec:circuits_associated_R1CS}, the circuits associated Rank-1 Constraint System is given by:
+Используя общий метод из~\ref{sec:circuits_associated_R1CS}, связанная с схемой система ограничений ранга~1 задаётся:
 \begin{equation}
 \left(S_1 + (-1)\cdot S_2\right)\cdot 1 = S_3
 \end{equation}
-Any valid assignment $<S_1,S_2, S_3>$ to this circuit therefore enforces the value $S_3$ to be the difference $S_1- S_2$.
+Любое корректное присваивание (assignment) $<S_1,S_2, S_3>$ к этой схеме поэтому принуждает значение $S_3$ быть разностью $S_1- S_2$.
 
-Real-world compilers usually provide a gadget or a function to abstract over this circuit such that programmers can use subtraction as if it were native to circuits.
-In \lgname{PAPER}, we define the following subtraction function that compiles to the previous circuit:
+Реальные компиляторы (compilers) обычно предоставляют гаджет (gadget) или функцию для абстрагирования над этой схемой, так что программисты могут использовать вычитание так, как будто оно встроено в схемы.
+В \lgname{PAPER} мы определяем следующую функцию вычитания, которая компилируется в предыдущую схему:
 \begin{lstlisting}
 fn SUB(x : F, y : F) -> F{
   let rslt : F ;
@@ -528,16 +528,16 @@ fn SUB(x : F, y : F) -> F{
   return rslt ;
 }
 \end{lstlisting}
-In the setup phase of a statement, we compile every occurrence of the $\mathtt{SUB}$ function into an instance of its associated subtraction circuit, and edge labels are generated according to the rules from \ref{def:algebraic-circuit}.
-\paragraph{The Inversion Constraint System} By definition, algebraic circuits only contain addition and multiplication gates, and it follows that there is no single gate for field inversion, despite the fact that inversion is a native operation in every field. 
+В фазе настройки (setup phase) утверждения мы компилируем каждое вхождение функции $\mathtt{SUB}$ в экземпляр её связанной схемы вычитания, а метки рёбер генерируются согласно правилам из~\ref{def:algebraic-circuit}.
+\paragraph{Система ограничений обращения} По определению, алгебраические схемы содержат только вентили (gates) сложения и умножения, и следовательно, не существует единого вентиля для обращения в поле, несмотря на то, что обращение является встроенной операцией в любом поле.
 
-If the underlying field is a prime field, one approach would be to use Fermat's little theorem \ref{fermats-little-theorem} to compute the multiplicative inverse inside the circuit. To see how this works, let $\F_p$ be the prime field. The multiplicative inverse $x^{-1}$ of a field element $x\in\F$ with $x\neq 0$ is then given by $x^{-1}= x^{p-2}$, and computing $x^{p-2}$ in the circuit therefore computes the multiplicative inverse. 
+Если лежащее в основе поле является простым полем, один подход состоял бы в использовании малой теоремы Ферма (Fermat's little theorem)~\ref{fermats-little-theorem} для вычисления мультипликативной обратной внутри схемы. Чтобы увидеть, как это работает, пусть $\F_p$ будет простым полем. Мультипликативная обратная $x^{-1}$ элемента поля $x\in\F$ с $x\neq 0$ тогда задаётся как $x^{-1}= x^{p-2}$, и вычисление $x^{p-2}$ в схеме поэтому вычисляет мультипликативную обратную.
 
-Unfortunately, real-world primes $p$ are large and computing $x^{p-2}$ by repeated multiplication of $x$ with itself is infeasible. A ``square and multiply'' approach \ref{alg_square-and-mul} is faster, as it computes the power in roughly $log_2(p)$ steps, but still adds a lot of constraints to the circuit. 
+К сожалению, реальные простые числа $p$ велики, и вычисление $x^{p-2}$ путём повторного умножения $x$ на само себя неосуществимо. Подход ``квадрирование и умножение'' (square and multiply)~\ref{alg_square-and-mul} быстрее, так как вычисляет степень примерно за $log_2(p)$ шагов, но всё равно добавляет много ограничений (constraints) в схему.
 
-Computing inverses in the circuit makes no use of the fact that inversion is a native operation in any field. A more constraints friendly approach is therefore to compute the multiplicative inverse outside of the circuit and then only enforce correctness of the computation in the circuit. 
+Вычисление обратных в схеме не использует тот факт, что обращение является встроенной операцией в любом поле. Более дружественный к ограничениям (constraints) подход, следовательно, состоит в том, чтобы вычислить мультипликативную обратную вне схемы, а затем только обеспечить корректность вычисления в схеме.
 
-To understand how this can be achieved, observe that a field element $y\in \F$ is the multiplicative inverse of a field element $x\in \F$ if and only if $x\cdot y =1$ in $\F$. We can use this, and define a circuit that has two inputs, $x$ and $y$, and enforces $x\cdot y =1$. It is then guaranteed that $y$ is the multiplicative inverse of $x$. The price we pay is that we can not compute $y$ by circuit execution, but auxiliary data is needed to tell any prover which value of $y$ is needed for a valid circuit assignment.  The following circuit defines the constraint
+Чтобы понять, как это может быть достигнуто, заметим, что элемент поля $y\in \F$ является мультипликативной обратной элемента поля $x\in \F$ тогда и только тогда, когда $x\cdot y =1$ в $\F$. Мы можем использовать это и определить схему, которая имеет два входа, $x$ и $y$, и принуждает $x\cdot y =1$. Тогда гарантируется, что $y$ является мультипликативной обратной $x$. Цена, которую мы платим, заключается в том, что мы не можем вычислить $y$ путём выполнения схемы, но необходимы вспомогательные данные, чтобы сообщить доказывающему (prover), какое значение $y$ требуется для корректного присваивания (assignment) схемы. Следующая схема определяет ограничение
 \begin{center}
 \label{circ:inversion}
 \digraph[scale=0.4]{BTINV}{
@@ -554,13 +554,13 @@ To understand how this can be achieved, observe that a field element $y\in \F$ i
 	n4 [shape=box, label="1"];	
 }
 \end{center}
-Using the general method from \ref{sec:circuits_associated_R1CS}, the circuit is transformed into the following Rank-1 Constraint System:
+Используя общий метод из~\ref{sec:circuits_associated_R1CS}, схема преобразуется в следующую систему ограничений ранга~1:
 \begin{equation}
 S_1 \cdot S_2 = 1
 \end{equation}
-Any valid assignment $<S_1,S_2>$ to this circuit enforces that $S_2$ is the multiplicative inverse of $S_1$, and, since there is no field element $S_2$ such that $0\cdot S_2=1$, it also handles the fact that the multiplicative inverse of $0$ is not defined in any field. 
+Любое корректное присваивание (assignment) $<S_1,S_2>$ к этой схеме принуждает $S_2$ быть мультипликативной обратной $S_1$, и, поскольку не существует элемента поля $S_2$ такого, что $0\cdot S_2=1$, она также обрабатывает тот факт, что мультипликативная обратная $0$ не определена в любом поле.
 
-Real-world compilers usually provide a gadget or a function to abstract over this circuit, and those functions compute the inverse $x^{-1}$ as part of their witness generation process. Programers then don't have to care about providing the inverse as auxiliary data to the circuit. In \lgname{PAPER}, we define the following inversion function that compiles to the previous circuit:
+Реальные компиляторы (compilers) обычно предоставляют гаджет (gadget) или функцию для абстрагирования над этой схемой, и эти функции вычисляют обратную $x^{-1}$ как часть своего процесса генерации witness. Программистам тогда не нужно беспокоиться о предоставлении обратной как вспомогательных данных схеме. В \lgname{PAPER} мы определяем следующую функцию обращения, которая компилируется в предыдущую схему:
 \begin{lstlisting}
 fn INV(x : F, y : F) -> F {
   let x_inv : F ;
@@ -570,13 +570,13 @@ fn INV(x : F, y : F) -> F {
   return x_inv ;
 }
 \end{lstlisting}
-As we see, this functions takes two inputs, the field value and its inverse. It therefore does not handle the computation of the inverse by itself. This is to keep \lgname{PAPER} as simple as possible. 
+Как мы видим, эта функция принимает два входа: значение поля и его обратную. Следовательно, она не обрабатывает вычисление обратной самостоятельно. Это сделано для того, чтобы сохранить \lgname{PAPER} максимально простым.
 
-In the setup phase, we compile every occurrence of the $\mathtt{INV}$ function into an instance of the inversion circuit \ref{circ:inversion}, and edge labels are generated according to the rules from \ref{def:algebraic-circuit}.
-\paragraph{The Division Constraint System}
-\label{def:division_circuit} By definition, algebraic circuits only contain addition and multiplication gates, and it follows that there is no single gate for field division, despite the fact that division is a native operation in every field.
+В фазе настройки (setup phase) мы компилируем каждое вхождение функции $\mathtt{INV}$ в экземпляр схемы обращения~\ref{circ:inversion}, а метки рёбер генерируются согласно правилам из~\ref{def:algebraic-circuit}.
+\paragraph{Система ограничений деления}
+\label{def:division_circuit} По определению, алгебраические схемы содержат только вентили (gates) сложения и умножения, и следовательно, не существует единого вентиля для полевого деления, несмотря на то, что деление является встроенной операцией в любом поле.
 
-Implementing division as a circuit, we use the fact that division is multiplication with the multiplicative inverse. We therefore define division as a circuit using the inversion circuit and constraint system from the previous paragraph. Expensive inversion is computed outside of the circuit and then provided as circuit input. We get 
+Реализуя деление как схему, мы используем тот факт, что деление является умножением на мультипликативную обратную. Мы поэтому определяем деление как схему, используя схему обращения и систему ограничений из предыдущего параграфа. Дорогостоящее обращение вычисляется вне схемы, а затем предоставляется как вход схемы. Мы получаем
 \begin{center}
 \digraph[scale=0.4]{BTDIV}{
 	forcelabels=true;
@@ -598,14 +598,14 @@ Implementing division as a circuit, we use the fact that division is multiplicat
 	n7 [shape=box, label="DIV(x,y)"];	
 }
 \end{center} 
-Using the method from \ref{sec:circuits_associated_R1CS}, we transform this circuit into the following Rank-1 Constraint System:
+Используя метод из~\ref{sec:circuits_associated_R1CS}, мы преобразуем эту схему в следующую систему ограничений ранга~1:
 \begin{align*}
 S_2 \cdot S_3 &= 1\\
 S_1 \cdot S_3 &= S_4
 \end{align*}
-Any valid assignment $<S_1,S_2,S_3,S_4>$ to this circuit enforces $S_4$ to be the field division of $S_1$ by $S_2$. It handles the fact that division by $0$ is not defined, since there is no valid assignment in case $S_2=0$. 
+Любое корректное присваивание (assignment) $<S_1,S_2,S_3,S_4>$ к этой схеме принуждает $S_4$ быть полевым делением $S_1$ на $S_2$. Она обрабатывает тот факт, что деление на $0$ не определено, поскольку не существует корректного присваивания в случае $S_2=0$.
 
-In \lgname{PAPER}, we define the following division function that compiles to the previous circuit:
+В \lgname{PAPER} мы определяем следующую функцию деления, которая компилируется в предыдущую схему:
 \begin{lstlisting}
 fn DIV(x : F, y : F, y_inv : F) -> F {
   let DIV : F ;
@@ -613,8 +613,8 @@ fn DIV(x : F, y : F, y_inv : F) -> F {
   return DIV
 }
 \end{lstlisting}
-In the setup phase, we compile every occurrence of the binary $\mathtt{DIV}$ operator into an instance of the inversion circuit.
-\begin{exercise} Let $\mathtt{F}$ be the field $\F_5$ of modular $5$ arithmetics from \examplename{} \ref{primfield_z_5}. Brain-compile the following \lgname{PAPER} statement into an algebraic circuit:
+В фазе настройки (setup phase) мы компилируем каждое вхождение бинарного оператора $\mathtt{DIV}$ в экземпляр схемы обращения.
+\begin{exercise} Пусть $\mathtt{F}$ будет полем $\F_5$ модульной арифметики по модулю $5$ из~\examplename{}~\ref{primfield_z_5}. ``Мозговым компилятором'' (brain-compile) скомпилируйте следующее утверждение на \lgname{PAPER} в алгебраическую схему (algebraic circuit):
 \begin{lstlisting}
 statement STUPID_CIRC {F: F_5} {
   fn foo(in_1 : F, in_2 : F)->(out_1 : F, out_2 : F,){
@@ -630,11 +630,11 @@ statement STUPID_CIRC {F: F_5} {
 }
 \end{lstlisting}
 \end{exercise}
-\begin{exercise} Consider the tiny-jubjub curve from \examplename{} \ref{TJJ13} and its associated circuit \ref{ex:3-fac-zk-circuit}. Write a statement in \lgname{PAPER} that brain-compiles the statement into a circuit equivalent to the one derived in \ref{ex:3-fac-zk-circuit}, assuming that curve point is the instance and every other assignment is a witness. 
+\begin{exercise} Рассмотрим кривую tiny-jubjub из~\examplename{}~\ref{TJJ13} и связанную с ней схему~\ref{ex:3-fac-zk-circuit}. Напишите утверждение на \lgname{PAPER}, которое ``мозговым компилятором'' (brain-compile) компилируется в схему, эквивалентную выведенной в~\ref{ex:3-fac-zk-circuit}, предполагая, что точка кривой является instance, а всё остальное присваивание (assignment) --- witness.
 \end{exercise}
-\begin{exercise} Let $\mathtt{F}=\F_{13}$ be the modular $13$ prime field and $x\in\mathtt{F}$ some field element. Define a statement in \lgname{PAPER} such that given instance $x$ a field element $y\in\mathtt{F}$ is a witness for the statement if and only if $y$ is the square root of $x$.  
+\begin{exercise} Пусть $\mathtt{F}=\F_{13}$ будет простым полем модульной арифметики по модулю $13$ и $x\in\mathtt{F}$ --- некоторый элемент поля. Определите утверждение на \lgname{PAPER} так, чтобы данный instance $x$ элемент поля $y\in\mathtt{F}$ был witness для утверждения тогда и только тогда, когда $y$ является квадратным корнем из $x$.
 
-Brain-compile the statement into a circuit and derive its associated Rank-1 Constraint System. Consider the instance $x=9$ and compute a constructive proof for the statement. 
+``Мозговым компилятором'' (brain-compile) скомпилируйте утверждение в схему и выведите связанную с ней систему ограничений ранга~1. Рассмотрите instance $x=9$ и вычислите конструктивное доказательство для утверждения.
 \begin{comment}
 \begin{lstlisting}
 statement KNOWLEDGE_OF_SQUARE_ROOT {F} {
@@ -651,7 +651,7 @@ statement KNOWLEDGE_OF_SQUARE_ROOT {F} {
 \end{comment}
 \end{exercise}
 \begin{comment}
-\paragraph{Modularity} Implementing bounded computation in algebraic circuits it is often necessary to deal with complex expressions of the field type. As we have seen in XXX\sme{add reference} and XXX\sme{add reference}, both algebraic circuits and R1CS have a modularity property, which enables a compiler to derive algebraic circuit implementations for arbitrary circuits. 
+\paragraph{Modularity} Implementing bounded computation in algebraic circuits it is often necessary to deal with complex expressions of the field type. As we have seen in XXX\sme{add reference} and XXX\sme{add reference}, both algebraic circuits and R1CS have a modularity property, which enables a compiler to derive algebraic circuit implementations for arbitrary circuits.
 \begin{example}
 To given an intuition of how real-world circuit compilers make use of the modularity property to synthesize complex circuits from high-level programs, we derive a circuit for the following \lgname{PAPER} code:
 \begin{lstlisting}
@@ -662,7 +662,7 @@ def main<F_13>(private x : F, private y : F, private y^(-1) : F ) -> () {
 }
 \end{lstlisting}
 \end{example}
-\begin{example} Consider the prime field $\F_{13}$. In this example, we want to derive an algebraic circuit and associated R1CS that enforces a pair $(x,y)\in \F_{13}^2$ to be the sum of two tiny-jubjub curve points $(x_1,y_1)$ and $(x_2,y_2)$. We assume that we already know that $(x_1,x_2)$ as well as $(x_2,y_2)$ are tiny-jubjub points, that is, we assume that they are the inputs to valid assignments of circuit XXX\sme{add reference}. 
+\begin{example} Consider the prime field $\F_{13}$. In this example, we want to derive an algebraic circuit and associated R1CS that enforces a pair $(x,y)\in \F_{13}^2$ to be the sum of two tiny-jubjub curve points $(x_1,y_1)$ and $(x_2,y_2)$. We assume that we already know that $(x_1,x_2)$ as well as $(x_2,y_2)$ are tiny-jubjub points, that is, we assume that they are the inputs to valid assignments of circuit XXX\sme{add reference}.
 
 To synthesize the associated circuit, we start with the twisted Edwards addition law XXX\sme{add reference} of the tiny-jubjub curve:
 $$
@@ -719,17 +719,17 @@ We then proceed inductively choosing circuits for the outer most operators, whic
 \end{comment}
 \sme{Is the comment group hidden on purpose?}
 
-\subsubsection{The Boolean Type} 
+\subsubsection{Булев тип}
 % implementations can be found here: https://github.com/filecoin-project/zexe/tree/master/snark-gadgets/src/bits
-Booleans are a classical primitive type, implemented by virtually every higher programing language. It is therefore important to implement booleans in circuits. One of the most common ways to do this is by interpreting the additive and multiplicative neutral element $\{0,1\}\subset \F$ as the two boolean values such that $0$ represents $false$ and $1$ represents $true$. Boolean operators like $and$, $or$, or $xor$ are then expressible as algebraic circuits over $\F$. 
+Булевы значения (booleans) --- это классический примитивный тип, реализуемый практически каждым языком программирования более высокого уровня. Поэтому важно реализовать булевы значения в схемах. Одним из самых распространённых способов сделать это является интерпретация аддитивного и мультипликативного нейтральных элементов $\{0,1\}\subset \F$ как двух булевых значений так, что $0$ представляет $false$, а $1$ представляет $true$. Булевы операторы, такие как $and$, $or$ или $xor$, тогда выражаются как алгебраические схемы над $\F$.
 
-Representing booleans this way is convenient, because the elements $0$ and $1$ are defined in any field. The representation is therefore independent of the actual field in consideration. 
+Такое представление булевых значений удобно, потому что элементы $0$ и $1$ определены в любом поле. Представление поэтому не зависит от конкретного рассматриваемого поля.
 
-To fix boolean algebra notation, we write $0$ to represent $false$ and $1$ to represent $true$, and we write $\wedge$ to represent the boolean AND as well as $\vee$ to represent the boolean OR operator. The boolean NOT operator is written as $\lnot$. 
-\paragraph{The boolean Constraint System}
-\label{def:boolean_constraint} To represent booleans by the additive and multiplicative neutral elements of a field, a constraint is required to actually enforce variables of boolean type to be either $1$ or $0$. In fact, many of the following circuits that represent boolean functions are only correct under the assumption that their input variables are constrained to be either $0$ or $1$. Not constraining boolean variables is a common problem in circuit design.
+Чтобы зафиксировать нотацию булевой алгебры, мы пишем $0$ для представления $false$ и $1$ для представления $true$, а $\wedge$ пишем для представления булева И (AND), а также $\vee$ для представления булева ИЛИ (OR). Булев оператор НЕ (NOT) записывается как $\lnot$.
+\paragraph{Булева система ограничений}
+\label{def:boolean_constraint} Чтобы представить булевы значения аддитивным и мультипликативным нейтральными элементами поля, требуется ограничение (constraint), фактически принуждающее переменные булева типа быть либо $1$, либо $0$. На самом деле, многие из следующих схем, представляющих булевы функции, корректны только при условии, что их входные переменные ограничены быть либо $0$, либо $1$. Неограниченность булевых переменных --- это распространённая проблема в проектировании схем.
 
-In order to constrain an arbitrary field element $x\in \F$ to be $1$ or $0$, the key observation is that the equation $x \cdot (1-x) =0$ has only the two solutions $0$ and $1$ in any field. Implementing this equation as a circuit therefore generates the correct constraint:
+Чтобы ограничить произвольный элемент поля $x\in \F$ быть $1$ или $0$, ключевое наблюдение состоит в том, что уравнение $x \cdot (1-x) =0$ имеет только два решения $0$ и $1$ в любом поле. Реализация этого уравнения как схемы поэтому генерирует корректное ограничение:
 \begin{center}
 \digraph[scale=0.4]{BOOLCONS}{
   forcelabels=true;
@@ -752,28 +752,28 @@ In order to constrain an arbitrary field element $x\in \F$ to be $1$ or $0$, the
   nCONS7 [shape=box, label="0"] ;
 }
 \end{center}
-Using the method from \ref{sec:circuits_associated_R1CS}, we transform this circuit into the following Rank-1 Constraint System:
+Используя метод из~\ref{sec:circuits_associated_R1CS}, мы преобразуем эту схему в следующую систему ограничений ранга~1:
 $$
 S_1 \cdot (1-S_1) = 0
 $$
-Any valid assignment $<S_1>$ to label of this circuit therefore enforces $S_1$ to be either the field element $0$ or $1$. 
+Любое корректное присваивание (assignment) $<S_1>$ к метке этой схемы поэтому принуждает $S_1$ быть либо элементом поля $0$, либо $1$.
 
-Some real-world circuit compilers (like \texttt{ZOKRATES} or \texttt{BELLMAN}) are typed, while others (like \texttt{circom}) are not. However, all of them have their way of dealing with the binary constraint. In \lgname{PAPER}, we define the boolean type by its type\_function that compiles to the previous circuit:
+Некоторые реальные компиляторы схем (circuit compilers) (такие как \texttt{ZOKRATES} или \texttt{BELLMAN}) являются типизированными, в то время как другие (такие как \texttt{circom}) --- нет. Однако у всех них есть свой способ работы с двоичным ограничением. В \lgname{PAPER} мы определяем булев тип его type\_function, которая компилируется в предыдущую схему:
 \begin{lstlisting}
 type_function BOOL(b : BOOL) -> F { 
 	let x : F ;
 	let const c1 : F = 0 ;
 	let const c2 : F = 1 ;
-	tet const c3 : F = -1 ;
+	let const c3 : F = -1 ;
     c1 <== MUL( b ,  ADD( c2 , MUL( b , c3) ) ) );
     x <== b ;
     return x ;
 }
 \end{lstlisting}
-In the setup phase of a statement, we compile every occurrence of a variable of boolean type into an instance of its associated boolean circuit.
-\paragraph{The AND operator constraint system} Given two field elements $b_1$ and $b_2$ from $\F$ that are constrained to represent boolean variables, we want to find a circuit that computes the logical \term{and} operator $AND(b_1,b_2)$ as well as its associated R1CS that enforces $b_1$, $b_2$, $AND(b_1,b_2)$ to satisfy the constraint system if and only if $b_1\; \wedge \; b_2 =AND(b_1,b_2)$ holds true. 
+В фазе настройки (setup phase) утверждения мы компилируем каждое вхождение переменной булева типа в экземпляр её связанной булевой схемы.
+\paragraph{Система ограничений оператора AND} Даны два элемента поля $b_1$ и $b_2$ из $\F$, которые ограничены представлять булевы переменные, мы хотим найти схему, которая вычисляет логический оператор \term{and} (И) $AND(b_1,b_2)$, а также связанную с ней R1CS, принуждающую $b_1$, $b_2$, $AND(b_1,b_2)$ удовлетворять системе ограничений тогда и только тогда, когда $b_1\; \wedge \; b_2 =AND(b_1,b_2)$ выполняется.
 
-The key insight here is that, given three boolean constraint variables $b_1$, $b_2$ and $b_3$, the equation $b_1\cdot b_2 = b_3$ is satisfied in $\F$ if and only if the equation $b_1\; \wedge \; b_2 = b_3$ is satisfied in boolean algebra. The logical operator $\wedge$ is therefore implementable in $\F$ by field multiplication of its arguments and the following circuit computes the $\wedge$ operator in $\F$, assuming all inputs are restricted to be $0$ or $1$:
+Ключевое наблюдение здесь состоит в том, что, даны три булевых ограниченных переменных $b_1$, $b_2$ и $b_3$, уравнение $b_1\cdot b_2 = b_3$ удовлетворяется в $\F$ тогда и только тогда, когда уравнение $b_1\; \wedge \; b_2 = b_3$ удовлетворяется в булевой алгебре. Логический оператор $\wedge$ поэтому реализуем в $\F$ путём полевого умножения его аргументов, и следующая схема вычисляет оператор $\wedge$ в $\F$, предполагая, что все входы ограничены быть $0$ или $1$:
 \begin{center}
 \digraph[scale=0.4]{BOOLAND}{
   forcelabels=true;
@@ -790,11 +790,11 @@ The key insight here is that, given three boolean constraint variables $b_1$, $b
   nAND4 [shape=box, label="AND(b_1,b_2)"] ;
 }
 \end{center}
-The associated Rank-1 Constraint System can be deduced from the general process \ref{sec:circuits_associated_R1CS} and consists of the following constraint:
+Связанная система ограничений ранга~1 может быть выведена из общего процесса~\ref{sec:circuits_associated_R1CS} и состоит из следующего ограничения:
 \begin{equation}
  S_1 \cdot S_2 = S_3
 \end{equation}
-Common circuit languages typically provide a gadget or a function to abstract over this circuit such that programers can use the $\wedge$ operator without caring about the associated circuit. In \lgname{PAPER}, we define the following function that compiles to the $\wedge$-operator's circuit:
+Распространённые языки схем обычно предоставляют гаджет (gadget) или функцию для абстрагирования над этой схемой, так что программисты могут использовать оператор $\wedge$, не заботясь о связанной схеме. В \lgname{PAPER} мы определяем следующую функцию, которая компилируется в схему оператора $\wedge$:
 \begin{lstlisting}
 fn AND(b_1 : BOOL, b_2 : BOOL) -> BOOL {
   let AND : BOOL ;
@@ -802,11 +802,11 @@ fn AND(b_1 : BOOL, b_2 : BOOL) -> BOOL {
   return AND ;
 }
 \end{lstlisting}
-In the setup phase of a statement, we compile every occurrence of the $\mathtt{AND}$ function into an instance of its associated $\wedge$-operator's circuit.
-\paragraph{The OR operator constraint system}
-\label{def:boolean-or} Given two field elements $b_1$ and $b_2$ from $\F$ that are constrained to represent boolean variables, we want to find a circuit that computes the logical \term{or} operator $OR(b_1,b_2)$ as well as its associated R1CS that enforces $b_1$, $b_2$, $OR(b_1,b_2)$ to satisfy the constraint system if and only if $b_1\; \vee \; b_2 = OR(b_1,b_2)$ holds true. 
+В фазе настройки (setup phase) утверждения мы компилируем каждое вхождение функции $\mathtt{AND}$ в экземпляр связанной с ней схемы оператора $\wedge$.
+\paragraph{Система ограничений оператора OR}
+\label{def:boolean-or} Даны два элемента поля $b_1$ и $b_2$ из $\F$, которые ограничены представлять булевы переменные, мы хотим найти схему, которая вычисляет логический оператор \term{or} (ИЛИ) $OR(b_1,b_2)$, а также связанную с ней R1CS, принуждающую $b_1$, $b_2$, $OR(b_1,b_2)$ удовлетворять системе ограничений тогда и только тогда, когда $b_1\; \vee \; b_2 = OR(b_1,b_2)$ выполняется.
 
-Assuming that three variables $b_1$, $b_2$ and $b_3$ are boolean constraint, the equation $b_1 + b_2 - b_1\cdot b_2 = b_3$ is satisfied in $\F$ if and only if the equation $b_1 \; \vee \; b_2 = b_3$ is satisfied in boolean algebra. The logical operator $\vee$ is therefore implementable in $\F$ by the following circuit, assuming all inputs are restricted to be $0$ or $1$:
+Предполагая, что три переменные $b_1$, $b_2$ и $b_3$ булево ограничены, уравнение $b_1 + b_2 - b_1\cdot b_2 = b_3$ удовлетворяется в $\F$ тогда и только тогда, когда уравнение $b_1 \; \vee \; b_2 = b_3$ удовлетворяется в булевой алгебре. Логический оператор $\vee$ поэтому реализуем в $\F$ следующей схемой, предполагая, что все входы ограничены быть $0$ или $1$:
 \begin{center}
 \digraph[scale=0.4]{BOOLOR}{
   forcelabels=true;
@@ -835,7 +835,7 @@ Assuming that three variables $b_1$, $b_2$ and $b_3$ are boolean constraint, the
 
 }
 \end{center}
-The associated Rank-1 Constraint System can be deduced from the general process \ref{sec:circuits_associated_R1CS} and consists of the following constraints:
+Связанная система ограничений ранга~1 может быть выведена из общего процесса~\ref{sec:circuits_associated_R1CS} и состоит из следующих ограничений:
 
 \begin{equation}\label{def:boolean-or_constraints}
 \begin{tabular}{lcr}
@@ -844,7 +844,7 @@ $(S_1 + S_2 - S_3)\cdot 1$ &$=$ &$S_4$
 \end{tabular}
 \end{equation}
 
-Common circuit languages typically provide a gadget or a function to abstract over this circuit such that programers can use the $\vee$ operator without caring about the associated circuit. In \lgname{PAPER}, we define the following function that compiles to the $\vee$-operator's circuit:
+Распространённые языки схем обычно предоставляют гаджет (gadget) или функцию для абстрагирования над этой схемой, так что программисты могут использовать оператор $\vee$, не заботясь о связанной схеме. В \lgname{PAPER} мы определяем следующую функцию, которая компилируется в схему оператора $\vee$:
 \begin{lstlisting}
 fn OR(b_1 : BOOL, b_2 : BOOL) -> BOOL {
   let OR : BOOL ;
@@ -853,13 +853,13 @@ fn OR(b_1 : BOOL, b_2 : BOOL) -> BOOL {
   return OR ;
 }
 \end{lstlisting}
-In the setup phase of a statement, we compile every occurrence of the $\mathtt{OR}$ function into an instance of its associated $\vee$-operator's circuit.
-\begin{exercise} Let $\F$ be a finite field and let $b_1$ as well as $b_2$ two boolean constrained variables from $\F$. Show that the equation 
-$OR(b_1,b_2) = 1 - (1 - b_1)\cdot (1 - b_2)$ holds true.
+В фазе настройки (setup phase) утверждения мы компилируем каждое вхождение функции $\mathtt{OR}$ в экземпляр связанной с ней схемы оператора $\vee$.
+\begin{exercise} Пусть $\F$ будет конечным полем и пусть $b_1$, а также $b_2$ --- две булево ограниченные переменные из $\F$. Покажите, что уравнение
+$OR(b_1,b_2) = 1 - (1 - b_1)\cdot (1 - b_2)$ выполняется.
 
-Use this equation to derive an algebraic circuit with ingoing variables $b_1$ and $b_2$ and outgoing variable $OR(b_1,b_2)$ such that $b_1$ and $b_2$ are boolean constrained and the circuit has a valid assignment, if and only if $OR(b_1,b_2) = b_1 \vee b_2$.  
+Используйте это уравнение для выведения алгебраической схемы с входящими переменными $b_1$ и $b_2$ и исходящей переменной $OR(b_1,b_2)$ так, чтобы $b_1$ и $b_2$ были булево ограничены и схема имела корректное присваивание (assignment) тогда и только тогда, когда $OR(b_1,b_2) = b_1 \vee b_2$.
 
-Use the technique from \ref{sec:circuits_associated_R1CS} to transform this circuit into a Rank-1 Constraint System and find its full solution set. Define a \lgname{PAPER} function that brain-compiles into the circuit. 
+Используйте технику из~\ref{sec:circuits_associated_R1CS} для преобразования этой схемы в систему ограничений ранга~1 и найдите её полное множество решений. Определите функцию на \lgname{PAPER}, которая ``мозговым компилятором'' (brain-compile) компилируется в схему.
 \begin{comment}
 \begin{center}
 \digraph[scale=0.4]{BOOLOR}{
@@ -910,9 +910,9 @@ fn OR(b_1 : BOOL, b_2 : BOOL) -> OR(b_1,b_2) : BOOL{
 In the setup phase of a statement, we compile every occurrence of the $\mathtt{OR}$ function into an instance of its associated $\vee$-operator's circuit.
 \end{comment} 
 \end{exercise}
-\paragraph{The NOT operator constraint system} Given a field element $b$ from $\F$ that is constrained to represent a boolean variable, we want to find a circuit that computes the logical \term{NOT} operator $NOT(b)$ as well as its associated R1CS that enforces $b$, $NOT(b)$ to satisfy the constraint system if and only if $\lnot b = NOT(b)$ holds true. 
+\paragraph{Система ограничений оператора NOT} Дан элемент поля $b$ из $\F$, который ограничен представлять булеву переменную, мы хотим найти схему, которая вычисляет логический оператор \term{NOT} (НЕ) $NOT(b)$, а также связанную с ней R1CS, принуждающую $b$, $NOT(b)$ удовлетворять системе ограничений тогда и только тогда, когда $\lnot b = NOT(b)$ выполняется.
 
-Assuming that two variables $b_1$ and $b_2$ are boolean constrained, the equation $(1-b_1) = b_2$ is satisfied in $\F$ if and only if the equation $\lnot b_1 = b_2$ is satisfied in boolean algebra. The logical operator $\lnot$ is therefore implementable in $\F$ by the following circuit, assuming all inputs are restricted to be $0$ or $1$:
+Предполагая, что две переменные $b_1$ и $b_2$ булево ограничены, уравнение $(1-b_1) = b_2$ удовлетворяется в $\F$ тогда и только тогда, когда уравнение $\lnot b_1 = b_2$ удовлетворяется в булевой алгебре. Логический оператор $\lnot$ поэтому реализуем в $\F$ следующей схемой, предполагая, что все входы ограничены быть $0$ или $1$:
 \begin{center}
 \digraph[scale=0.4]{BOOLNOT}{
   forcelabels=true;
@@ -933,11 +933,11 @@ Assuming that two variables $b_1$ and $b_2$ are boolean constrained, the equatio
   nNOT6 [shape=box, label="NOT(b)"] ;
 }
 \end{center}
-The associated Rank-1 Constraint System can be deduced from the general process \ref{sec:circuits_associated_R1CS} and consists of the following constraints
+Связанная система ограничений ранга~1 может быть выведена из общего процесса~\ref{sec:circuits_associated_R1CS} и состоит из следующих ограничений
 \begin{align*}
   (1-S_1)\cdot 1 &= S_2
 \end{align*}
-Common circuit languages typically provide a gadget or a function to abstract over this circuit such that programers can use the $\lnot$ operator without caring about the associated circuit. In \lgname{PAPER}, we define the following function that compiles to the $\lnot$-operator's circuit:
+Распространённые языки схем обычно предоставляют гаджет (gadget) или функцию для абстрагирования над этой схемой, так что программисты могут использовать оператор $\lnot$, не заботясь о связанной схеме. В \lgname{PAPER} мы определяем следующую функцию, которая компилируется в схему оператора $\lnot$:
 \begin{lstlisting}
 fn NOT(b : BOOL) -> BOOL{
   let NOT : BOOL ;
@@ -947,14 +947,14 @@ fn NOT(b : BOOL) -> BOOL{
   return NOT ;
 }
 \end{lstlisting}
-In the setup phase of a statement, we compile every occurrence of the $\mathtt{NOT}$ function into an instance of its associated $\lnot$-operator's circuit.
+В фазе настройки (setup phase) утверждения мы компилируем каждое вхождение функции $\mathtt{NOT}$ в экземпляр связанной с ней схемы оператора $\lnot$.
 \begin{exercise}
-Let $\F$ be a finite field. Derive algebraic circuits and associated Rank-1 Constraint Systems for the following operators: NOR, XOR, NAND, EQU.
+Пусть $\F$ будет конечным полем. Выведите алгебраические схемы и связанные с ними системы ограничений ранга~1 для следующих операторов: NOR, XOR, NAND, EQU.
 \end{exercise}
-\paragraph{Modularity} As we have seen in chapter \ref{sec:statements}, both algebraic circuits and R1CS have a modularity property, and as we have seen in this section, all basic boolean functions are expressible in circuits. Combining those two properties shows that it is possible to express arbitrary boolean functions as algebraic circuits.
+\paragraph{Модульность} Как мы видели в главе~\ref{sec:statements}, и алгебраические схемы, и R1CS обладают свойством модульности (modularity), и как мы видели в этом разделе, все базовые булевы функции выражаемы в схемах. Комбинация этих двух свойств показывает, что возможно выражать произвольные булевы функции как алгебраические схемы.
 
-The expressiveness of algebraic circuits and therefore Rank-1 Constraint Systems is as general as the expressiveness of boolean circuits. An important implication is that the languages $L_{R1CS-SAT}$ and $L_{Circuit-SAT}$ as defined in \ref{r1cs-satisfiability} and \ref{circuit-satisfiability}, are as general as the famous language $L_{3-SAT}$, which is known to be $\mathcal{NP}$-complete. 
-\begin{example} To give an example of how a compiler might construct complex boolean expressions in algebraic circuits from simple ones and how we derive their associated Rank-1 Constraint Systems, let's look at the following \lgname{PAPER} statement:
+Выразительность алгебраических схем, а следовательно, систем ограничений ранга~1 столь же обща, как выразительность булевых схем. Важное следствие состоит в том, что языки $L_{R1CS-SAT}$ и $L_{Circuit-SAT}$, как определены в~\ref{r1cs-satisfiability} и~\ref{circuit-satisfiability}, столь же общи, как известный язык $L_{3-SAT}$, который известен как $\mathcal{NP}$-полный.
+\begin{example} Чтобы привести пример того, как компилятор (compiler) может конструировать сложные булевы выражения в алгебраических схемах из простых, и как мы выводим их связанные системы ограничений ранга~1, рассмотрим следующее утверждение на \lgname{PAPER}:
 \begin{lstlisting}
 statement BOOLEAN_STAT {F: F_p} {
   fn main(b_1:BOOL,b_2:BOOL,b_3:BOOL,b_4:BOOL )-> BOOL {
@@ -964,13 +964,13 @@ statement BOOLEAN_STAT {F: F_p} {
   } ;
 }
 \end{lstlisting}
-The code describes a circuit that takes four witness input variables $b_1$, $b_2$, $b_3$ and $b_4$ of boolean type and computes an instance variable output $b_5$ such that the following boolean expression holds true:
+Код описывает схему, которая принимает четыре witness-входные переменные $b_1$, $b_2$, $b_3$ и $b_4$ булева типа и вычисляет instance-переменную выхода $b_5$ так, чтобы следующее булево выражение выполнялось:
 $$
 \left( b_1 \vee b_2 \right) \wedge (b_3 \wedge \lnot b_4) = b_5
 $$
-During a setup-phase, a circuit compiler transforms this high-level language statement into a circuit and associated Rank-1 Constraint Systems and hence defines a  language $L_{BOOLEAN\_STAT}$. 
+Во время фазы настройки (setup-phase) компилятор схем (circuit compiler) преобразует это высокоуровневое утверждение в схему и связанную систему ограничений ранга~1, тем самым определяя язык $L_{BOOLEAN\_STAT}$.
 
-To see how this might be achieved, we use \lgname{PAPER} as an example to execute the setup-phase and compile \texttt{BOOLEAN\_STAT} into a circuit. Taking the definition of the boolean constraint \ref{def:boolean_constraint} as well as the definitions of the appropriate boolean operators into account, we get the following circuit:
+Чтобы увидеть, как это может быть достигнуто, мы используем \lgname{PAPER} как пример для выполнения фазы настройки (setup-phase) и компиляции \texttt{BOOLEAN\_STAT} в схему. Учитывая определение булева ограничения~\ref{def:boolean_constraint}, а также определения соответствующих булевых операторов, мы получаем следующую схему:
 \begin{center}
 \digraph[scale=0.25]{BOOLCOMPLEX}{
   forcelabels=true;
@@ -989,7 +989,7 @@ To see how this might be achieved, we use \lgname{PAPER} as an example to execut
   }
   
   subgraph clusterOUTPUT {
-    nout1 [shape=box, label="AND( OR( b1 , b2 ) , AND( b3 , NOT( b4 ) )"]
+    nout1 [shape=box, label="AND( OR( b1 , b2 ) , AND( b3 , NOT( b4 ) )"] 
     color=lightgray;
     label="outputs" ; 
   }
@@ -1158,7 +1158,7 @@ To see how this might be achieved, we use \lgname{PAPER} as an example to execut
 
 }
 \end{center}\sme{can we rotate this by $90^{\circ}$? Good question. IDK}
-Simple optimization then collapses all box-nodes that are directly linked and all box nodes that represent the same constants. After relabeling the edges, the following circuit represents the circuit associated to the \texttt{BOOLEAN\_STAT} statement:
+Простая оптимизация (optimization) затем сворачивает все прямоугольные узлы, напрямую связанные, и все прямоугольные узлы, представляющие одинаковые константы (constants). После перемаркировки рёбер следующая схема представляет схему, связанную с утверждением \texttt{BOOLEAN\_STAT}:
 \begin{center}
 \digraph[scale=0.5]{BOOLCOMPLEXOPTI}{
   forcelabels=true;
@@ -1276,28 +1276,28 @@ Simple optimization then collapses all box-nodes that are directly linked and al
     zero [shape=box, label="0"] ;
 }
 \end{center}
-Given some instance variable $I_1$ from $\F_{13}$, a valid assignment to this circuit consists of witness variables $W_1$, $W_2$, $W_3$, $W_4$ from $\F_{13}$ such that the equation $I_1 = \left( W_1 \vee W_2 \right) \wedge (W_3 \wedge \lnot W_4)$ holds true. In addition, a valid assignment also has to contain witness variables $W_5$, $W_6$, $W_7$, $W_8$, $W_9$ and $W_{10}$, which can be derived from circuit execution. The variables $W_5$, $\ldots$, $W_8$ ensure that the first four witnesses are constrained to be either $0$ or $1$ but not any other field element, and the others enforce the boolean operations in the expression.  
+Для некоторой instance-переменной $I_1$ из $\F_{13}$ корректное присваивание (assignment) к этой схеме состоит из witness-переменных $W_1$, $W_2$, $W_3$, $W_4$ из $\F_{13}$ таких, что уравнение $I_1 = \left( W_1 \vee W_2 \right) \wedge (W_3 \wedge \lnot W_4)$ выполняется. Кроме того, корректное присваивание также должно содержать witness-переменные $W_5$, $W_6$, $W_7$, $W_8$, $W_9$ и $W_{10}$, которые могут быть выведены из выполнения схемы. Переменные $W_5$, $\ldots$, $W_8$ обеспечивают, что первые четыре witness-переменные ограничены быть либо $0$, либо $1$, но не каким-либо другим элементом поля, а остальные обеспечивают булевы операции в выражении.
 
-To compute the associated R1CS, we can use the general method from \ref{sec:circuits_associated_R1CS} and look at every labeled outgoing edge not coming from a source node in the optimized circuit. We declare the edge going to the single output node as instance, and every other edge as witness. In this case we get:
+Чтобы вычислить связанную R1CS, мы можем использовать общий метод из~\ref{sec:circuits_associated_R1CS} и посмотреть на каждое помеченное исходящее ребро, не идущее от источникового узла, в оптимизированной схеме. Мы объявляем ребро, идущее к единственному выходному узлу, как instance, а каждое другое ребро --- как witness. В этом случае мы получаем:
 \begin{align*}
-W_5:\;\; & W_1 \cdot (1- W_1) = 0  & \text{boolean constraints}\\
+W_5:\;\; & W_1 \cdot (1- W_1) = 0  & \text{булевы ограничения}\\
 W_6:\;\; & W_2 \cdot (1- W_2) = 0 \\
 W_7:\;\; & W_3 \cdot (1- W_3) = 0 \\
 W_8:\;\; & W_4 \cdot (1- W_4) = 0 \\
-W_9:\;\; & W_1 \cdot W_2 = W_9 & \text{ first OR-operator constraint}\\
-W_{10}:\;\; & W_3 \cdot (1-W_4) = W_{10} & \text{AND(.,NOT(.))-operator constraints}\\
-I_1:\;\; & (W_1 + W_2 -W_9) \cdot W_{10} = I_1 & \text{AND-operator constraints}\\
+W_9:\;\; & W_1 \cdot W_2 = W_9 & \text{ первое ограничение OR-оператора}\\
+W_{10}:\;\; & W_3 \cdot (1-W_4) = W_{10} & \text{ограничения AND(.,NOT(.))-оператора}\\
+I_1:\;\; & (W_1 + W_2 -W_9) \cdot W_{10} = I_1 & \text{ограничения AND-оператора}\\
 \end{align*}
-The reason why this R1CS only contains a single constraint for the multiplication gate in the OR-circuit, while the general definition \ref{def:boolean-or} requires two constraints, is that the second constraint in \ref{def:boolean-or_constraints} only appears because the final addition gate is connected to an output node. In this case, however, the final addition gate from the OR-circuit is enforced in the left factor of the $I_{1}$ constraint. Something similar holds true for the negation circuit. 
+Причина, по которой эта R1CS содержит только одно ограничение для вентиля (gate) умножения в OR-схеме, в то время как общее определение~\ref{def:boolean-or} требует двух ограничений, состоит в том, что второе ограничение в~\ref{def:boolean-or_constraints} появляется только потому, что конечный вентиль сложения связан с выходным узлом. В этом случае, однако, конечный вентиль сложения из OR-схемы обеспечен в левом множителе ограничения $I_{1}$. Аналогичное верно и для схемы отрицания.
 
-During a prover-phase, some public instance $I_1$ must be given. To compute a constructive proof for the statement of the associated languages with respect to instance $I_1$, a prover has to find four boolean values $W_1$, $W_2$, $W_3$ and $W_4$ such that 
+Во время фазы доказывающего (prover-phase) должно быть дано некоторое публичное instance $I_1$. Чтобы вычислить конструктивное доказательство для утверждения связанных языков относительно instance $I_1$, доказывающий (prover) должен найти четыре булевых значения $W_1$, $W_2$, $W_3$ и $W_4$ таких, что
 $$
 \left( W_1 \vee W_2 \right) \wedge (W_3 \wedge \lnot W_4) = I_1
 $$ 
-holds true. In our case neither the circuit nor the \lgname{PAPER} statement specifies how to find those values, and it is a problem that any prover has to solve outside of the circuit. This might or might not be true for other problems, too. In any case, once the prover found those values, they can execute the circuit to find a valid assignment. 
+выполняется. В нашем случае ни схема, ни утверждение на \lgname{PAPER} не указывают, как найти эти значения, и это проблема, которую любой доказывающий (prover) должен решить вне схемы. Это может быть или не быть верно и для других задач. В любом случае, как только доказывающий (prover) нашёл эти значения, он может выполнить схему, чтобы найти корректное присваивание (assignment).
 
-To give a concrete example, let $I_1=1$ and assume $W_1=1$, $W_2=0$, $W_3=1$ and $W_4=0$. Since 
-$\left( 1 \vee 0 \right) \wedge (1 \wedge \lnot 0) = 1$, those values satisfy the problem and we can use them to execute the circuit. We get 
+Чтобы привести конкретный пример, пусть $I_1=1$ и предположим $W_1=1$, $W_2=0$, $W_3=1$ и $W_4=0$. Поскольку
+$\left( 1 \vee 0 \right) \wedge (1 \wedge \lnot 0) = 1$, эти значения удовлетворяют задаче, и мы можем использовать их для выполнения схемы. Мы получаем
 \begin{align*}
 W_5 & = W_1 \cdot (1- W_1) = 0\\
 W_6 & = W_2 \cdot (1- W_2) = 0 \\
@@ -1307,20 +1307,20 @@ W_9 & = W_1\cdot W_2 = 0\\
 W_{10} & = W_3 \cdot (1-W_4) = 1\\
 I_1 & = (W_1 + W_2 - W_9) \cdot W_{10} = 1
 \end{align*}
-A constructive proof of knowledge of a witness, for instance, $I_1=1$, is therefore given by the string $\pi=<W_5,W_6,W_7,W_8,W_9,W_{10}>=<0,0,0,0,0,1>$. 
+Конструктивное доказательство знания witness, например, для $I_1=1$, поэтому задаётся строкой $\pi=<W_5,W_6,W_7,W_8,W_9,W_{10}>=<0,0,0,0,0,1>$.
 \end{example}
-\subsubsection{Arrays} The \texttt{array} type represents a fixed-size collection of elements of equal type, each selectable by one or more indices that can be computed at run time during program execution. 
+\subsubsection{Массивы} Тип \texttt{array} (массив) представляет собой коллекцию фиксированного размера элементов одинакового типа, каждый из которых выбирается одним или несколькими индексами, которые могут вычисляться во время выполнения программы.
 
-Arrays are a classical type, implemented by many higher programing languages that compile to circuits or Rank-1 Constraint Systems. However, most high-level circuit languages support \term{static} arrays, i.e., arrays whose length is known at compile time only. 
+Массивы --- это классический тип, реализуемый многими языками программирования более высокого уровня, компилируемыми в схемы или системы ограничений ранга~1. Однако большинство высокоуровневых языков схем поддерживают \term{static} (статические) массивы, т.е. массивы, длина которых известна только во время компиляции.
 
-The most common way to compile arrays to circuits is to transform any array of a given type $\texttt{t}$ and size $\texttt{N}$ into $\texttt{N}$ circuit variables of type $\texttt{t}$. Arrays are therefore \term{syntactic sugar}, with the purpose to make code easier for humans to read, and write. In \lgname{PAPER}, we define the following array type\_function:
+Наиболее распространённый способ компиляции массивов в схемы состоит в преобразовании любого массива данного типа $\texttt{t}$ и размера $\texttt{N}$ в $\texttt{N}$ переменных (variables) схемы типа $\texttt{t}$. Массивы поэтому являются \term{syntactic sugar} (синтаксическим сахаром), цель которого --- сделать код более читаемым и записываемым для человека. В \lgname{PAPER} мы определяем следующую type\_function массива:
 \begin{lstlisting}
 type_function <Name>: <Type>[N : unsigned] -> (Type,...) { 
   return (<Name>[0],...)
 }
 \end{lstlisting}
-In the setup phase of a statement, we compile every occurrence of an array of size \texttt{N} that contains elements of type \texttt{Type} into \texttt{N} variables of type \texttt{Type}.
-\begin{example} To give an intuition of how a real-world compiler might transform arrays into circuit variables, consider the following \lgname{PAPER} statement:
+В фазе настройки (setup phase) утверждения мы компилируем каждое вхождение массива размера \texttt{N}, содержащего элементы типа \texttt{Type}, в \texttt{N} переменных (variables) типа \texttt{Type}.
+\begin{example} Чтобы дать интуицию о том, как реальный компилятор (compiler) может преобразовать массивы в переменные (variables) схемы, рассмотрим следующее утверждение на \lgname{PAPER}:
 \begin{lstlisting}
 statement ARRAY_TYPE {F: F_5} {
   fn main(x: F[2])-> F {
@@ -1330,7 +1330,7 @@ statement ARRAY_TYPE {F: F_5} {
   } ;
 }
 \end{lstlisting}
-During a setup phase, a circuit compiler might then replace any occurrence of the array type by a tuple of variables of the underlying type, and then use those variables in the circuit synthesis process instead. To see how this can be achieved, we use \lgname{PAPER} as an example. Abstracting over the sub-circuit of the computation, we get the following circuit:
+Во время фазы настройки (setup phase) компилятор схем (circuit compiler) может затем заменить любое вхождение типа массива кортежем переменных (variables) лежащего в основе типа, а затем использовать эти переменные в процессе синтеза схемы. Чтобы увидеть, как это может быть достигнуто, мы используем \lgname{PAPER} как пример. Абстрагируясь над подсхемой вычисления, мы получаем следующую схему:
 \begin{center}
 \digraph[scale=0.5]{SIMPLEARRAYCIRC}{
   forcelabels=true;
@@ -1377,11 +1377,11 @@ During a setup phase, a circuit compiler might then replace any occurrence of th
 }
 \end{center}
 \end{example}
-\subsubsection{The Unsigned Integer Type} Unsigned integers of size \texttt{N}, where \texttt{N} is usually a power of two, represent non-negative integers in the range $0\ldots 2^N-1$. They have a notion of addition, subtraction and multiplication, defined by modular $2^N$ arithmetics. If some \texttt{N} is given, we write \texttt{uN} for the associated type.
+\subsubsection{Беззнаковый целочисленный тип} Беззнаковые целые числа (unsigned integers) размера \texttt{N}, где \texttt{N} обычно является степенью двойки, представляют неотрицательные целые числа в диапазоне $0\ldots 2^N-1$. У них есть понятие сложения, вычитания и умножения, определённое модульной арифметикой по модулю $2^N$. Если дано некоторое \texttt{N}, мы пишем \texttt{uN} для связанного типа.
 
-\paragraph{The uN Constraint System} Many high-level circuit languages define the various \texttt{uN} types as arrays of size \texttt{N}, where each element is of boolean type. This parallels their representation on common computer hardware and allows for efficient and straightforward definition of common operators, like the various shift operators, or the logical operators.
+\paragraph{Система ограничений uN} Многие высокоуровневые языки схем определяют различные типы \texttt{uN} как массивы размера \texttt{N}, где каждый элемент имеет булев тип. Это параллельно их представлению на обычном компьютерном оборудовании и позволяет эффективно и прямолинейно определять распространённые операторы, такие как различные операторы сдвига или логические операторы.
 
-Assuming that some unsigned integer \texttt{N} is known at compile time in \lgname{PAPER}, we define the following \texttt{uN} type\_function, which casts an unsigned integer into an array of boolean variables:
+Предполагая, что некоторое беззнаковое целое число (unsigned integer) \texttt{N} известно во время компиляции в \lgname{PAPER}, мы определяем следующую type\_function \texttt{uN}, которая приводит беззнаковое целое число (unsigned integer) к массиву булевых переменных:
 \begin{lstlisting}
 type_function uN -> BOOL[N] { 
   let base2 : BOOL[N] ;
@@ -1392,18 +1392,18 @@ type_function uN -> BOOL[N] {
   return base2 ;
 }
 \end{lstlisting}
-To enforce an $N$-tuple of field elements $<b_0,\ldots,b_{N-1}>$ to represent an element of type \texttt{uN} we therefore need $N$ boolean constraints 
+Чтобы принудить $N$-куплет элементов поля $<b_0,\ldots,b_{N-1}>$ представлять элемент типа \texttt{uN}, нам поэтому требуются $N$ булевых ограничений
 \begin{align*}
 S_0 \cdot (1-S_0) & = 0\\
 S_1 \cdot (1-S_1) & = 0\\
 \cdots &\\
 S_{N-1} \cdot (1-S_{N-1}) & = 0\\
 \end{align*}
-\begin{remark} Representing the \texttt{uN} type as boolean arrays is conceptually clean and works over generic base fields. However, representing unsigned integers in this way requires a lot of space as every bit is represented as a field element and if the base field is large, those field elements require considerable space in hardware.
+\begin{remark} Представление типа \texttt{uN} как булевых массивов концептуально чисто и работает над произвольными базовыми полями. Однако представление беззнаковых целых чисел (unsigned integers) таким образом требует много места, поскольку каждый бит представляется как элемент поля, и если базовое поле велико, эти элементы поля требуют значительного места в оборудовании.
 
-It should be noted that, in some cases, there is another, more space- and Constraint System efficient approach for representing unsigned integers that can be used whenever the underlying base field is sufficiently large. To understand this, recall that addition and multiplication in a prime field $\F_p$ is equal to addition and multiplication of integers, as long as the sum or the product does exceed neither the modulus $p$ of the base field nor the modulus $2^N$ of the unsigned integer type. Under those limitations it is possible to represent the \texttt{uN} type inside the base-field type whenever $N$ is small enough. This however is not safe and care has to be taken to never overflow any of those moduli, or underflow $0$.
+Следует отметить, что в некоторых случаях существует другой, более эффективный с точки зрения места и системы ограничений (Constraint System) подход для представления беззнаковых целых чисел (unsigned integers), который может использоваться всякий раз, когда лежащее в основе базовое поле достаточно велико. Чтобы понять это, вспомним, что сложение и умножение в простом поле $\F_p$ равны сложению и умножению целых чисел, пока сумма или произведение не превышают ни модуля $p$ базового поля, ни модуля $2^N$ типа беззнакового целого числа (unsigned integer). При этих ограничениях возможно представить тип \texttt{uN} внутри базового полевого типа, когда $N$ достаточно мало. Однако это небезопасно, и необходимо соблюдать осторожность, чтобы никогда не переполнять ни один из этих модулей и не выходить ниже $0$.
 \end{remark}
-\begin{example} To give an intuition of how a real-world compiler might transform unsigned integers into circuit variables, consider the following \lgname{PAPER} statement, which implement the classical ring-shift operator on the $u4$ type as a circuit:
+\begin{example} Чтобы дать интуицию о том, как реальный компилятор (compiler) может преобразовать беззнаковые целые числа (unsigned integers) в переменные (variables) схемы, рассмотрим следующее утверждение на \lgname{PAPER}, которое реализует классический оператор кольцевого сдвига (ring-shift) на типе $u4$ как схему:
 \begin{lstlisting}
 statement RING_SHIFT{F: F_p, N=4} {
   fn main(x: uN)-> uN {
@@ -1413,7 +1413,7 @@ statement RING_SHIFT{F: F_p, N=4} {
   } ;
 }
 \end{lstlisting}
-During the setup-phase, a circuit compiler might then replace any occurrence of the \texttt{uN} type by \texttt{N} variables of \texttt{boolean} type. Using the definition of booleans, each of these variables is then transformed into the \texttt{field} type and a boolean constraint system. To see how this can be achieved, we use \lgname{PAPER} as an example and get the following circuit:
+Во время фазы настройки (setup-phase) компилятор схем (circuit compiler) может затем заменить любое вхождение типа \texttt{uN} на \texttt{N} переменных (variables) булева типа. Используя определение булевых значений, каждая из этих переменных затем преобразуется в полевой тип с булевой системой ограничений. Чтобы увидеть, как это может быть достигнуто, мы используем \lgname{PAPER} как пример и получаем следующую схему:
 
 \begin{center}
 \digraph[scale=0.25]{u4SHIFTER}{
@@ -1556,13 +1556,13 @@ During the setup-phase, a circuit compiler might then replace any occurrence of 
   nCONSB48 -> nb21;
 }
 \end{center}
-During the prover phase, the function \texttt{main} is called with an actual input of \texttt{u4} type, say \texttt{x=14}. The Prover then has to transform the decimal value $14$ into its $4$-bit binary representation $Bits(14)_2 = <0,1,1,1>$ outside of the circuit. Then the array of field values $x[4] = [0,1,1,1]$ is used as an input to the circuit. Since all $4$ field elements are either $0$ or $1$, the four boolean constraints are satisfied and the output is a ring shift of the input array of the four field elements given by $[1,1,1,0]$, which represents the \texttt{u4} element $7$. 
+Во время фазы доказывающего (prover phase) функция \texttt{main} вызывается с фактическим входом типа \texttt{u4}, скажем, \texttt{x=14}. Доказывающий (Prover) затем должен преобразовать десятичное значение $14$ в его $4$-битное двоичное представление $Bits(14)_2 = <0,1,1,1>$ вне схемы. Затем массив значений поля $x[4] = [0,1,1,1]$ используется как вход в схему. Поскольку все $4$ элемента поля являются либо $0$, либо $1$, четыре булевых ограничения удовлетворены, а выходом является кольцевой сдвиг входного массива из четырёх элементов поля, заданный как $[1,1,1,0]$, что представляет элемент \texttt{u4} $7$.
 \end{example}
-\paragraph{The Unsigned Integer Operators} Since elements of \texttt{uN} type are represented as boolean arrays, shift operators are implemented in circuits simply by rewiring the boolean input variables to the output variables accordingly. 
+\paragraph{Операторы беззнаковых целых чисел} Поскольку элементы типа \texttt{uN} представлены как булевы массивы, операторы сдвига реализуются в схемах просто переподключением булевых входных переменных к выходным переменным соответствующим образом.
 
-Logical operators, like \texttt{AND}, \texttt{OR}, or \texttt{NOT} are defined on the \texttt{uN} type by invoking the appropriate boolean operators bitwise to every bit in the boolean array that represents the \texttt{uN} element.
+Логические операторы, такие как \texttt{AND}, \texttt{OR} или \texttt{NOT}, определяются на типе \texttt{uN} путём вызова соответствующих булевых операторов побитово к каждому биту в булевом массиве, представляющем элемент \texttt{uN}.
 
-Addition and multiplication can be represented similarly to how machines represent those operations. Addition can be implemented by first defining the \term{full adder} circuit and then combining $N$ of  these circuits into a circuit that adds two elements from the \texttt{uN} type.
+Сложение и умножение могут быть представлены аналогично тому, как машины представляют эти операции. Сложение может быть реализовано сначала определением схемы \term{full adder} (полного сумматора), а затем объединением $N$ таких схем в схему, которая складывает два элемента из типа \texttt{uN}.
 \begin{comment}
 To understand the algebraic circuit for the $1$-bit full, recall that we already defined circuits for boolean algebra in the previous section. Abstracting over those circuits, a full adder circuit can then be defined as:
 \begin{center}
@@ -1693,19 +1693,19 @@ With a circuit definition of the $1$-bit full adder at hand, addition of two uIn
   
 }
 \end{center}
-Depending on how the output carry bit is handled we get different definition of addition in this type. One way would be to enforce it to be zero. This way addition in the circuit is only possible if the sum does not exceed $2^N-1$. On the other hand if the carry bit is unconstraint, then the resulting addition is equivalent to modulo $2^N$ arithmetics. Good  compilers should therefore always describe explicitly how exactly their implementation of the uintN type behaves such that users don't build their system on false assumptions. 
+Depending on how the output carry bit is handled we get different definition of addition in this type. One way would be to enforce it to be zero. This way addition in the circuit is only possible if the sum does not exceed $2^N-1$. On the other hand if the carry bit is unconstraint, then the resulting addition is equivalent to modulo $2^N$ arithmetics. Good compilers should therefore always describe explicitly how exactly their implementation of the uintN type behaves such that users don't build their system on false assumptions.
 
 The associated constraint system consists of XXX\sme{add reference} constraints, including the boolean constraints of the representing bits
 \paragraph{The boolean Operators} In implementations it is often necessary to execute boolean operations like $ans$, $or$, or $xor$ on elements of the uInt type. Fortunately this easily done by simply applying those operators to every bit separately as shown in XXX\sme{add reference}.  
 \end{comment}
 % =====================================
 \begin{exercise}
-Let \texttt{F}$=\F_{13}$ and \texttt{N=4} be fixed and let $x$ be of $uN$ type. Define circuits and associated R1CS for the left and right bit-shift operators $x<<2$ as well as $x>>2$. Execute the associated circuit for $x : u4 = 11$ and generate a constructive proof for $R1CS$ satisfiability.
+Пусть \texttt{F}$=\F_{13}$ и \texttt{N=4} фиксированы, и пусть $x$ имеет тип $uN$. Определите схемы и связанные с ними R1CS для операторов побитового сдвига влево и вправо $x<<2$ и $x>>2$. Выполните связанную схему для $x : u4 = 11$ и сгенерируйте конструктивное доказательство для выполнимости R1CS.
 \end{exercise}
 \begin{exercise}
-Let \texttt{F}$=\F_{13}$ and \texttt{N=2} be fixed. Define a circuit and associated R1CS for the addition operator $\mathtt{ADD}: uN \times uN \to uN$. Execute the associated circuit to compute $\mathtt{ADD}(2,7)$ for $2,7\in uN$.
+Пусть \texttt{F}$=\F_{13}$ и \texttt{N=2} фиксированы. Определите схему и связанную с ней R1CS для оператора сложения $\mathtt{ADD}: uN \times uN \to uN$. Выполните связанную схему, чтобы вычислить $\mathtt{ADD}(2,7)$ для $2,7\in uN$.
 \end{exercise}
-\begin{exercise} Execute the setup phase for the following \lgname{PAPER} code (That is brain compile the code into a circuit and derive the associated R1CS). 
+\begin{exercise} Выполните фазу настройки (setup phase) для следующего кода на \lgname{PAPER} (т.е. ``мозговым компилятором'' скомпилируйте код в схему и выведите связанную с ней R1CS).
 \begin{lstlisting}
 statement MASK_MERGE {F:F_5, N=4} {
   fn main(pub a : uN, pub b : uN) -> uN {
@@ -1716,16 +1716,16 @@ statement MASK_MERGE {F:F_5, N=4} {
   }
 }
 \end{lstlisting}
-Let $L_{mask\_merge}$ be the language defined by the circuit. Provide a constructive knowledge proof in $L_{mask\_merge}$ for the instance $I=(I_a, I_b) = (14, 7)$.
+Пусть $L_{mask\_merge}$ будет языком, определённым схемой. Предоставьте конструктивное доказательство знания в $L_{mask\_merge}$ для instance $I=(I_a, I_b) = (14, 7)$.
 \end{exercise}
-\subsection{Control Flow} Most programming languages of the imperative or functional style have some notion of basic control structures to direct the order in which instructions are evaluated. Contemporary circuit compilers usually provide a single thread of execution and provide basic flow constructs that implement control flow in circuits. In this part we look at some basic control flow constructions and their implementation in circuits.
-\subsubsection{The Conditional Assignment} Writing high-level code that compiles to circuits, it is often necessary to have a way for conditional assignment of values or computational output to variables. One way to realize this in many programming languages is in terms of the conditional ternary assignment operator $?:$ that branches the control flow of a program according to some condition and then assigns the output of the computed branch to some variable: 
+\subsection{Управление потоком выполнения} Большинство языков программирования императивного или функционального стиля имеют некоторое понятие базовых управляющих структур для направления порядка, в котором инструкции вычисляются. Современные компиляторы схем (circuit compilers) обычно предоставляют единственный поток выполнения и предоставляют базовые конструкции потока, реализующие управление потоком в схемах. В этой части мы рассмотрим некоторые базовые конструкции управления потоком и их реализацию в схемах.
+\subsubsection{Условное присваивание} При написании высокоуровневого кода, компилируемого в схемы, часто необходимо иметь способ условного присваивания значений или выходных данных вычислений переменным. Один из способов реализовать это во многих языках программирования --- через условный тернарный оператор присваивания $?:$, который ветвит поток управления программы в соответствии с некоторым условием, а затем присваивает выход вычисленной ветви некоторой переменной:
 \begin{lstlisting}
 variable = condition ? value_if_true : value_if_false  
 \end{lstlisting}
-In this description, \texttt{condition} is a boolean expression and \texttt{value\_if\_true} as well as \texttt{value\_if\_false} are expressions that evaluate to the same type as \texttt{variable}.
+В этом описании \texttt{condition} --- булево выражение, а \texttt{value\_if\_true}, а также \texttt{value\_if\_false} --- выражения, вычисляющиеся к тому же типу, что и \texttt{variable}.
 
-In programming languages like Rust, another way to write the conditional assignment operator that is more familiar to many programmers is given by 
+В языках программирования, таких как Rust, другой способ записи оператора условного присваивания, более знакомый многим программистам, задаётся как
 \begin{lstlisting}
 variable = if condition then { 
   value_if_true 
@@ -1733,14 +1733,14 @@ variable = if condition then {
   value_if_false 
 } 
 \end{lstlisting}
-In most programing languages, it is a key property of the ternary assignment operator that the expression \texttt{value\_if\_true} is only evaluated if \texttt{condition} evaluates to true and the expression \texttt{value\_if\_false} is only evaluated if \texttt{condition} evaluates to false. In fact, computer programs would turn out to be very inefficient if the ternary operator would evaluate both expressions regardless of the value of \texttt{condition}.
+В большинстве языков программирования ключевым свойством тернарного оператора присваивания является то, что выражение \texttt{value\_if\_true} вычисляется только если \texttt{condition} вычисляется в true, а выражение \texttt{value\_if\_false} вычисляется только если \texttt{condition} вычисляется в false. На самом деле, компьютерные программы оказались бы очень неэффективными, если бы тернарный оператор вычислял оба выражения независимо от значения \texttt{condition}.
 
-A simple way to implement conditional assignment operator as a circuit can be achieved if the requirement that only one branch of the conditional operator is executed is dropped. To see that, let $b$, $c$ and $d$ be field elements such that $b$ is boolean constrained. In this case, the following equation enforces a field element $x$ to be the result of the conditional assignment operator: 
+Простой способ реализовать оператор условного присваивания как схему может быть достигнут, если отказаться от требования, что выполняется только одна ветвь условного оператора. Чтобы увидеть это, пусть $b$, $c$ и $d$ --- элементы поля такие, что $b$ булево ограничен. В этом случае следующее уравнение принуждает элемент поля $x$ быть результатом оператора условного присваивания:
 \begin{equation}
 \label{def:conditional_operator_equation}
 x = b\cdot c + (1-b)\cdot d
 \end{equation}
-Expressing this equation in terms of the addition and multiplication operators from \ref{def:base_field_type}, we can flatten \ref{def:conditional_operator_equation} into the following algebraic circuit:
+Выражая это уравнение через операторы сложения и умножения из~\ref{def:base_field_type}, мы можем ``выровнять'' (flatten)~\ref{def:conditional_operator_equation} в следующую алгебраическую схему:
 \begin{center}
 \digraph[scale=0.4]{CONDASSIGN}{
 	forcelabels=true;
@@ -1773,15 +1773,15 @@ Expressing this equation in terms of the addition and multiplication operators f
   n11 -> n4 [xlabel= "S_6  "] ;
 }
 \end{center}
-Note that, in order to compute a valid assignment to this circuit, both $S_2$ as well as $S_4$ are necessary. If the inputs to the nodes $c$ and $d$ are circuits themself, both circuits need valid assignments and therefore have to be executed. As a consequence, this implementation of the conditional assignment operator has to execute all branches of all circuits, which is very different from the execution of common computer programs and contributes to the increased computational effort any prover has to invest, in contrast to the execution in other programing models. 
+Отметим, что для вычисления корректного присваивания (assignment) к этой схеме необходимы как $S_2$, так и $S_4$. Если входы в узлы $c$ и $d$ сами являются схемами, обе схемы требуют корректных присваиваний (assignments) и поэтому должны быть выполнены. Как следствие, эта реализация оператора условного присваивания должна выполнять все ветви всех схем, что сильно отличается от выполнения обычных компьютерных программ и способствует повышенным вычислительным затратам, которые должен инвестировать любой доказывающий (prover), в отличие от выполнения в других моделях программирования.
 
-We can use the general technique from \ref{sec:circuits_associated_R1CS} to derive the associated Rank-1 Constraint System of the conditional assignment operator. We get the following:
+Мы можем использовать общую технику из~\ref{sec:circuits_associated_R1CS} для выведения связанной системы ограничений ранга~1 оператора условного присваивания. Мы получаем следующее:
 \begin{align*}
 S_1 \cdot S_2 & = S_3 \\
 (1 - S_1) \cdot S_4 & = S_5 \\
 (S_3 + S_5)\cdot 1 &= S_6
 \end{align*}
-\begin{example} To give an intuition of how a real-world circuit compiler might transform any high-level description of the conditional assignment operator into a circuit, consider the following \lgname{PAPER} code:
+\begin{example} Чтобы дать интуицию о том, как реальный компилятор схем (circuit compiler) может преобразовать любое высокоуровневое описание оператора условного присваивания в схему, рассмотрим следующий код на \lgname{PAPER}:
 \begin{lstlisting}
 statement CONDITIONAL_OP {F:F_p} {
   fn main(x : F, y : F, b : BOOL) -> F {
@@ -1795,7 +1795,7 @@ statement CONDITIONAL_OP {F:F_p} {
   }
 }
 \end{lstlisting}
-Brain-compiling this code into a circuit, we first draw box nodes for all input and output variables, and then transform the boolean type into the field type together with its associated constraint. Then we evaluate the assignments to the output variables. Since the conditional assignment operator is the top level function, we draw its circuit and then draw the circuits for both conditional expressions. We get the following:
+``Мозговым компилятором'' (Brain-compiling) скомпилируйте этот код в схему: мы сначала рисуем прямоугольные узлы для всех входных и выходных переменных, а затем преобразуем булев тип в полевой тип вместе со связанным с ним ограничением. Затем мы вычисляем присваивания выходным переменным. Поскольку оператор условного присваивания является функцией верхнего уровня, мы рисуем его схему, а затем рисуем схемы для обоих условных выражений. Мы получаем следующее:
 \begin{center}
 \digraph[scale=0.4]{CONDITIONALOP}{
   forcelabels=true;
@@ -1911,11 +1911,11 @@ Brain-compiling this code into a circuit, we first draw box nodes for all input 
 
 % NOTE: ZK-Podcast with Alex Özdemir for the proper branching thing in version 2 of the book.
 
-\subsubsection{Loops} In many programming languages, various loop control structures are defined that allow developers to execute expressions with a specified number of repetitions. In particular, it is often possible to implement unbounded loops like the loop structure give below:
+\subsubsection{Циклы} Во многих языках программирования определены различные управляющие структуры циклов, позволяющие разработчикам выполнять выражения с указанным числом повторений. В частности, часто возможно реализовать неограниченные циклы, такие как структура цикла, приведённая ниже:
 \begin{lstlisting}
   while true do { }
 \end{lstlisting}
-In addition it is often possible to implement loop structures, where the number of execution steps in the loop depends on execution inputs or intermediate computational steps and is therefore unknown at compile time: 
+Кроме того, часто возможно реализовать структуры циклов, где число шагов выполнения в цикле зависит от входных данных выполнения или промежуточных вычислительных шагов и поэтому неизвестно во время компиляции:
 \begin{lstlisting}
   x = 0.5
   while x != 0 do { 
@@ -1923,10 +1923,10 @@ In addition it is often possible to implement loop structures, where the number 
   }
 \end{lstlisting}
 
-In contrast to this, algebraic circuits and Rank-1 Constraint Systems are not general enough to express arbitrary computation, but bounded computation only. As a consequence,  it is not possible to implement unbounded loops, or loops with bounds that are unknown at compile time in those models. This can be easily seen since circuits are acyclic by definition, and implementing an unbounded loop as an acyclic graph requires a circuits of unbounded size.  However, circuits are general enough to express bounded loops, where the upper bound on its execution is known at compile time. Those loop can be implemented in circuits by unrolling the loop. 
+В противоположность этому, алгебраические схемы и системы ограничений ранга~1 недостаточно общи для выражения произвольных вычислений, а только ограниченных вычислений. Как следствие, невозможно реализовать неограниченные циклы или циклы с границами, неизвестными во время компиляции, в этих моделях. Это легко видно, поскольку схемы ацикличны по определению, а реализация неограниченного цикла как ациклического графа требует схемы неограниченного размера. Однако схемы достаточно общи для выражения ограниченных циклов, где верхняя граница их выполнения известна во время компиляции. Такие циклы могут быть реализованы в схемах путём развёртки (unrolling) цикла.
 
-As a consequence, any programing language that compiles to algebraic circuits can only provide loop structures where the bound is a constant known at compile time. This implies that loops cannot depend on execution inputs, but on compile time parameters only.  
-\begin{example} To give an intuition of how a real-world circuit compiler might transform any high-level description of a bounded \texttt{for} loop into a circuit, consider the following \lgname{PAPER} code:
+Как следствие, любой язык программирования, компилируемый в алгебраические схемы, может предоставлять только структуры циклов, где граница является константой, известной во время компиляции. Это означает, что циклы не могут зависеть от входных данных выполнения, а только от параметров времени компиляции.
+\begin{example} Чтобы дать интуицию о том, как реальный компилятор схем (circuit compiler) может преобразовать любое высокоуровневое описание ограниченного цикла \texttt{for} в схему, рассмотрим следующий код на \lgname{PAPER}:
 \begin{lstlisting}
 statement FOR_LOOP {F:F_p, N: unsigned = 4} {
   fn main(fac : F[N]) -> F {
@@ -1939,9 +1939,9 @@ statement FOR_LOOP {F:F_p, N: unsigned = 4} {
   }
 }
 \end{lstlisting}
-Note that, in a program like this, the loop counter \texttt{i} has no expression in the derived circuit. It is a high level parameter that tells the compiler how to unroll the loop.
+Отметим, что в такой программе счётчик цикла \texttt{i} не имеет выражения в выведенной схеме. Это высокоуровневый параметр, который сообщает компилятору (compiler), как развернуть (unroll) цикл.
 
-Brain-compiling this code into a circuit, we first draw box nodes for all input and output variables, noting that the loop counter is not represented in the circuit. Since all variables are of \texttt{field} type, we don't have to compile any type constraints. Then we evaluate the assignments to the output variables by unrolling the loop into $3$ individual assignment operators. We get:
+``Мозговым компилятором'' (Brain-compiling) скомпилируйте этот код в схему: мы сначала рисуем прямоугольные узлы для всех входных и выходных переменных, отметив, что счётчик цикла не представлен в схеме. Поскольку все переменные имеют тип \texttt{field}, нам не нужно компилировать никаких ограничений типов. Затем мы вычисляем присваивания выходным переменным, разворачивая (unrolling) цикл в $3$ отдельных оператора присваивания (assignment). Мы получаем:
 \begin{center}
 \digraph[scale=0.3]{SIMPLELOOP}{
   forcelabels=true;
@@ -2022,22 +2022,14 @@ Brain-compiling this code into a circuit, we first draw box nodes for all input 
 }
 \end{center}
 \end{example}
-\subsection{Binary Field Representations} In applications, it is often necessary to enforce a binary representation of elements from the \texttt{field} type. To derive an appropriate circuit over a prime field $\F_p$, let $m=|p|_2$ be the smallest number of bits necessary to represent the prime modulus $p$. Then a bitstring $<b_0,\ldots,b_{m-1}>\in \{0,1\}^m$ is a binary representation of a field element $x\in\F_p$, if and only if
+\subsection{Двоичные представления полевых элементов} В приложениях часто необходимо обеспечить двоичное представление элементов из полевого типа \texttt{field}. Чтобы вывести подходящую схему над простым полем $\F_p$, пусть $m=|p|_2$ будет наименьшим числом битов, необходимых для представления простого модуля $p$. Тогда битовая строка $<b_0,\ldots,b_{m-1}>\in \{0,1\}^m$ является двоичным представлением элемента поля $x\in\F_p$, тогда и только тогда, когда
 \begin{equation}
 \label{def:binary_field_rep}
 x = b_0\cdot 2^0 + b_1\cdot 2^1 + \ldots + b_{m-1}\cdot 2^{m-1}
 \end{equation}
-In this expression, addition and exponentiation is considered to be
-executed in $\F_p$, which is well defined since all terms $2^j$ for
-$0 \leq j \leq m$ are elements of $\F_p$. Note, however, that in
-contrast to the binary representation of unsigned integers $n\in\N$,
-this representation is not unique in general, since the modular $p$
-equivalence class might contain more than one binary representative.
+В этом выражении сложение и возведение в степень считаются выполненными в $\F_p$, что корректно определено, поскольку все члены $2^j$ для $0 \leq j \leq m$ являются элементами $\F_p$. Однако, в отличие от двоичного представления беззнаковых целых чисел (unsigned integers) $n\in\N$, это представление не является уникальным в общем случае, поскольку модульный $p$ класс эквивалентности может содержать более одного двоичного представителя.
 
-Considering that the underlying prime field is fixed and the most
-significant bit of the prime modulus is $m-1$, the following circuit
-flattens equation \ref{def:binary_field_rep}, assuming all inputs
-$b_0$, $\ldots$, $b_{m-1}$ are of boolean type.
+Учитывая, что лежащее в основе простое поле фиксировано и наиболее значимый бит простого модуля равен $m-1$, следующая схема ``выравнивает'' (flattens) уравнение~\ref{def:binary_field_rep}, предполагая, что все входы $b_0$, $\ldots$, $b_{m-1}$ имеют булев тип.
 \begin{center}
 \digraph[scale=0.3]{BINARYREP}{
 	forcelabels=true;
@@ -2119,38 +2111,38 @@ $b_0$, $\ldots$, $b_{m-1}$ are of boolean type.
   n21 -> n22  [xlabel="W_1=0  "] ;
 }
 \end{center}
-Applying the general transformation rule \ref{sec:circuits_associated_R1CS} to compute the associated Rank-1 Constraint Systems, we see that we actually only need a single constraint to enforce some binary representation of any field element. We get 
+Применяя общее правило преобразования~\ref{sec:circuits_associated_R1CS} для вычисления связанной системы ограничений ранга~1, мы видим, что нам на самом деле нужно только одно ограничение, чтобы обеспечить некоторое двоичное представление любого элемента поля. Мы получаем
 $$
 (S_0\cdot 2^0 + S_1\cdot 2^1 + \ldots + S_{m-1}\cdot 2^{m-1} -S_m)\cdot 1 = 0
 $$
-Given an array \texttt{BOOL[N]} of \texttt{N} boolean constrained field elements and another field element $x$, the circuit enforces \texttt{BOOL[N]} to be one of the binary representations of $x$. If \texttt{BOOL[N]} is not a binary representation of $x$, no valid assignment and hence no solution to the associated R1CS can exists. 
-\begin{example} Consider the prime field $\F_{13}$. To compute binary representations of elements from that field, we start with the binary representation of the prime modulus $13$, which is $Bits(13) = <1,0,1,1>$ since $13= 1\cdot 2^0 + 0\cdot 2^1 + 1\cdot 2^2 + 1\cdot 2^3$. So $m=4$ and we need up to $4$ bits to represent any element $x\in\F_{13}$.
+Дан массив \texttt{BOOL[N]} из \texttt{N} булево ограниченных элементов поля и другой элемент поля $x$, схема принуждает \texttt{BOOL[N]} быть одним из двоичных представлений $x$. Если \texttt{BOOL[N]} не является двоичным представлением $x$, не может существовать корректного присваивания (assignment) и, следовательно, решения связанной R1CS.
+\begin{example} Рассмотрим простое поле $\F_{13}$. Чтобы вычислить двоичные представления элементов этого поля, мы начинаем с двоичного представления простого модуля $13$, которое равно $Bits(13) = <1,0,1,1>$, поскольку $13= 1\cdot 2^0 + 0\cdot 2^1 + 1\cdot 2^2 + 1\cdot 2^3$. Таким образом, $m=4$ и нам требуется до $4$ битов для представления любого элемента $x\in\F_{13}$.
 
-To see that binary representations are not unique in general, consider the element $2\in \F_{13}$. It has the following two $4$-bit, binary representations $Bits(2)=<0,1,0,0>$ and $Bits(2)=<1,1,1,1>$, since in $\F_{13}$ we have
+Чтобы увидеть, что двоичные представления не являются уникальными в общем случае, рассмотрим элемент $2\in \F_{13}$. Он имеет следующие два $4$-битных двоичных представления $Bits(2)=<0,1,0,0>$ и $Bits(2)=<1,1,1,1>$, поскольку в $\F_{13}$ мы имеем
 $$
 2 = \begin{cases}
 0\cdot 2^0 + 1\cdot 2^1 + 0\cdot 2^2 + 0\cdot 2^3\\
 1\cdot 2^0 + 1\cdot 2^1 + 1\cdot 2^2 + 1\cdot 2^3
 \end{cases}
 $$
-This is because the unsigned integers $2$ and $15$ are both in the modular $13$ remainder class of $2$ and hence are both representatives of $2$ in $\F_{13}$.
+Это происходит потому, что беззнаковые целые числа (unsigned integers) $2$ и $15$ оба находятся в модульном $13$ классе остатков $2$ и поэтому являются обоими представителями $2$ в $\F_{13}$.
 
-To see how the associated circuit works, we want to enforce the binary representation of $7\in \F_{13}$. Since $m=4$ we have to enforce a $4$-bit representation for $7$, which is $<1,1,1,0>$, since $7= 1\cdot 2^0 + 1\cdot 2^1 + 1\cdot 2^2 + 0\cdot 2^3$. A valid circuit assignment is therefore given by $<S_0,S_1,S_2,S_3,S_4>=<1,1,1,0,7>$ and, indeed, the assignment satisfies the required $5$ constraints including the $4$ boolean constraints for $S_0$, $\ldots$, $S_3$: 
+Чтобы увидеть, как работает связанная схема, мы хотим обеспечить двоичное представление $7\in \F_{13}$. Поскольку $m=4$, мы должны обеспечить $4$-битное представление для $7$, которое равно $<1,1,1,0>$, поскольку $7= 1\cdot 2^0 + 1\cdot 2^1 + 1\cdot 2^2 + 0\cdot 2^3$. Корректное присваивание (assignment) схемы поэтому задаётся как $<S_0,S_1,S_2,S_3,S_4>=<1,1,1,0,7>$ и, действительно, присваивание удовлетворяет требуемым $5$ ограничениям, включая $4$ булевых ограничения для $S_0$, $\ldots$, $S_3$:
 \begin{align*}
-1\cdot (1-1) &= 0 & \text{// boolean constraints}\\
+1\cdot (1-1) &= 0 & \text{// булевы ограничения}\\
 1\cdot (1-1) &= 0 \\
 1\cdot (1-1) &= 0 \\
 0\cdot (1-0) &= 0  \\
-(1 + 2 + 4 + 0 -7)\cdot 1 &= 0  & \text{// binary rep. constraint}
+(1 + 2 + 4 + 0 -7)\cdot 1 &= 0  & \text{// ограничение двоичного представления}
 \end{align*}
 \end{example}
-\subsection{Cryptographic Primitives}
-In applications, it is often required to do cryptography in a circuit. To do this, basic cryptographic primitives like hash functions or elliptic curve cryptography needs to be implemented as circuits. In this section, we give a few basic examples of how to implement such primitives. 
-\subsubsection{Twisted Edwards Curves} Implementing elliptic curve cryptography in circuits means to implement the defining curve equations as well as the algebraic operations, like the group law or the scalar multiplication as circuits. To do this efficiently, the curve must be defined over the same base field as the field that is used in the circuit. 
+\subsection{Криптографические примитивы}
+В приложениях часто требуется выполнять криптографию в схеме. Для этого базовые криптографические примитивы, такие как хеш-функции или криптография на эллиптических кривых, необходимо реализовывать как схемы. В этом разделе мы приведём несколько базовых примеров того, как реализовать такие примитивы.
+\subsubsection{Кривые Твистед-Эдвардса} Реализация криптографии на эллиптических кривых в схемах означает реализацию определяющих уравнений кривых, а также алгебраических операций, таких как групповой закон или скалярное умножение, как схем. Чтобы делать это эффективно, кривая должна быть определена над тем же базовым полем, что и поле, используемое в схеме.
 
-For efficiency reasons, it is advantageous to choose an elliptic curve such that that all required constraints and operations can be implemented with as few gates as possible. Twisted Edwards curves are particularly useful for that matter, since their group law is particularly simple and the same calculation can be used for all curve points including the point at infinity. This simplifies the circuit a lot.
+По соображениям эффективности выгодно выбирать эллиптическую кривую так, чтобы все требуемые ограничения и операции могли быть реализованы с как можно меньшим числом вентилей (gates). Кривые Твистед-Эдвардса (Twisted Edwards curves) особенно полезны для этого, поскольку их групповой закон особенно прост, и одно и то же вычисление может использоваться для всех точек кривой, включая точку на бесконечности. Это существенно упрощает схему.
 % implementations https://github.com/iden3/circomlib/blob/master/circuits/babyjub.circom
-\paragraph{Twisted Edwards curve constraints} As we have seen in \ref{sec:edwards}, a twisted Edwards curve over a finite field $F$ is defined as the set of all pairs of points $(x,y)\in \F\times \F$ such that $x$ and $y$ satisfy the equation $a\cdot x^2+y^2= 1+d\cdot x^2y^2$ and as we have seen in \examplename{} \ref{ex:TJJ-circuit_1}, we can transform this equation into the following circuit:
+\paragraph{Ограничения кривой Твистед-Эдвардса} Как мы видели в~\ref{sec:edwards}, кривая Твистед-Эдвардса (Twisted Edwards curve) над конечным полем $F$ определяется как множество всех пар точек $(x,y)\in \F\times \F$ таких, что $x$ и $y$ удовлетворяют уравнению $a\cdot x^2+y^2= 1+d\cdot x^2y^2$, и как мы видели в~\examplename{}~\ref{ex:TJJ-circuit_1}, мы можем преобразовать это уравнение в следующую схему:
 \begin{center}
 \digraph[scale=0.35]{TECCIRCUIT}{
 	forcelabels=true;
@@ -2194,7 +2186,7 @@ For efficiency reasons, it is advantageous to choose an elliptic curve such that
 	n16 [shape=box, label="0" /*, color=lightgray */];		
 }
 \end{center}
-The circuit enforces the two inputs of \texttt{field} type to satisfy the twisted Edwards curve equation and, as we know from \examplename{} \ref{ex:tjj-circuit-2-tjj-R1CS}, the associated Rank-1 Constraint System is given by:
+Схема принуждает два входа полевого типа удовлетворять уравнению кривой Твистед-Эдвардса (Twisted Edwards curve), и, как мы знаем из~\examplename{}~\ref{ex:tjj-circuit-2-tjj-R1CS}, связанная система ограничений ранга~1 задаётся как:
 \begin{align*}
  S_1 \cdot S_1 &= S_3\\
  S_2 \cdot S_2 &= S_4\\
@@ -2202,14 +2194,14 @@ The circuit enforces the two inputs of \texttt{field} type to satisfy the twiste
  (-1\cdot S_4 + S_5 -a\cdot S_3 + 1)\cdot 1 &= 0
 \end{align*}
 \begin{exercise}
-Write the circuit and associated Rank-1 Constraint System for a Weierstrass curve of a given field $\F$.
+Напишите схему и связанную с ней систему ограничений ранга~1 для кривой Вейерштрасса (Weierstrass curve) данного поля $\F$.
 \end{exercise}
-\paragraph{Twisted Edwards curve addition} As we have seen in \ref{sec:twisted_ed_group_law}, a major advantage of twisted Edwards curves is the existence of an addition law that contains no branching and is valid for all curve points. Moreover, the neutral element is not given by any auxiliary symbol but the curve point $(0,1)$. In fact, given two points $(x_1,y_1)$ and $(x_2,y_2)$ on a twisted Edwards curve, their sum is defined as
+\paragraph{Сложение на кривой Твистед-Эдвардса} Как мы видели в~\ref{sec:twisted_ed_group_law}, главное преимущество кривых Твистед-Эдвардса (Twisted Edwards curves) заключается в существовании закона сложения, который не содержит ветвления и верен для всех точек кривой. Более того, нейтральный элемент не задаётся каким-либо вспомогательным символом, а является точкой кривой $(0,1)$. На самом деле, даны две точки $(x_1,y_1)$ и $(x_2,y_2)$ на кривой Твистед-Эдвардса, их сумма определяется как
 $$
 (x_3,y_3) = \left(\frac{x_1y_2+y_1x_2}{1+d\cdot x_1x_2y_1y_2}, \frac{y_1y_2-a\cdot x_1x_2}{1-d\cdot x_1x_2y_1y_2}\right)
 $$
 % https://z.cash/technology/jubjub/
-We can use the division circuit from \ref{def:division_circuit} to flatten this equation into an algebraic circuit. Inputs to the circuit are then not only the two curve points $(x_1,y_1)$ and $(x_2,y_2)$, but also the multiplicative inverses of the two denominators $inv_1 = (1+d\cdot x_1x_2y_1y_2)^{-1}$ as well as $inv_2= (1-d\cdot x_1x_2y_1y_2)^{-1}$, which any prover needs to compute outside of the circuit. We get
+Мы можем использовать схему деления из~\ref{def:division_circuit}, чтобы ``выровнять'' (flatten) это уравнение в алгебраическую схему. Входами в схему затем являются не только две точки кривой $(x_1,y_1)$ и $(x_2,y_2)$, но также мультипликативные обратные двух знаменателей $inv_1 = (1+d\cdot x_1x_2y_1y_2)^{-1}$ и $inv_2= (1-d\cdot x_1x_2y_1y_2)^{-1}$, которые любой доказывающий (prover) должен вычислить вне схемы. Мы получаем
 \begin{center}
 \digraph[scale=0.5]{EDWARDSADD}{
   forcelabels=true;
@@ -2297,7 +2289,7 @@ We can use the division circuit from \ref{def:division_circuit} to flatten this 
     
 }
 \end{center}
-Using the general technique from \ref{sec:circuits_associated_R1CS} to derive the associated Rank-1 Constraint System, we get the following result:
+Используя общую технику из~\ref{sec:circuits_associated_R1CS} для выведения связанной системы ограничений ранга~1, мы получаем следующий результат:
 \begin{align*}
 S_1 \cdot S_4 & = S_7 \\
 S_1 \cdot S_2 & = S_8 \\
@@ -2334,10 +2326,10 @@ S_6 \cdot (S_{10} - a\cdot S_8) & = S_{15}
 \end{example}
 \end{comment}
 \begin{exercise}
-Let $\F$ be a field. Define a circuit that enforces field inversion for a point of a twisted Edwards curve over $\F$.
+Пусть $\F$ будет полем. Определите схему, которая обеспечивает полевое обращение для точки кривой Твистед-Эдвардса (Twisted Edwards curve) над $\F$.
 \end{exercise}
 \begin{exercise}
-Write the circuit and associated Rank-1 Constraint System for a Weierstrass addition law of a given field $\F$.
+Напишите схему и связанную с ней систему ограничений ранга~1 для закона сложения Вейерштрасса (Weierstrass addition law) данного поля $\F$.
 \end{exercise}
 \begin{comment}
 \paragraph{Twisted Edwards curve inversion} Similar to elliptic curves in Weierstrass form, inversion is cheap on Edwards curves, as the negative of a curve point $-(x,y)$ is given by $(-x,y)$. A curve point $(x_2,y_2)$ is the additive inverse of another curve point $(x_1,y_1)$ precisely if the equation $(x_1,y_1) = (-x_2,y_2)$ holds. We can write this as follows:

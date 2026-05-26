@@ -1,45 +1,46 @@
-= The MoonMath Manual
+= Руководство MoonMath
 
-The MoonMath Manual is a resource for anyone interested in understanding and unlocking the potential of zk-SNARKs, from beginners to experts.
+Руководство MoonMath — это ресурс для всех, кто хочет понять и раскрыть потенциал zk-SNARKs, от начинающих до экспертов.
 
-The acronym zk-SNARK stands for “Zero-Knowledge Succinct Non-Interactive Argument of Knowledge,” and refers to a cryptographic technique where one can prove correct execution of computation and  possession of certain information without revealing the information itself. Zk-SNARKs, a type of zero-knowledge proof, offer a new paradigm for privacy, and have been used to enable private blockchain transactions. They also have  the potential to securely scale blockchain-based solutions.
+Аббревиатура zk-SNARK расшифровывается как «Zero-Knowledge Succinct Non-Interactive Argument of Knowledge» (краткий неинтерактивный аргумент знания с нулевым разглашением) и относится к криптографической технике, позволяющей доказать корректное выполнение вычислений и владение определённой информацией, не раскрывая саму информацию. Zk-SNARKs, являясь разновидностью доказательств с нулевым разглашением (zero-knowledge proofs), открывают новую парадигму конфиденциальности и уже используются для обеспечения приватных транзакций в блокчейнах. Они также обладают потенциалом для безопасного масштабирования решений на основе блокчейна.
 
-Most explanations struggle to clarify how and why they work, so zk-SNARKs remain somewhat “magical” and elusive, deterring developers from exploring or utilizing them in projects. Resources are scattered across blog posts and GitHub libraries. This results in a high barrier to entry, thereby slowing the widespread adoption of zk-SNARKs and associated privacy-enhancing technologies. Even worse, implementing zk-SNARKs without understanding the fundamentals of how they work increases the potential for security issues.
+Большинство объяснений не способны прояснить, как и почему работают zk-SNARKs, поэтому они остаются чем-то «магическим» и неуловимым, отпугивая разработчиков от изучения и применения их в проектах. Ресурсы разбросаны по блогам и библиотекам GitHub. Это создаёт высокий порог входа, замедляя широкое распространение zk-SNARKs и связанных с ними технологий повышения конфиденциальности. Ещё хуже то, что внедрение zk-SNARKs без понимания фундаментальных основ их работы повышает риск проблем с безопасностью.
 
-We want to change that with our MoonMath Manual to zk-SNARKs, designed for an audience with only minimal experience in cryptography and programming.
+Мы хотим изменить это с помощью нашего Руководства MoonMath по zk-SNARKs, рассчитанного на аудиторию с минимальным опытом в криптографии и программировании.
 
-What is particularly unique about the MoonMath Manual is that it is designed to enable users to construct zk-SNARKs using simple pen-and-paper computations. Throughout the manual, users are encouraged to complete exercises that ensure they engage with the foundational building blocks of zk-SNARKs. While doing that, readers build the smallest possible — but fully functional — cryptographic stack to compute zk-SNARK internals without the need of a computer.
+Особенность Руководства MoonMath заключается в том, что оно позволяет читателям конструировать zk-SNARKs с помощью простых вычислений ручкой и бумагой. На протяжении всего руководства читателям предлагается выполнять упражнения, гарантирующие погружение в фундаментальные строительные блоки zk-SNARKs. При этом читатели создают минимально возможный, но полностью функциональный криптографический стек для вычисления внутренних компонентов zk-SNARK без помощи компьютера.
 
-As users go through the manual, they will grasp mathematical concepts that are not only used in SNARKs, but also in other zero-knowledge proofs and cryptography more generally.
+Проходя через руководство, читатели постигнут математические концепции, которые используются не только в SNARKs, но и в других доказательствах с нулевым разглашением и в криптографии вообще.
 
-== Donations
-If you would like to support the continuous production of content like this, please donate via one of the following channels, or contact Least Authority for additional solutions:
+== Пожертвования
+Если вы хотите поддержать непрерывное создание подобного контента, пожалуйста, пожертвуйте через один из следующих каналов или свяжитесь с Least Authority для дополнительных вариантов:
 
 - Bitcoin: bc1q0d8pf6tgqq6j0gzv5yf259usvh6zfjsuuq39d7
 - Ethereum: 0x470E2902CC34A8b2A1E1890325cA0564593a5eDB
 - ZCash: t1JyQ9X4VDkiZSdNF2XLXPU5CHTT33saunf 
 - PayPal: https://www.paypal.com/donate/?hosted_button_id=6FBFT8XC8UTYL
 
-== Download
-You can download the latest version of the moonmath manual https://github.com/LeastAuthority/moonmath-manual/releases/latest/download/main-moonmath.pdf[here].
+== Скачать
+Вы можете скачать последнюю версию руководства MoonMath https://github.com/LeastAuthority/moonmath-manual/releases/latest/download/main-moonmath.pdf[здесь].
 
-== Build instructions
+== Инструкции по сборке
 
-=== Prerequisites
+=== Требования
 
-* LaTeX distribution installed
-* Latexmk installed
-* Docker installed
+* Установленный дистрибутив LaTeX
+* Установленный Latexmk
+* Установленный Docker
 
-=== Steps
+=== Шаги
 
-In order to build the PDF document of the moonmath manual, please follow these steps:
+Чтобы собрать PDF-документ руководства MoonMath, выполните следующие шаги:
 
-. `git clone https://github.com/LeastAuthority/moonmath-manual.git` (download the source)
-. `cd moonmath-manual` (change into the moonmath-manual folder)
-. `./install_sagetex_sty.sh` (install `sagetex.sty`)
-. `pdflatex main-moonmath.tex` (create SageMath files from document)
-. `./generate_sagetex_files.sh` (run SageMath 9.3 on the output files)
-. `latexmk -pdf main-moonmath.tex` (build main-moonmath.pdf)
+. `git clone https://github.com/LeastAuthority/moonmath-manual.git` (скачать исходники)
+. `cd moonmath-manual` (перейти в папку moonmath-manual)
+. `./install_sagetex_sty.sh` (установить `sagetex.sty`)
+. `pdflatex main-moonmath.tex` (создать файлы SageMath из документа)
+. `./generate_sagetex_files.sh` (запустить SageMath 9.3 для выходных файлов)
+. `latexmk -pdf main-moonmath.tex` (собрать main-moonmath.pdf)
 
-
+== О русском переводе
+Данный репозиторий содержит полный перевод MoonMath Manual на русский язык. Перевод выполнен с сохранением всех математических формул, примеров кода SageMath и структуры оригинального издания. При первом упоминании каждого специального термина даётся русский перевод с английским оригиналом в скобках.

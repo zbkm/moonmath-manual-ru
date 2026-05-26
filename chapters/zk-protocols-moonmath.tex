@@ -1,113 +1,113 @@
-\chapter{Zero Knowledge Protocols}
+\chapter{Протоколы с нулевым разглашением}
 \label{chapter:zk-protocols}
 % Intro from https://core.ac.uk/download/pdf/82198769.pdf
 % CONTAINS NICE HIHG LEVEL STUFF
 % Term SNARK was introduced in  Bitansky, Nir; Canetti, Ran; Chiesa, Alessandro; Tromer, Eran (January 2012). ``From extractable collision resistance to succinct non-interactive arguments of knowledge, and back again''
-A so-called \term{zero-knowledge protocol} is a set of mathematical rules by which one party, usually called \term{the prover}, can convince another party, usually called \term{the verifier}, that given some instance, the prover knows some witness for that instance, without revealing any information about the witness. 
+Так называемый \term{протокол с нулевым разглашением} (zero-knowledge protocol) --- это набор математических правил, с помощью которых одна сторона, обычно называемая \term{доказывающим} (prover), может убедить другую сторону, обычно называемую \term{проверяющим} (verifier), что при данном экземпляре (instance) доказывающий знает некоторый свидетель (witness) для этого экземпляра, не раскрывая никакой информации о свидетеле.
 
-As we have seen in \chaptname{} \ref{chap:statements}, given some language $L$ and instance $I$, the knowledge claim ``there is a witness $W$ such that  $(I;W)$ is a word in $L$'' is constructively provable by providing the witness $W$ to the verifier. The verifier can then use the grammar of the language to verify the proof. In contrast, it's the challenge of any zero-knowledge protocol to enable a prover to prove knowledge of a witness to any verifier, without revealing any information about the witness beyond its existence.
+Как мы видели в \chaptname{} \ref{chap:statements}, для данного языка $L$ и экземпляра $I$ утверждение о знании <<существует свидетель $W$ такой, что $(I;W)$ является словом в $L$>> конструктивно доказывается путём предоставления свидетеля $W$ проверяющему. Проверяющий затем может использовать грамматику языка для проверки доказательства. Напротив, задача любого протокола с нулевым разглашением заключается в том, чтобы позволить доказывающему доказать знание свидетеля любому проверяющему, не раскрывая никакой информации о свидетеле, кроме его существования.
 
-In this chapter, we look at various systems that exist to solve this task. We start with an introduction to the basic concepts and terminology in zero-knowledge proving systems and then introduce the so-called Groth\_16 protocol as one of the most efficient systems. We will update this chapter with other zero-knowledge proof systems in future versions of this book.
+В этой главе мы рассмотрим различные системы, существующие для решения этой задачи. Мы начнём с введения в основные понятия и терминологию систем доказательства с нулевым разглашением, а затем представим так называемый протокол Groth\_16 как одну из наиболее эффективных систем. В будущих версиях этой книги мы обновим эту главу другими системами доказательства с нулевым разглашением.
 
-\section{Proof Systems}
-From an abstract point of view, a proof system is a set of rules which models the generation and exchange of messages between two parties, usually called the prover and the verifier. The purpose of a proof system is to ascertain whether a given string belongs to a formal language or not.  
+\section{Системы доказательства}
+С абстрактной точки зрения, система доказательства --- это набор правил, моделирующих генерацию и обмен сообщениями между двумя сторонами, обычно называемыми доказывающим и проверяющим. Цель системы доказательства состоит в том, чтобы установить, принадлежит ли данная строка формальному языку или нет.
 
-Proof systems are often classified by certain trust assumptions and the computational capabilities of the prover and the verifier. In its most general form, the prover usually possesses unlimited computational resources but cannot be trusted, while the verifier has bounded computational power but is assumed to be honest.
+Системы доказательства часто классифицируются по определённым предположениям о доверии и вычислительным возможностям доказывающего и проверяющего. В наиболее общей форме доказывающий обычно обладает неограниченными вычислительными ресурсами, но ему нельзя доверять, в то время как проверяющий имеет ограниченную вычислительную мощность, но предполагается честным.
 
-Proving membership or knowledge claims of a statement for some string as explained in \chaptname{} \ref{chap:statements} is executed by the generation of certain messages that are sent between prover and verifier, until the verifier is convinced that the string is a word in the language in consideration.
+Доказательство принадлежности или утверждений о знании для некоторой строки, как объяснялось в \chaptname{} \ref{chap:statements}, выполняется путём генерации определённых сообщений, которые отправляются между доказывающим и проверяющим, пока проверяющий не убедится, что строка является словом в рассматриваемом языке.
 
 % https://link.springer.com/content/pdf/10.1007/BF00195207.pdf
-To be more specific, let $\Sigma$ be an alphabet, and let $L$ be a formal language defined over $\Sigma$. Then a \term{proof system} for language $L$ is a pair of probabilistic interactive algorithms $(P,V)$, where $P$ is called the \term{prover} and $V$ is called the \term{verifier}. 
+Более конкретно, пусть $\Sigma$ --- алфавит, и пусть $L$ --- формальный язык, определённый над $\Sigma$. Тогда \term{система доказательства} (proof system) для языка $L$ --- это пара вероятностных интерактивных алгоритмов $(P,V)$, где $P$ называется \term{доказывающим} (prover), а $V$ называется \term{проверяющим} (verifier).
 
-Both algorithms are able to send messages to one another, each algorithm has its own state, some shared initial state and access to the messages. The verifier is bounded to a number of steps which is polynomial in the size of the shared initial state, after which it stops and outputs either \texttt{accept} or \texttt{reject} indicating that it accepts or rejects a given string to be a word in $L$ or not. In contrast, in the most general form of a proof system, there are no bounds on the computational power of the prover.
+Оба алгоритма могут отправлять сообщения друг другу, каждый алгоритм имеет своё собственное состояние, некоторое общее начальное состояние и доступ к сообщениям. Проверяющий ограничен числом шагов, полиномиальным от размера общего начального состояния, после чего он останавливается и выдаёт либо \texttt{accept}, либо \texttt{reject}, указывая, принимает ли он данную строку как слово в $L$ или нет. Напротив, в наиболее общей форме системы доказательства на вычислительную мощность доказывающего не накладывается никаких ограничений.
 
-When the execution of the verifier algorithm stops the following conditions are required to hold:
+Когда выполнение алгоритма проверяющего завершается, должны выполняться следующие условия:
 \begin{itemize}
-\item (Completeness) If the string $x\in \Sigma^*$ is a word in language $L$ and both prover and verifier follow the protocol, the verifier outputs \texttt{accept}.
-\item (Soundness) If the string $x\in \Sigma^*$ is not a word in language $L$ and the verifier follows the protocol, the verifier outputs \texttt{reject}, except with some small probability.
+\item (Полнота) Если строка $x\in \Sigma^*$ является словом в языке $L$ и обе стороны следуют протоколу, проверяющий выдаёт \texttt{accept}.
+\item (Корректность) Если строка $x\in \Sigma^*$ не является словом в языке $L$ и проверяющий следует протоколу, проверяющий выдаёт \texttt{reject}, за исключением некоторой малой вероятности.
 \end{itemize}
-In addition, a proof system is called \term{zero-knowledge} if the verifier learns nothing about $x$ other than $x\in L$. 
+Кроме того, система доказательства называется \term{с нулевым разглашением} (zero-knowledge), если проверяющий не узнаёт ничего о $x$, кроме того, что $x\in L$.
 
-The previous definition of proof systems is very general, and many subclasses of proof systems are known in the field. For example, some proof systems restrict the computational power of the prover, while some proof systems assume that the verifier has access to randomness. In addition, proof systems are classified by the number of messages that can be exchanged. If the system only requires to send a single message from the prover to the verifier, the proof system is called \term{non-interactive}, because no interaction other than sending the actual proof is required. In contrast, any other proof system is called \term{interactive}.
+Предыдущее определение систем доказательства очень общее, и в этой области известно много подклассов систем доказательства. Например, некоторые системы доказательства ограничивают вычислительную мощность доказывающего, в то время как другие предполагают, что проверяющий имеет доступ к случайности. Кроме того, системы доказательства классифицируются по количеству сообщений, которые могут быть обменены. Если системе требуется отправить лишь одно сообщение от доказывающего к проверяющему, система доказательства называется \term{неинтерактивной} (non-interactive), поскольку никакого взаимодействия, кроме отправки самого доказательства, не требуется. Напротив, любая другая система доказательства называется \term{интерактивной} (interactive).
 
-A proof system is usually called \term{succinct} if the size of the proof is shorter than the witness necessary to generate the proof. Moreover, a proof system is called \term{computationally sound} if soundness only holds under the assumption that the computational capabilities of the prover are polynomial bound. To distinguish general proofs from computationally sound proofs, the latter are often called \term{arguments}.
+Система доказательства обычно называется \term{краткой} (succinct), если размер доказательства меньше, чем свидетель, необходимый для генерации доказательства. Более того, система доказательства называется \term{вычислительно корректной} (computationally sound), если корректность выполняется лишь при предположении, что вычислительные возможности доказывающего полиномиально ограничены. Чтобы отличать общие доказательства от вычислительно корректных доказательств, последние часто называют \term{аргументами} (arguments).
 
-The term \term{zk-SNARKs} is an abbreviation for "Zero-knowledge, succinct, non-interactive argument of knowledge". These proof systems are able to generate zk-SNARKS therefore have the zero-knowledge property, are able to generate proofs that require less space than the original witness and require no interaction between prover and verifier, other than transmitting the zk-SNARK itself. However, those systems are only sound under the assumption that the prover's computational capabilities are polynomial bound.
-\begin{example}[Constructive Proofs for Algebraic Circuits] We have seen in \ref{circuit-satisfiability} how algebraic circuits give rise to formal languages and constructive proofs for knowledge claims.
+Термин \term{zk-SNARK} является аббревиатурой от <<Zero-knowledge, succinct, non-interactive argument of knowledge>> (аргумент знания с нулевым разглашением, краткий, неинтерактивный). Следовательно, системы доказательства, способные генерировать zk-SNARK, обладают свойством нулевого разглашения (zero-knowledge), способны генерировать доказательства, требующие меньше места, чем исходный свидетель, и не требуют взаимодействия между доказывающим и проверяющим, кроме передачи самого zk-SNARK. Однако эти системы корректны лишь при предположении, что вычислительные возможности доказывающего полиномиально ограничены.
+\begin{example}[Конструктивные доказательства для алгебраических схем] Как мы видели в \ref{circuit-satisfiability}, алгебраические схемы порождают формальные языки и конструктивные доказательства для утверждений о знании.
 
-To reformulate this notion of constructive proofs for algebraic circuits into a proof system, let $\F$ be a finite field, and let $C(\F)$ be an algebraic circuit over $\F$ with associated language $L_{C(\F)}$. A non-interactive proof system for $L_{C(\F)}$ is given by the following two algorithms:
+Чтобы переформулировать это понятие конструктивных доказательств для алгебраических схем в систему доказательства, пусть $\F$ --- конечное поле, и пусть $C(\F)$ --- алгебраическая схема над $\F$ с ассоциированным языком $L_{C(\F)}$. Неинтерактивная система доказательства для $L_{C(\F)}$ задаётся следующими двумя алгоритмами:
 
-\term{Prover Algorithm}: The prover $P$ is defined by circuit execution. Given some instance $I$ the prover executes circuit $C(\F)$ to compute a witness $W$ such that the pair $(I;W)$ is a valid assignment to $C(\F)$ whenever the circuit is satisfiable for $I$. The prover then sends the constructive proof $(I;W)$ to the verifier.
+\term{Алгоритм доказывающего}: Доказывающий $P$ определяется выполнением схемы. При данном экземпляре $I$ доказывающий выполняет схему $C(\F)$ для вычисления свидетеля $W$ такого, что пара $(I;W)$ является допустимым назначением для $C(\F)$, если схема выполнима для $I$. Доказывающий затем отправляет конструктивное доказательство $(I;W)$ проверяющему.
 
-\term{Verifier Algorithm}: On receiving a message $(I;W)$, the verifier algorithm $V$ inserts $(I;W)$ into the associated R1CS of the circuit. If $(I;W)$ is a solution to the $R1CS$, the verifier returns \texttt{accept}, if not, it returns \texttt{reject}. 
+\term{Алгоритм проверяющего}: Получив сообщение $(I;W)$, алгоритм проверяющего $V$ подставляет $(I;W)$ в ассоциированную R1CS схемы. Если $(I;W)$ является решением R1CS, проверяющий возвращает \texttt{accept}, если нет --- \texttt{reject}.
 
-To see that this proof system is complete and sound, let $C(\F)$ be a circuit of the field $\F$, and let $I$ be an instance. The circuit may or may not have a witness $W$ such that $(I;W)$ is a valid assignment to $C(\F)$. 
+Чтобы убедиться, что эта система доказательства полна и корректна, пусть $C(\F)$ --- схема над полем $\F$, и пусть $I$ --- экземпляр. Схема может иметь или не иметь свидетеля $W$ такого, что $(I;W)$ является допустимым назначением для $C(\F)$.
 
-If no $W$ exists, $I$ is not part of any word in $L_{C(\F)}$, and there is no way for $P$ to generate a valid assignment. It follows that the verifier will not accept any claimed proof sent by $P$, since the associated $R1CS$ has no solutions for instance $I$. This implies that the system is \term{sound}.
+Если $W$ не существует, $I$ не является частью никакого слова в $L_{C(\F)}$, и нет способа для $P$ сгенерировать допустимое назначение. Следовательно, проверяющий не примет никакое заявленное доказательство, отправленное $P$, поскольку ассоциированная R1CS не имеет решений для экземпляра $I$. Это означает, что система \term{корректна} (sound).
 
-If, on the other hand, $W$ exists and $P$ is honest, $P$ can use its unlimited computational power to compute $W$ and send $(I;W)$ to $V$, which $V$ will accept, since it is a solution to the associated $R1CS$. This implies that the system is \term{complete}.
+Если, с другой стороны, $W$ существует и $P$ честен, $P$ может использовать свою неограниченную вычислительную мощность для вычисления $W$ и отправить $(I;W)$ к $V$, который примет его, поскольку это решение ассоциированной R1CS. Это означает, что система \term{полна} (complete).
 
-The system is non-interactive because the prover only sends a single message to the verifier, which contains the proof itself. However the proof system is \term{not} succinct, since the proof is the witness. The proof system is also not zero knowledge, since the verifier has access to the witness and hence learns everything about the witness.
+Система неинтерактивна, поскольку доказывающий отправляет лишь одно сообщение проверяющему, которое содержит само доказательство. Однако система доказательства \term{не} является краткой, поскольку доказательство является свидетелем. Система доказательства также не обладает свойством нулевого разглашения, поскольку проверяющий имеет доступ к свидетелю и, следовательно, узнаёт о нём всё.
 \end{example}
-\section{The ``Groth16'' Protocol}
+\section{Протокол Groth16}
 \label{sec:gorth_16}
- In \chaptname{} \ref{chap:statements}, we presented algebraic circuits, their associated Rank-1 Constraint Systems and their induced Quadratic Arithmetic Programs. These models define formal languages, and associated memberships and knowledge claims provide constructive proofs by executing the circuit to compute a solution to the associated R1CS. As previously noted in Section \ref{sec:QAP} the proof can then be transformed into a polynomial that is only divisible by another polynomial if and only if the proof is valid. 
+ В \chaptname{} \ref{chap:statements} мы представили алгебраические схемы, их ассоциированные системы ограничений ранга 1 (Rank-1 Constraint Systems) и порождённые ими квадратичные арифметические программы (Quadratic Arithmetic Programs). Эти модели определяют формальные языки, а ассоциированные утверждения о принадлежности и знании предоставляют конструктивные доказательства путём выполнения схемы для вычисления решения ассоциированной R1CS. Как отмечалось ранее в разделе \ref{sec:QAP}, доказательство затем может быть преобразовано в многочлен, который делится на другой многочлен только в том и только в том случае, если доказательство корректно.
  
-In \cite{Groth16}, Jens Groth developed a method for transforming constructive proofs into zero-knowledge succinct non-interactive arguments of knowledge. Given groups $\G_1$, $\G_2$, and $\G_3$, and an efficiently computable pairing map $e(\cdot,\cdot): \G_1 \times \G_2 \to \G_3$ (see \ref{pairing-map}), the resulting zk-SNARK in Groth's protocol is of constant size, consisting of two elements from $\G_1$ and one element from $\G_2$, regardless of the instance and witness size. Verification is non-interactive, requiring the computation of a number of exponentiations proportional to the instance size, along with three group pairings, in order to verify a single proof.
+В \cite{Groth16} Йенс Грот (Jens Groth) разработал метод преобразования конструктивных доказательств в краткие неинтерактивные аргументы знания с нулевым разглашением (zero-knowledge succinct non-interactive arguments of knowledge). Заданные группы $\G_1$, $\G_2$ и $\G_3$, и эффективно вычислимое отображение спаривания $e(\cdot,\cdot): \G_1 \times \G_2 \to \G_3$ (см. \ref{pairing-map}), результирующий zk-SNARK в протоколе Грота имеет постоянный размер, состоящий из двух элементов из $\G_1$ и одного элемента из $\G_2$, независимо от размера экземпляра и свидетеля. Проверка неинтерактивна и требует вычисления числа возведений в степень, пропорционального размеру экземпляра, вместе с тремя групповыми спариваниями, чтобы проверить одно доказательство.
 
-The generated zk-SNARK is zero-knowledge, has completeness and soundness in the generic bilinear group model, under the assumption of the existence of a trusted third party that executes a preprocessing phase to produce a Common Reference String and a simulation trapdoor. It is imperative that this party is trusted to delete the simulation trapdoor, as any individual in possession of it would have the ability to simulate proofs. As demonstrated in \cite{bowe-17}, it is possible to transform the single-party trusted setup into a multi-party computation that is secure as long as at least one contributor deletes their contribution to the simulation trapdoor. 
+Сгенерированный zk-SNARK обладает свойством нулевого разглашения, имеет полноту и корректность в общей модели билинейных групп, при предположении существования доверенной третьей стороны, которая выполняет предобработку для создания общей опорной строки (Common Reference String) и симуляционного люка (simulation trapdoor). Крайне важно, чтобы эта сторона была доверенной в удалении симуляционного люка, поскольку любой, кто обладает им, имел бы возможность моделировать доказательства. Как показано в \cite{bowe-17}, можно преобразовать одностороннюю доверенную установку (trusted setup) в многостороннее вычисление, которое является безопасным, пока хотя бы один участник удаляет свой вклад в симуляционный люк.
 
-To be more precise, let $R$ be a Rank-1 Constraint System defined over some finite field $\F_r$. Then \term{Groth\_16 parameters} for $R$ are given by the following set:
+Более точно, пусть $R$ --- система ограничений ранга 1 (Rank-1 Constraint System), определённая над некоторым конечным полем $\F_r$. Тогда \term{параметры Groth16} (Groth16 parameters) для $R$ задаются следующим множеством:
 \begin{equation}
 \label{groth16-parameters}
-\mathtt{Groth\_16-Param}(R)= \{ r, \G_1, \G_2, e(\cdot,\cdot), g_1,g_2 \}
+\mathtt{Groth16\text{-}Param}(R)= \{ r, \G_1, \G_2, e(\cdot,\cdot), g_1,g_2 \}
 \end{equation}
 
-Here, $\G_1$ and $\G_2$ are finite cyclic groups of order $r$, $g_1$ is a generator of $\G_1$, $g_2$ is a generator of $\G_2$ and $e: \G_1 \times \G_2 \to \G_T$ is an efficiently computable, non-degenerate, bilinear pairing for some target group $\G_T$. In real-world applications, the parameter set is usually agreed on in advance. 
+Здесь $\G_1$ и $\G_2$ --- конечные циклические группы порядка $r$, $g_1$ --- образующий $\G_1$, $g_2$ --- образующий $\G_2$, и $e: \G_1 \times \G_2 \to \G_T$ --- эффективно вычислимое, невырожденное, билинейное спаривание для некоторой целевой группы $\G_T$. В реальных приложениях набор параметров обычно согласовывается заранее.
 
-Given some Groth\_16 parameters, a \term{Groth\_16 protocol} is then a quadruple of probabilistic polynomial algorithms $(\textsc{Setup},\textsc{Prove},\textsc{Vfy},\textsc{Sim})$ such that the following conditions hold:
+Заданные некоторые параметры Groth16, \term{протокол Groth16} (Groth16 protocol) --- это тогда четвёрка вероятностных полиномиальных алгоритмов $(\textsc{Setup},\textsc{Prove},\textsc{Vfy},\textsc{Sim})$, таких что выполняются следующие условия:
 \begin{itemize}
-\item (Setup-Phase): $(CRS,\Tau)\leftarrow \textsc{Setup}(R)$: Algorithm $\textsc{Setup}$ takes the R1CS $R$ as input and computes a \term{\concept{Common Reference String}} $CRS$ and a \term{simulation trapdoor} $\Tau$.
-\item (Prover-Phase): $\pi\leftarrow \textsc{Prove}(R,CRS,I,W)$: Given a constructive proof $(I;W)$ for $R$, algorithm $\textsc{Prove}$ takes the R1CS $R$, the \concept{Common Reference String} $CRS$ and the constructive proof $(I,W)$ as input and computes an zk-SNARK $\pi$.
-\item (Verification Phase): $\{\mathtt{accept},\mathtt{reject}\}\leftarrow \textsc{Vfy}(R,CRS,I,\pi)$:   Algorithm \textsc{Vfy} takes the R1CS $R$, the \concept{Common Reference String} $CRS$, the instance $I$ and the zk-SNARK $\pi$ as input and returns \texttt{reject} or \texttt{accept}.
-\item (Simulation) $\pi\leftarrow \textsc{Sim}(R,\Tau,CRS, I)$: Algorithm \textsc{Sim} takes the R1CS $R$, the \concept{Common Reference String} $CRS$, the simulation trapdoor $\Tau$ and the instance $I$ as input and returns a zk-SNARK $\pi$. 
+\item (Фаза установки): $(CRS,\Tau)\leftarrow \textsc{Setup}(R)$: Алгоритм $\textsc{Setup}$ принимает R1CS $R$ на вход и вычисляет \term{\concept{общую опорную строку}} (Common Reference String, CRS) $CRS$ и \term{симуляционный люк} (simulation trapdoor) $\Tau$.
+\item (Фаза доказывающего): $\pi\leftarrow \textsc{Prove}(R,CRS,I,W)$: Задано конструктивное доказательство $(I;W)$ для $R$, алгоритм $\textsc{Prove}$ принимает R1CS $R$, \concept{общую опорную строку} $CRS$ и конструктивное доказательство $(I,W)$ на вход и вычисляет zk-SNARK $\pi$.
+\item (Фаза проверки): $\{\mathtt{accept},\mathtt{reject}\}\leftarrow \textsc{Vfy}(R,CRS,I,\pi)$: Алгоритм \textsc{Vfy} принимает R1CS $R$, \concept{общую опорную строку} $CRS$, экземпляр $I$ и zk-SNARK $\pi$ на вход и возвращает \texttt{reject} или \texttt{accept}.
+\item (Моделирование) $\pi\leftarrow \textsc{Sim}(R,\Tau,CRS, I)$: Алгоритм \textsc{Sim} принимает R1CS $R$, \concept{общую опорную строку} $CRS$, симуляционный люк $\Tau$ и экземпляр $I$ на вход и возвращает zk-SNARK $\pi$.
 \end{itemize}
-We will explain these algorithms together with detailed examples in the remainder of this section.
+Мы объясним эти алгоритмы вместе с подробными примерами в оставшейся части этого раздела.
 
-Assuming a trusted third party or the presence of a corresponding multi-party computation for the setup, the protocol is capable of deriving a zk-SNARK from a constructive proof for $R$, provided that the group order $r$ is suitably large, with the requirement being particularly applicable to being larger than the number of constraints in the associated R1CS.
+При предположении доверенной третьей стороны или наличия соответствующего многостороннего вычисления для установки, протокол способен получить zk-SNARK из конструктивного доказательства для $R$, при условии, что порядок группы $r$ достаточно велик, причём требование особенно применимо к быть большим, чем число ограничений в ассоциированной R1CS.
 
-\begin{example}[The 3-Factorization Problem]
-\label{ex:3-fac-groth-16-params} Consider the $3$-factorization problem from \ref{ex:3-factorization} and its associated algebraic circuit \ref{ex:3-fac-zk-circuit} as well the Rank-1 Constraint System from \ref{ex:3-factorization-r1cs}. In this example, we want to agree on a parameter set $\{r, \G_1, \G_2, e(\cdot,\cdot), g_1, g_2\}$ in order to use the Groth\_16 protocol for our $3$-factorization problem. 
+\begin{example}[Задача 3-факторизации]
+\label{ex:3-fac-groth-16-params} Рассмотрим задачу 3-факторизации из \ref{ex:3-factorization} и её ассоциированную алгебраическую схему \ref{ex:3-fac-zk-circuit}, а также систему ограничений ранга 1 из \ref{ex:3-factorization-r1cs}. В этом примере мы хотим согласовать набор параметров $\{r, \G_1, \G_2, e(\cdot,\cdot), g_1, g_2\}$, чтобы использовать протокол Groth16 для нашей задачи 3-факторизации.
 
-To find proper parameters, first observe that the circuit \ref{ex:3-fac-zk-circuit}, as well as its associated R1CS $R_{3.fac\_zk}$ \ref{ex:3-factorization-r1cs} and the derived QAP \ref{ex:3-fac-QAP}, are defined over the field $\F_{13}$. We therefore have to choose pairing groups $\G_1$ and $\G_2$ of order $13$. 
+Чтобы найти подходящие параметры, сначала заметим, что схема \ref{ex:3-fac-zk-circuit}, а также её ассоциированная R1CS $R_{3.fac\_zk}$ \ref{ex:3-factorization-r1cs} и порождённая QAP \ref{ex:3-fac-QAP}, определены над полем $\F_{13}$. Поэтому мы должны выбрать группы спаривания $\G_1$ и $\G_2$ порядка 13.
 
-We know from \ref{BLS6} that the moon-math curve \texttt{BLS6\_6} has two subgroups $\G_1[13]$ and $\G_2[13]$, which are both of order $13$. The associated Weil pairing $e(\cdot,\cdot)$ \ref{BLS6-weil-pairing} is efficiently computable, bilinear as well as non-degenerate. We therefore choose those groups and the Weil pairing together with the generators $g_1 = (13,15) $ and $g_2=(7v^2,16v^3)$ of $\G_1[13]$ and $\G_2[13]$, as a parameter set:
+Как нам известно из \ref{BLS6}, кривая moon-math \texttt{BLS6\_6} имеет две подгруппы $\G_1[13]$ и $\G_2[13]$, которые обе имеют порядок 13. Ассоциированное спаривание Вейля $e(\cdot,\cdot)$ \ref{BLS6-weil-pairing} эффективно вычислимо, билинейно и невырождено. Поэтому мы выбираем эти группы и спаривание Вейля вместе с образующими $g_1 = (13,15)$ и $g_2=(7v^2,16v^3)$ групп $\G_1[13]$ и $\G_2[13]$ в качестве набора параметров:
 $$
-\mathtt{Groth\_16-Param}(R_{3.fac\_zk})= \{ 13, \G_1[13], \G_2[13], e(\cdot,\cdot), (13,15),(7v^2,16v^3) \}
+\mathtt{Groth16\text{-}Param}(R_{3.fac\_zk})= \{ 13, \G_1[13], \G_2[13], e(\cdot,\cdot), (13,15),(7v^2,16v^3) \}
 $$
-It should be noted that our choice is not unique. Every pair of finite cyclic groups of order $13$ that has an efficiently computable, non-degenerate, bilinear pairing qualifies as a Groth\_16 parameter set. The situation is similar to real-world applications, where SNARKs with equivalent behavior are defined over different curves, used in different applications.
+Следует отметить, что наш выбор не является единственным. Каждая пара конечных циклических групп порядка 13, имеющая эффективно вычислимое, невырожденное, билинейное спаривание, квалифицируется как набор параметров Groth16. Ситуация аналогична реальным приложениям, где SNARK с эквивалентным поведением определены над различными кривыми, используемыми в различных приложениях.
 \end{example}
-\begin{example}[The 3-Factorization Problem in Circom and Snarkjs]
-\label{ex:3-fac-groth-16-params-circom} Snark.js is a JavaScript library that facilitates the development of systems incorporating zero-knowledge proofs (ZKPs), including the Groth-16 protocol. To showcase a practical example of the 3-factorization problem, we utilize our Circom implementation (see \ref{ex:3-fac-circom}), which compiles into a form that is compatible with snark.js.
+\begin{example}[Задача 3-факторизации в Circom и Snarkjs]
+\label{ex:3-fac-groth-16-params-circom} Snark.js --- это JavaScript-библиотека, которая облегчает разработку систем, включающих доказательства с нулевым разглашением (ZKP), включая протокол Groth-16. Чтобы продемонстрировать практический пример задачи 3-факторизации, мы используем нашу реализацию на Circom (см. \ref{ex:3-fac-circom}), которая компилируется в форму, совместимую с snark.js.
 
-As of the time of writing, Snark.js supports the elliptic curves \curvename{alt\_bn128}, \curvename{BLS12-381}, and \curvename{Goldilocks}. For the purposes of this example, we shall utilize \curvename{alt\_bn128}, and its associated scalar field $\F_{bn128}$ as introduced in \ref{BN128}. The Groth-16 parameters for this curve, as officially defined for the Ethereum blockchain, can be found in \href{https://github.com/ethereum/EIPs/blob/master/EIPS/eip-197.md}{EIP-197}. Snark.js utilizes those parameters.
+На момент написания этого текста Snark.js поддерживает эллиптические кривые \curvename{alt\_bn128}, \curvename{BLS12-381} и \curvename{Goldilocks}. Для целей этого примера мы будем использовать \curvename{alt\_bn128} и её ассоциированное скалярное поле $\F_{bn128}$, как представлено в \ref{BN128}. Параметры Groth-16 для этой кривой, как официально определено для блокчейна Ethereum, можно найти в \href{https://github.com/ethereum/EIPs/blob/master/EIPS/eip-197.md}{EIP-197}. Snark.js использует эти параметры.
 \end{example}
 \begin{exercise}
-\label{ex:baby-jubjub-circom} Implement the \href{https://github.com/iden3/iden3-docs/blob/master/source/iden3_repos/research/publications/zkproof-standards-workshop-2/baby-jubjub/baby-jubjub.rst}{Baby-JubJub}  twisted Edwards curve equation in Circom and compile it into an R1CS and associated witness generator.
+\label{ex:baby-jubjub-circom} Реализуйте уравнение кривой Беби-ДжабДжаб (Baby-JubJub) в форме скрученной кривой Эдвардса (twisted Edwards curve) в Circom и скомпилируйте его в R1CS и ассоциированный генератор свидетелей.
 \end{exercise}
 
-\subsection{The Setup Phase} Generating zk-SNARKs from constructive proofs in the Groth16 protocol requires a preprocessing phase to be performed. This phase must be executed once for every Rank-1 Constraint System and its associated Quadratic Arithmetic Program. The outcome of this phase is a \concept{Common Reference String}, which is necessary for both the prover and the verifier to generate and verify the zk-SNARK. Additionally, a simulation trapdoor is generated during this phase, which can be utilized to simulate proofs.
+\subsection{Фаза установки} Генерация zk-SNARK из конструктивных доказательств в протоколе Groth16 требует выполнения предобрабатывающей фазы. Эта фаза должна быть выполнена один раз для каждой системы ограничений ранга 1 и её ассоциированной квадратичной арифметической программы. Результатом этой фазы является \concept{общая опорная строка} (Common Reference String), которая необходима как доказывающему, так и проверяющему для генерации и проверки zk-SNARK. Дополнительно, во время этой фазы генерируется симуляционный люк, который может быть использован для моделирования доказательств.
 
-To be more precise, let $L$ be a language defined by some Rank-1 Constraint System $R$ such that  a constructive proof of knowledge for an instance $<I_1,\ldots,I_n>$ in $L$ consists of a witness $<W_1,\ldots,W_m>$. Let $QAP(R) = \left\{T\in \F[x],\left\{A_j,B_j,C_j\in \F[x]\right\}_{j=0}^{n+m}\right\}$ be a Quadratic Arithmetic Program associated to $R$, and let $\{\G_1, \G_2, e(\cdot,\cdot), g_1, g_2, \F_r\}$ be a set of Groth\_16 parameters.
+Более точно, пусть $L$ --- язык, определённый некоторой системой ограничений ранга 1 $R$, такой что конструктивное доказательство знания для экземпляра $<I_1,\ldots,I_n>$ в $L$ состоит из свидетеля $<W_1,\ldots,W_m>$. Пусть $QAP(R) = \left\{T\in \F[x],\left\{A_j,B_j,C_j\in \F[x]\right\}_{j=0}^{n+m}\right\}$ --- квадратичная арифметическая программа (Quadratic Arithmetic Program), ассоциированная с $R$, и пусть $\{\G_1, \G_2, e(\cdot,\cdot), g_1, g_2, \F_r\}$ --- набор параметров Groth16.
 
-The setup phase then samples $5$ random, invertible elements $\alpha$, $\beta$,$\gamma$, $\delta$ and $\tau$ from the scalar field $\F_r$ of the protocol and outputs the \term{simulation trapdoor} $\Tau$:
+Фаза установки затем выбирает 5 случайных, обратимых элементов $\alpha$, $\beta$,$\gamma$, $\delta$ и $\tau$ из скалярного поля $\F_r$ протокола и выдаёт \term{симуляционный люк} (simulation trapdoor) $\Tau$:
 \begin{equation}
 \label{def:groth16-trapdoor}
 \Tau = (\alpha, \beta, \gamma, \delta, \tau)
 \end{equation}
-In addition, the setup phase uses those $5$ random elements together with the two generators $g_1$ and $g_2$  and the Quadratic Arithmetic Program to generate a \term{\concept{Common Reference String}} $CRS_{QAP}= (CRS_{\mathbb{G}_1},CRS_{\mathbb{G}_2})$ of language $L$:
+Кроме того, фаза установки использует эти 5 случайных элемента вместе с двумя образующими $g_1$ и $g_2$ и квадратичной арифметической программой для генерации \term{\concept{общей опорной строки}} (Common Reference String) $CRS_{QAP}= (CRS_{\mathbb{G}_1},CRS_{\mathbb{G}_2})$ языка $L$:
 
-\begin{definition}[\deftitle{Common \concept{reference string}}]
+\begin{definition}[\deftitle{Общая \concept{опорная строка}}]
 \begin{align*}
 \label{def:groth16-crs}
 CRS_{\mathbb{G}_{1}} &= \textstyle\left\{ \begin{array}{c}
@@ -119,11 +119,11 @@ CRS_{\mathbb{G}_{2}} &= \left\{g_2^\beta ,g_2^\gamma,g_2^\delta,\left(g_2^{\tau^
 \end{align*}
 \end{definition}
 
-Common \concept{reference string}s depend on the simulation trapdoor, and are therefore not unique to the problem. Any language can have more than one \concept{Common Reference String}. The  size of a \concept{Common Reference String} is linear in the size of the instance and the size of the witness.
+Общие \concept{опорные строки} зависят от симуляционного люка и поэтому не являются единственными для задачи. Любой язык может иметь более одной \concept{общей опорной строки}. Размер \concept{общей опорной строки} линеен от размера экземпляра и размера свидетеля.
 
-If a simulation trapdoor $\Tau = (\alpha,\beta,\gamma,\delta, \tau)$ is given, we call the element $\tau$ a \term{secret evaluation point} of the protocol, because if $\F_r$ is the scalar field of the finite cyclic groups $\G_1$ and $\G_2$, then a key feature of any \concept{Common Reference String} is that it provides data to compute the evaluation of any polynomial $P\in \F_r[x]$ of degree $deg(P)<deg(T)$ at the point $\tau$ in the exponent of the generator $g_1$ or $g_2$, without knowing $\tau$.
+Если дан симуляционный люк $\Tau = (\alpha,\beta,\gamma,\delta, \tau)$, мы называем элемент $\tau$ \term{секретной точкой вычисления} (secret evaluation point) протокола, потому что если $\F_r$ --- скалярное поле конечных циклических групп $\G_1$ и $\G_2$, то ключевая особенность любой \concept{общей опорной строки} заключается в том, что она предоставляет данные для вычисления значения любого многочлена $P\in \F_r[x]$ степени $deg(P)<deg(T)$ в точке $\tau$ в показателе степени образующего $g_1$ или $g_2$, не зная $\tau$.
 
-To be more precise, let $\tau$ be the secret evaluation point and let $P(x)=a_0\cdot x^0 + a_1\cdot x^1 + \ldots a_k\cdot x^k$ be a polynomial of degree $k<deg(T)$ with coefficients in $\F_r$. Then we can compute $g_1^{P(\tau)}$ without knowing what the actual value of $\tau$ is:
+Более точно, пусть $\tau$ --- секретная точка вычисления, и пусть $P(x)=a_0\cdot x^0 + a_1\cdot x^1 + \ldots a_k\cdot x^k$ --- многочлен степени $k<deg(T)$ с коэффициентами в $\F_r$. Тогда мы можем вычислить $g_1^{P(\tau)}$, не зная фактического значения $\tau$:
 
 \label{eq:exp_evaluation-poly}
 \begin{align}
@@ -131,36 +131,36 @@ g_1^{P(\tau)} & = g_1^{a_0\cdot \tau^0 + a_1\cdot \tau^1 + \ldots a_k\cdot \tau^
  & = g_1^{a_0\cdot \tau^0} \cdot g_1^{a_1\cdot \tau^1} \cdot \ldots \cdot g_1^{a_k\cdot \tau^k}\notag\\
  & = \Big(g_1^{\tau^0}\Big)^{a_0} \cdot \Big(g_1^{\tau^1}\Big)^{a_1} \cdot \ldots \cdot \Big(g_1^{\tau^k}\Big)^{a_k}
 \end{align}
-In this expression, all group points $g_1^{\tau^j}$ are part of the \concept{Common Reference String}, hence, they can be used to compute the result. The same holds true for the evaluation of $g_2^{P(\tau)}$, since the $\G_2$ part of the \concept{Common Reference String} contains the points $g_2^{\tau^j}$. 
+В этом выражении все групповые точки $g_1^{\tau^j}$ являются частью \concept{общей опорной строки}, следовательно, они могут быть использованы для вычисления результата. То же самое верно для вычисления $g_2^{P(\tau)}$, поскольку $\G_2$ часть \concept{общей опорной строки} содержит точки $g_2^{\tau^j}$.
 
-In practical applications, the elements $g_{1/2}^{\tau^0}$, $g_{1/2}^{\tau^1}$, $\ldots$, $g_{1/2}^{\tau^k}$ are commonly referred to as the \term{powers of tau}, a term frequently used in trusted setup computations. Additionally, the simulation trapdoor is often referred to as the \term{toxic waste} of the setup phase. As will be demonstrated in section \ref{sec:proof_simulation}, the simulation trapdoor can be utilized to generate fraud proofs, which are verifiable zk-SNARKs that can be constructed without knowledge of any witness. The Common Reference String is also known as the \term{prover and verifier key pair}.
+В практических приложениях элементы $g_{1/2}^{\tau^0}$, $g_{1/2}^{\tau^1}$, $\ldots$, $g_{1/2}^{\tau^k}$ обычно называются \term{степенями тау} (powers of tau), термин, часто используемый в вычислениях доверенной установки. Кроме того, симуляционный люк часто называют \term{токсичными отходами} (toxic waste) фазы установки. Как будет показано в разделе \ref{sec:proof_simulation}, симуляционный люк может быть использован для генерации мошеннических доказательств, которые являются проверяемыми zk-SNARK, которые могут быть построены без знания какого-либо свидетеля. Общая опорная строка также известна как \term{пара ключей доказывающего и проверяющего} (prover and verifier key pair).
 
-To ensure the security of the protocol, the setup must be carried out in a way that ensures the safe disposal of the simulation trapdoor. The simplest method for accomplishing this is through the use of a so-called \term{trusted third party}, where trust is placed in the party to properly generate the \concept{Common Reference String} and securely dispose of the toxic waste afterwards.
+Чтобы обеспечить безопасность протокола, установка должна быть выполнена таким образом, который гарантирует безопасное уничтожение симуляционного люка. Простейший метод достижения этого --- использование так называемой \term{доверенной третьей стороны} (trusted third party), где доверие возлагается на сторону должным образом сгенерировать \concept{общую опорную строку} и безопасно уничтожить токсичные отходы после этого.
 
-However, finding a trusted third party can be challenging, thus alternative methods have been developed in practical applications. These utilize multi-party computation in the setup phase, which can be publicly verified for proper execution, and the simulation trapdoor is not recoverable if at least one participant destroys their contribution. Each participant holds only a fraction of the trapdoor, making it recoverable only if all participants collaborate and share their parts.
+Однако найти доверенную третью сторону может быть сложно, поэтому в практических приложениях были разработаны альтернативные методы. Они используют многостороннее вычисление на фазе установки, которое может быть публично проверено на правильное выполнение, и симуляционный люк не может быть восстановлен, если хотя бы один участник уничтожит свой вклад. Каждый участник держит лишь часть люка, делая его восстановимым только если все участники сотрудничают и делятся своими частями.
 
-\begin{example}[The $3$-factorization Problem]
+\begin{example}[Задача 3-факторизации]
 \label{ex:3-fac-groth-16-crs}
-To see how the setup phase of a Groth\_16 zk-SNARK can be computed, consider the $3$-factorization problem from \ref{ex:3-factorization} and the Groth\_16 parameters from \examplename{} \ref{ex:3-fac-groth-16-params}. As we have seen in \ref{ex:3-fac-QAP}, an associated Quadratic Arithmetic Program is given by the following set:
+Чтобы увидеть, как может быть вычислена фаза установки Groth16 zk-SNARK, рассмотрим задачу 3-факторизации из \ref{ex:3-factorization} и параметры Groth16 из \examplename{} \ref{ex:3-fac-groth-16-params}. Как мы видели в \ref{ex:3-fac-QAP}, ассоциированная квадратичная арифметическая программа задаётся следующим множеством:
 \begin{multline*}
 QAP(R_{3.fac\_zk}) =\{x^{2}+x+9,\\
  \{0,0,6x+10,0,0,7x+4\},\{0,0,0,6x+10,7x+4,0\},\{0,7x+4,0,0,0,6x+10\}\}
 \end{multline*}
-To transform this QAP into a \concept{Common Reference String}, we choose the  field elements $\alpha=6$, $\beta=5$, $\gamma=4$, $\delta=3$, $\tau=2$ from $\mathbb{F}_{13}$. 
-In real-world applications, it is important to sample those values randomly from the scalar field, but in our approach, we choose those non-random values to make them more memorizable, which helps in pen-and-paper computations. Our simulation trapdoor is then given as follows:
+Чтобы преобразовать эту QAP в \concept{общую опорную строку}, мы выбираем элементы поля $\alpha=6$, $\beta=5$, $\gamma=4$, $\delta=3$, $\tau=2$ из $\mathbb{F}_{13}$.
+В реальных приложениях важно выбирать эти значения случайным образом из скалярного поля, но в нашем подходе мы выбираем эти неслучайные значения, чтобы сделать их более запоминающимися, что помогает при вычислениях на бумаге. Наш симуляционный люк затем задаётся следующим образом:
 $$
 \Tau = (6,5,4,3,2)
 $$
 
-We keep this secret in order to simulate proofs later on, but we are careful to hide $\Tau$ from anyone who hasn't read this book. Then we instantiate the \concept{Common Reference String} \ref{def:groth16-crs} from those values. Since our groups are subgroups of the \texttt{BLS6\_6} elliptic curve, we use scalar product notation instead of exponentiation. 
+Мы храним это в секрете, чтобы моделировать доказательства позже, но мы осторожно скрываем $\Tau$ от всех, кто не читал эту книгу. Затем мы инстанцируем \concept{общую опорную строку} \ref{def:groth16-crs} из этих значений. Поскольку наши группы являются подгруппами эллиптической кривой \texttt{BLS6\_6}, мы используем обозначение скалярного произведения вместо возведения в степень.
 
-To compute the $\G_1$ part of the \concept{Common Reference String}, we use the logarithmic order of the group $\G_1$ \ref{BLS6-G1-log}, the generator $g_1=(13,15)$, as well as the values from the simulation trapdoor. Since $deg(T)=2$, we get the following:
+Чтобы вычислить $\G_1$ часть \concept{общей опорной строки}, мы используем логарифмический порядок группы $\G_1$ \ref{BLS6-G1-log}, образующий $g_1=(13,15)$, а также значения из симуляционного люка. Поскольку $deg(T)=2$, мы получаем следующее:
 \begin{align*}
 [\alpha]g_1 & = [6](13,15) = (27,34) \\
 [\beta]g_1 & = [5](13,15) = (26,34) \\
 [\delta]g_1 & = [3](13,15) = (38,15)
 \end{align*}
-To compute the rest of the $\G_1$ part of the \concept{Common Reference String}, we expand the indexed tuples and insert the secret random elements from the simulation backdoor. We get the following:
+Чтобы вычислить остальную $\G_1$ часть \concept{общей опорной строки}, мы раскрываем индексированные кортежи и подставляем секретные случайные элементы из симуляционного люка. Мы получаем следующее:
 \begin{align*}
 \Big( [\tau^{j}]g_1,\ldots\Big) _{j=0}^{1} = 
  & \Big( [2^0](13,15), [2^1](13,15)\Big)  \\
@@ -175,7 +175,7 @@ To compute the rest of the $\G_1$ part of the \concept{Common Reference String},
 & \phantom{\Big(} [\frac{5 A_{5}(2)+ 6 B_{5}(2) + C_{5}(2)}{3}](13,15)\Big)\\
 \Big([\frac{\tau^j\cdot T(\tau)}{\delta})]g_1\Big)_{j=0}^0 = & \Big([\frac{2^0\cdot T(2)}{3}](13,15)\Big) 
 \end{align*}
-To compute the curve points on the right side of these expressions, we need the polynomials from the associated Quadratic Arithmetic Program and evaluate them on the secret point $\tau=2$. Since $4^{-1}=10$ and $3^{-1}=9$ in $\F_{13}$, we get the following:
+Чтобы вычислить точки кривой в правой части этих выражений, нам нужны многочлены из ассоциированной квадратичной арифметической программы и вычислить их в секретной точке $\tau=2$. Поскольку $4^{-1}=10$ и $3^{-1}=9$ в $\F_{13}$, мы получаем следующее:
 \begin{align*}
 [\frac{5 A_{0}(2)+6 B_{0}(2)+C_{0}(2)}{4}](13,15) = 
  & [(5 \cdot 0 +6\cdot 0 + 0)\cdot 10](13,15) = [0](13,14)\\
@@ -199,7 +199,7 @@ To compute the curve points on the right side of these expressions, we need the 
  & [1\cdot (2^2+2+9)\cdot 9](13,15)= [5](13,15) = \\
  & (26,34)
 \end{align*}
-Putting all those values together, we see that the $\mathbb{G}_1$ part of the \concept{Common Reference String} is given by the following set of $12$ points from the \texttt{BLS6\_6} $13$-torsion group $\G_1$: 
+Собрав все эти значения вместе, мы видим, что $\mathbb{G}_1$ часть \concept{общей опорной строки} (Common Reference String) задаётся следующим множеством из $12$ точек из $13$-кручённой группы $\G_1$ кривой \texttt{BLS6\_6}:
 \begin{equation}
 \label{eq:3-fac-groth-16-crs}
 CRS_{\mathbb{G}_{1}}=\left\{ \begin{array}{c}
@@ -210,23 +210,23 @@ CRS_{\mathbb{G}_{1}}=\left\{ \begin{array}{c}
 \end{array}\right\}
 \end{equation}
 
-To compute the $\G_2$ part of the \concept{Common Reference String}, we use the logarithmic order of the group $\G_2$ \ref{BLS6-G2-log}, the generator $g_2=(7v^2,16v^3)$, as well as the values from the simulation trapdoor. Since $deg(T)=2$, we get the following:
+Чтобы вычислить $\G_2$ часть \concept{общей опорной строки}, мы используем логарифмический порядок группы $\G_2$ \ref{BLS6-G2-log}, образующий $g_2=(7v^2,16v^3)$, а также значения из симуляционного люка. Поскольку $deg(T)=2$, мы получаем следующее:
 \begin{align*}
 [\beta]g_2 & = [5](7v^2,16v^3) = (16v^2,28v^3) \\
 [\gamma]g_2 & = [4](7v^2,16v^3) = (37v^2,27v^3) \\
 [\delta]g_2 & = [3](7v^2,16v^3) = (42v^2,16v^3)
 \end{align*}
-To compute the rest of the $\G_2$ part of the \concept{Common Reference String}, we expand the indexed tuple and insert the secret random elements from the simulation trapdoor. We get the following:
+Чтобы вычислить остальную $\G_2$ часть \concept{общей опорной строки}, мы раскрываем индексированный кортеж и подставляем секретные случайные элементы из симуляционного люка. Мы получаем следующее:
 \begin{align*}
 \Big( [\tau^{j}]g_2,\ldots\Big) _{j=0}^{1} = 
  & \Big( [2^0](7v^2,16v^3), [2^1](7v^2,16v^3)\Big)  \\
  = & \Big((7v^2,16v^3),(10v^2,28v^3)\Big)
 \end{align*}
-Putting all these values together, we see that the $\mathbb{G}_2$ part of the \concept{Common Reference String} is given by the following set of $5$ points from the \texttt{BLS6\_6} $13$-torsion group $\G_2$:
+Собрав все эти значения вместе, мы видим, что $\mathbb{G}_2$ часть \concept{общей опорной строки} задаётся следующим множеством из $5$ точек из $13$-кручённой группы $\G_2$ кривой \texttt{BLS6\_6}:
 $$
 CRS_{\mathbb{G}_{2}}=\left\{(16v^2,28v^3) ,(37v^2,27v^3),(42v^2,16v^3),\Big(7v^2,16v^3), (10v^2,28v^3)\Big)\right\} 
 $$
-Given the simulation trapdoor $\Tau$ and the Quadratic Arithmetic Program \ref{ex:3-fac-QAP}, the associated \concept{Common Reference String} of the $3$-factorization problem is as follows:
+Заданы симуляционный люк $\Tau$ и квадратичная арифметическая программа \ref{ex:3-fac-QAP}, ассоциированная \concept{общая опорная строка} задачи 3-факторизации выглядит следующим образом:
 \begin{align*}
 CRS_{\mathbb{G}_{1}} &=\left\{ \begin{array}{c}
 (27,34),(26,34),(38,15),\Big((13,15),(33,34)\Big),
@@ -236,15 +236,15 @@ CRS_{\mathbb{G}_{1}} &=\left\{ \begin{array}{c}
 \end{array}\right\}\\
 CRS_{\mathbb{G}_{2}} &=\left\{(16v^2,28v^3) ,(37v^2,27v^3),(42v^2,16v^3),\Big(7v^2,16v^3), (10v^2,28v^3)\Big)\right\}
 \end{align*}
-We then publish this data to everyone who wants to participate in the generation of a zk-SNARK or its verification in the $3$-factorization problem.
+Мы затем публикуем эти данные для всех, кто хочет участвовать в генерации zk-SNARK или его проверке для задачи 3-факторизации.
 
-To understand how this \concept{Common Reference String} can be used to evaluate polynomials at the secret evaluation point in the exponent of a generator, let's assume that we have deleted the simulation trapdoor. In that case, assuming that the discrete logarithm problem is hard in our groups, we have no way to know the secret evaluation point anymore, hence, we cannot evaluate polynomials at that point. However, we can evaluate polynomials of smaller degree than the degree of the target polynomial in the exponent of both generators at that point. 
+Чтобы понять, как эта \concept{общая опорная строка} может быть использована для вычисления многочленов в секретной точке вычисления в показателе степени образующего, предположим, что мы удалили симуляционный люк. В этом случае, при предположении, что проблема дискретного логарифма является трудной в наших группах, у нас нет способа узнать секретную точку вычисления, следовательно, мы не можем вычислять многочлены в этой точке. Однако мы можем вычислять многочлены меньшей степени, чем степень целевого многочлена, в показателе степени обоих образующих в этой точке.
 
-To see that, consider e.g. the polynomials $A_2(x)= 6x +10$ and $A_5(x)=7x+4$ from the QAP of this problem. To evaluate these polynomials in the exponent of $g_1$ and $g_2$ at the secret point $\tau$ without knowing the value of $\tau$ (which is $2$ in our case), we can use the \concept{Common Reference String} and equation \ref{eq:exp_evaluation-poly}. Using the scalar product notation instead of exponentiation, we get the following:
+Чтобы увидеть это, рассмотрим, например, многочлены $A_2(x)= 6x +10$ и $A_5(x)=7x+4$ из QAP этой задачи. Чтобы вычислить эти многочлены в показателе степени $g_1$ и $g_2$ в секретной точке $\tau$, не зная значения $\tau$ (которое в нашем случае $2$), мы можем использовать \concept{общую опорную строку} и уравнение \ref{eq:exp_evaluation-poly}. Используя обозначение скалярного произведения вместо возведения в степень, мы получаем следующее:
 \begin{align}
 [A_2(\tau)]g_1 & = [6\cdot \tau^1 + 10\cdot \tau^0] g_1 \nonumber \\
      & = [6](33,34) + [10](13,15) & \text{\# } [\tau^0]g_1 = (13,15), [\tau^1]g_1 = (33,34) \nonumber \\
-     & = [6\cdot 2](13,15) + [10](13,15) = [9](13,15) & \text{\# logarithmic order on } \G_1 \nonumber \\
+     & = [6\cdot 2](13,15) + [10](13,15) = [9](13,15) & \text{\# логарифмический порядок на } \G_1 \nonumber \\
      & = (35,15) \label{eq:3-fac-A2-g1} \\
 [A_5(\tau)]g_1 & = [7\cdot \tau^1 + 4\cdot \tau^0] g_1 \nonumber \\
      & = [7](33,34) + [4](13,15) \nonumber \\
@@ -252,7 +252,7 @@ To see that, consider e.g. the polynomials $A_2(x)= 6x +10$ and $A_5(x)=7x+4$ fr
      & = (26,34) \label{eq:3-fac-A5-g1}
 \end{align}
 
-Indeed, we are able to evaluate the polynomials in the exponent at a secret evaluation point, because that point is encrypted in the curve point $(33,34)$ and its secrecy is protected by the discrete logarithm assumption. Of course, in our computation, we recovered the secret point $\tau=2$, but that was only possible because we know the logarithmic order of our groups with respect to the generators. Such an order is infeasible in cryptographically secure curves. We can do the same computation on $\G_2$ and get the following:
+Действительно, мы способны вычислять многочлены в показателе степени в секретной точке вычисления, потому что эта точка зашифрована в точке кривой $(33,34)$, и её секретность защищена предположением о дискретном логарифме. Конечно, в нашем вычислении мы восстановили секретную точку $\tau=2$, но это было возможно только потому, что мы знаем логарифмический порядок наших групп относительно образующих. Такой порядок является неосуществимым в криптографически защищённых кривых. Мы можем выполнить то же вычисление на $\G_2$ и получить следующее:
 \begin{align}
 [A_2(\tau)]g_2 & = [6\cdot \tau^1 + 10\cdot \tau^0] g_2 \nonumber \\
      & = [6](10v^2,28v^3) + [10](7v^2,16v^3) \nonumber \\
@@ -264,485 +264,338 @@ Indeed, we are able to evaluate the polynomials in the exponent at a secret eval
      & = (16v^2,28v^3)  \label{eq:3-fac-A5-g2}
 \end{align}
 
-Apart from the target polynomial $T$, all other polynomials of the Quadratic Arithmetic Program can be evaluated in the exponent this way.
+Помимо целевого многочлена $T$, все остальные многочлены квадратичной арифметической программы могут быть вычислены в показателе степени таким образом.
 \end{example}
 
-\begin{example}[The 3-Factorization Problem in Circom and Snark.js]
-\label{ex:3-fac-groth-16-setup-circom} The implementation of the Groth\_16 zk-SNARK setup phase in real world applications can be observed through the examination of our Circom implementation of the $3$-factorization problem from \ref{ex:3-fac-circom} and the associated parameter set from Snark.js, as outlined in example \ref{ex:3-fac-groth-16-params-circom}.
+\begin{example}[Задача 3-факторизации в Circom и Snark.js]
+\label{ex:3-fac-groth-16-setup-circom} Реализацию фазы установки Groth16 zk-SNARK в реальных приложениях можно наблюдать посредством изучения нашей реализации задачи 3-факторизации на Circom из \ref{ex:3-fac-circom} и ассоциированного набора параметров из Snark.js, как описано в примере \ref{ex:3-fac-groth-16-params-circom}.
 
-In accordance with the methodology described in \cite{bowe-17}, the generation of the Common Reference String in Snark.js is comprised of two parts. The first part depends on an upper bound on the number of constraints in the circuit, while the second part is dependent on the circuit itself. This division increases the flexibility of the trusted setup procedure, as protocols with Universal Common Reference Strings, such as PLONK, only require the execution of the first phase, while the Groth\_16 protocol mandates the execution of both phases.
+В соответствии с методологией, описанной в \cite{bowe-17}, генерация общей опорной строки (Common Reference String) в Snark.js состоит из двух частей. Первая часть зависит от верхней границы числа ограничений в схеме, в то время как вторая часть зависит от самой схемы. Это разделение повышает гибкость процедуры доверенной установки, поскольку протоколы с универсальными общими опорными строками, такие как PLONK, требуют выполнения только первой фазы, в то время как протокол Groth16 требует выполнения обеих фаз.
 
-The first phase, commonly referred to as \term{the powers of tau}, involves the calculation of consecutive powers, $g^\tau$, $g^{\tau^2}$, $g^{\tau^3}$, $\ldots$, $g^{\tau^k}$, of a random field element $\tau$ within the exponents of agreed-upon generators of $\G_1$ and $\G_2$. The random element $\tau$ can either be provided by a trusted third party or generated through a multi-party computation.
+Первая фаза, обычно называемая \term{степенями тау} (powers of tau), включает вычисление последовательных степеней, $g^\tau$, $g^{\tau^2}$, $g^{\tau^3}$, $\ldots$, $g^{\tau^k}$, случайного элемента поля $\tau$ в показателях степени согласованных образующих $\G_1$ и $\G_2$. Случайный элемент $\tau$ может быть либо предоставлен доверенной третьей стороной, либо сгенерирован через многостороннее вычисление.
 
-Assuming that an upper bound on the number of constraints in Circom's 3-fac circuit is given by $2^4$, the first part is initialized as follows:
+Предполагая, что верхняя граница числа ограничений в схеме 3-fac Circom задана $2^4$, первая часть инициализируется следующим образом:
 \\
 \\
 \texttt{:\$ snarkjs powersoftau new bn128 4 pot4\_0000.ptau -v}
 \\
 \\
-The \texttt{new} command is used to start a new phase and the first parameter after \texttt{new} refers to the type of curve and hence specifies the Groth-16 parameter set as defined in \ref{ex:3-fac-groth-16-params-circom}. The next parameter \texttt{a}, in this case 4, defines an upper bound $2^a$ on the number of constraints that the setup can accept. 
+Команда \texttt{new} используется для запуска новой фазы, и первый параметр после \texttt{new} относится к типу кривой и, следовательно, задаёт набор параметров Groth-16, как определено в \ref{ex:3-fac-groth-16-params-circom}. Следующий параметр \texttt{a}, в данном случае 4, определяет верхнюю границу $2^a$ числа ограничений, которые установка может принять.
 
-After this initialization, it is possible for multiple parties to contribute randomness to the common reference string:
+После этой инициализации несколько сторон могут внести случайность в общую опорную строку:
 \\
 \\
-\texttt{:\$ snarkjs powersoftau contribute pot4\_0000.ptau pot4\_0001.ptau \\--name="1st\_cont" -v}
+\texttt{:\$ snarkjs powersoftau contribute pot4\_0000.ptau pot4\_0001.ptau \-\-name="1st\_cont" -v}
 \\
 \\
-This step can be repeated and the contribution of randomness by each party to the common reference string is facilitated by the creation of a new contribution file, and the user is prompted to input additional entropy. It has been demonstrated that, provided at least one contributor forgets their randomness, recovery of the simulation trapdoor defined in reference \ref{def:groth16-trapdoor} is impossible. Verification of the validity of any contribution file is performed as follows:
+Этот шаг может повторяться, и вклад случайности каждой стороной в общую опорную строку облегчается созданием нового файла вклада, и пользователю предлагается ввести дополнительную энтропию. Было показано, что при условии, что хотя бы один участник забудет свою случайность, восстановление симуляционного люка, определённого в ссылке \ref{def:groth16-trapdoor}, невозможно. Проверка корректности любого файла вклада выполняется следующим образом:
 \\
 \\
 \texttt{:\$ snarkjs powersoftau verify pot4\_0001.ptau}
 \\
 \\
-The completion of the first phase requires the incorporation of some public and unpredictable randomness into the powers of tau generation, which needs to be unpredictable until the contribution from the final participant is made. This is typically achieved through the use of the hash of the latest block in a publicly accessible blockchain, or a similar mechanism.
+Завершение первой фазы требует включения некоторой публичной и непредсказуемой случайности в генерацию степеней тау, которая должна быть непредсказуемой до тех пор, пока не сделан вклад последнего участника. Это обычно достигается использованием хэша последнего блока в публично доступном блокчейне или аналогичного механизма.
 \\
 \\
-\texttt{:\$ snarkjs powersoftau beacon pot4\_0001.ptau pot4\_beacon.ptau \\ 0102030405060708090a0b0c00 10 -n="Final Beacon"}
+\texttt{:\$ snarkjs powersoftau beacon pot4\_0001.ptau pot4\_beacon.ptau \ 0102030405060708090a0b0c00 10 -n="Final Beacon"}
 \\
 \\
-Upon the incorporation of the contribution of randomness from the participating parties and the random beacon, the following two commands serve to complete and validate the first phase:
+После включения вклада случайности от участвующих сторон и случайного маяка следующие две команды служат для завершения и проверки первой фазы:
 \\
 \\
-\texttt{:\$ snarkjs powersoftau prepare phase2 pot4\_beacon.ptau \\ pot4\_final.ptau -v}\\
+\texttt{:\$ snarkjs powersoftau prepare phase2 pot4\_beacon.ptau \ pot4\_final.ptau -v}\\
 \texttt{:\$ snarkjs powersoftau verify pot4\_final.ptau}
 \\
 \\
-It is apparent that this phase only depends on the upper bound of the number of constraints and is independent of any specific circuit. Therefore, this power of tau ceremony can be utilized to generate a common reference string for any circuit with a number of constraints less than $2^4$.
+Очевидно, что эта фаза зависит только от верхней границы числа ограничений и не зависит от какой-либо конкретной схемы. Следовательно, эта церемония степеней тау может быть использована для генерации общей опорной строки для любой схемы с числом ограничений меньше $2^4$.
 
-As indicated in reference \ref{ex:3-fac-circom}, the three\_fac circuit in Circom consists of two constraints. Hence, the randomness generated from this power of tau ceremony can be employed to initiate the second phase of the Common Reference String generation process:
+Как указано в ссылке \ref{ex:3-fac-circom}, схема three\_fac в Circom состоит из двух ограничений. Следовательно, случайность, сгенерированная из этой церемонии степеней тау, может быть использована для инициации второй фазы процесса генерации общей опорной строки:
 \\
 \\
-\texttt{:\$ snarkjs groth16 setup three\_fac.r1cs pot4\_final.ptau \\ three\_fac0000.zkey}
+\texttt{:\$ snarkjs groth16 setup three\_fac.r1cs pot4\_final.ptau \ three\_fac0000.zkey}
 \\
 \\
-The second phase commences with the computation of a Groth\_16 Common Reference String, as specified in reference \ref{def:groth16-crs}. This phase depends on the R1CS of the problem, and the resulting computation is saved to \fname{three\_fac0000.zkey}.
+Вторая фаза начинается с вычисления общей опорной строки Groth16, как указано в ссылке \ref{def:groth16-crs}. Эта фаза зависит от R1CS задачи, и результирующее вычисление сохраняется в \fname{three\_fac0000.zkey}.
 
-In contrast to the first phase, where the randomness was used to generate the '$\tau$' parameter of the CRS, multiple parties can now contribute randomness to the other parameters, namely $\alpha$, $\beta$, $\gamma$, and $\delta$, of the Groth\_16 CRS.
+В отличие от первой фазы, где случайность использовалась для генерации параметра '$\tau$' CRS, несколько сторон теперь могут внести случайность в другие параметры, а именно $\alpha$, $\beta$, $\gamma$ и $\delta$, CRS Groth16.
 \\
 \\
-\texttt{:\$ snarkjs zkey contribute three\_fac0000.zkey \\ three\_fac0001.zkey --name="1st Contributor Name" -v}
+\texttt{:\$ snarkjs zkey contribute three\_fac0000.zkey \ three\_fac0001.zkey --name="1st Contributor Name" -v}
 \\
 \\
-This  creates a file with a new contribution to the second phase and prompts the user to provide additional randomness to enhance entropy. This step can be repeated many times for different users. The correctness of any contribution file can be verified as follows:
+Это создаёт файл с новым вкладом во вторую фазу и предлагает пользователю предоставить дополнительную случайность для повышения энтропии. Этот шаг может повторяться много раз для разных пользователей. Корректность любого файла вклада может быть проверена следующим образом:
 \\
 \\
-\texttt{:\$ snarkjs zkey verify three\_fac.r1cs pot4\_final.ptau \\ three\_fac0001.zkey}
+\texttt{:\$ snarkjs zkey verify three\_fac.r1cs pot4\_final.ptau \ three\_fac0001.zkey}
 \\
 \\
-The second phase requires the integration of unpredictable, public randomness, which is not known prior to the contribution of the final participant. This can be achieved through the utilization of a method such as the hash of the latest block in a public blockchain.:
+Вторая фаза требует интеграции непредсказуемой, публичной случайности, которая не известна до вклада последнего участника. Это может быть достигнуто посредством использования такого метода, как хэш последнего блока в публичном блокчейне:
 \\
 \\
-\texttt{:\$ snarkjs zkey beacon three\_fac0001.zkey three\_fac\_final.zkey \\
+\texttt{:\$ snarkjs zkey beacon three\_fac0001.zkey three\_fac\_final.zkey \
 010203040506070809 10 -n="Final Beacon phase2"}
 \\
 \\
-Once the randomness input from all parties and the random beacon have been incorporated, the verification of the second phase can be performed using the following two commands. This process will also export the verification key, which is a vital component of the Common Reference String and will be stored in a JSON file for the verifier to use: 
+После того как вклад случайности от всех сторон и случайный маяк были включены, проверка второй фазы может быть выполнена с использованием следующих двух команд. Этот процесс также экспортирует ключ проверки, который является жизненно важным компонентом общей опорной строки и будет сохранён в JSON-файле для использования проверяющим:
 \\
 \\
-\texttt{:\$ snarkjs zkey verify three\_fac.r1cs pot4\_final.ptau \\ three\_fac\_final.zkey}\\
-\texttt{:\$ snarkjs zkey export verificationkey three\_fac\_final.zkey \\ verification\_key.json}
+\texttt{:\$ snarkjs zkey verify three\_fac.r1cs pot4\_final.ptau \ three\_fac\_final.zkey}\\
+\texttt{:\$ snarkjs zkey export verificationkey three\_fac\_final.zkey \ verification\_key.json}
 \\
 \\
-The Circom trusted setup therefore enables the creation of the Common Reference String \fname{three\_fac\_final.zkey}, which holds both the prover and the verifier key. The verifier key can also be exported as a JSON file \fname{verification\_key.json} for the purpose of publishing it on a public blockchain for implementation as a smart contract.
+Доверенная установка Circom, таким образом, позволяет создать общую опорную строку \fname{three\_fac\_final.zkey}, которая содержит как ключ доказывающего, так и ключ проверяющего. Ключ проверяющего также может быть экспортирован как JSON-файл \fname{verification\_key.json} с целью публикации его в публичном блокчейне для реализации в виде смарт-контракта.
 \end{example}
 \begin{exercise} 
 \label{ex:baby-jubjub-circom-setupt}
-Consider exercise \ref{ex:baby-jubjub-circom} and execute a 3-party trusted setup phase for the baby-jubjub circuit.
+Рассмотрите упражнение \ref{ex:baby-jubjub-circom} и выполните 3-стороннюю фазу доверенной установки для схемы baby-jubjub.
 \end{exercise}
 
-\subsection{The Prover Phase} Given some Rank-1 Constraint System $R$ and instance $I=<I_1,\ldots, I_n>$, the objective of the prover phase is to convince any verifier that a prover knows a witness $W$ to instance $I$ such that  $(I;W)$ is a word in the language $L_R$ of the system, without revealing anything about $W$. 
+\subsection{Фаза доказывающего} Чтобы понять, как общая опорная строка может быть использована в фазе доказывающего для генерации zk-SNARK, давайте повторно рассмотрим пример задачи 3-факторизации и предположим, что в дополнение к общей опорной строке доказывающий выбрал некоторое значение $I_1=11$. Тогда доказывающий должен вычислить допустимое назначение $W$ для экземпляра $<3\_fac,3\_fac.r1cs, I_1>$ из $\mathcal{R}_{3\_fac.r1cs}$. В данном случае $W=(11,3,2,6,1)$, что является допустимым назначением, поскольку $11\cdot 3\cdot 2=66$ и остальные строки таблицы \ref{ex:3-fac-qap-witness} выполняются при $(I_1;W) = (11;3,2,6,1)$. Доказывающий использует секретное знание $W$ в качестве свидетеля и выполняет фазу доказывающего алгоритма Groth16 zk-SNARK, описанную в ссылке \ref{groth16}. 
 
-To achieve this in the Groth\_16 protocol, we assume that any prover has access to the Rank-1 Constraint System of the problem, in addition to some algorithm that tells the prover how to compute constructive proofs for the R1CS. In addition, the prover has access to a \concept{Common Reference String} and its associated Quadratic Arithmetic Program. 
+Чтобы вычислить открытую часть $S_1$ из определения \ref{def:groth16-snark}, доказывающий должен сначала вычислить элементы $\F_{13}$, заданные следующими полиномами и их коэффициентами:
+\begin{align*}
+P_1(x) & = l_1(x)\cdot 11 + l_3(x)\cdot 3 + l_5(x)\cdot 2 + l_6(x)\cdot 6 + l_7(x)\cdot 1 \\
+       & = 10\cdot 11 + 2\cdot 3 + 4\cdot 2 + 8\cdot 6 + 1\cdot 1 = 11\\
+P_2(x) & = l_1(x)\cdot 11 + l_3(x)\cdot 3 + l_5(x)\cdot 2 + l_6(x)\cdot 6 + l_7(x)\cdot 1 \\
+       & = 10\cdot 11 + 5\cdot 3 + 10\cdot 2 + 5\cdot 6 + 1\cdot 1 = 11\\
+P_3(x) & = l_1(x)\cdot 11 + l_3(x)\cdot 3 + l_5(x)\cdot 2 + l_6(x)\cdot 6 + l_7(x)\cdot 1 \\
+       & = 10\cdot 11 + 1\cdot 3 + 2\cdot 2 + 4\cdot 6 + 1\cdot 1 = 9\\
+P_4(x) & = l_1(x)\cdot 11 + l_3(x)\cdot 3 + l_5(x)\cdot 2 + l_6(x)\cdot 6 + l_7(x)\cdot 1 \\
+       & = 10\cdot 11 + 1\cdot 3 + 4\cdot 2 + 8\cdot 6 + 1\cdot 1 = 9\\
+P_5(x) & = l_1(x)\cdot 11 + l_3(x)\cdot 3 + l_5(x)\cdot 2 + l_6(x)\cdot 6 + l_7(x)\cdot 1 \\
+       & = 10\cdot 11 + 1\cdot 3 + 1\cdot 2 + 1\cdot 6 + 1\cdot 1 = 10\\
+P_6(x) & = l_1(x)\cdot 11 + l_3(x)\cdot 3 + l_5(x)\cdot 2 + l_6(x)\cdot 6 + l_7(x)\cdot 1 \\
+       & = 10\cdot 11 + 1\cdot 3 + 1\cdot 2 + 1\cdot 6 + 1\cdot 1 = 10
+\end{align*}
+и
+\begin{align*}
+R_1(x) & = r_1(x)\cdot 11 + r_3(x)\cdot 3 + r_5(x)\cdot 2 + r_6(x)\cdot 6 + r_7(x)\cdot 1 \\
+       & = 10\cdot 11 + 1\cdot 3 + 2\cdot 2 + 4\cdot 6 + 1\cdot 1 = 9\\
+R_2(x) & = r_1(x)\cdot 11 + r_3(x)\cdot 3 + r_5(x)\cdot 2 + r_6(x)\cdot 6 + r_7(x)\cdot 1 \\
+       & = 10\cdot 11 + 4\cdot 3 + 1\cdot 2 + 2\cdot 6 + 1\cdot 1 = 9\\
+R_3(x) & = r_1(x)\cdot 11 + r_3(x)\cdot 3 + r_5(x)\cdot 2 + r_6(x)\cdot 6 + r_7(x)\cdot 1 \\
+       & = 10\cdot 11 + 1\cdot 3 + 1\cdot 2 + 1\cdot 6 + 1\cdot 1 = 10\\
+R_4(x) & = r_1(x)\cdot 11 + r_3(x)\cdot 3 + r_5(x)\cdot 2 + r_6(x)\cdot 6 + r_7(x)\cdot 1 \\
+       & = 10\cdot 11 + 1\cdot 3 + 1\cdot 2 + 1\cdot 6 + 1\cdot 1 = 10\\
+R_5(x) & = r_1(x)\cdot 11 + r_3(x)\cdot 3 + r_5(x)\cdot 2 + r_6(x)\cdot 6 + r_7(x)\cdot 1 \\
+       & = 10\cdot 11 + 1\cdot 3 + 1\cdot 2 + 1\cdot 6 + 1\cdot 1 = 10\\
+R_6(x) & = r_1(x)\cdot 11 + r_3(x)\cdot 3 + r_5(x)\cdot 2 + r_6(x)\cdot 6 + r_7(x)\cdot 1 \\
+       & = 10\cdot 11 + 1\cdot 3 + 1\cdot 2 + 1\cdot 6 + 1\cdot 1 = 10
+\end{align*}
+и
+\begin{align*}
+O_1(x) & = o_1(x)\cdot 11 + o_3(x)\cdot 3 + o_5(x)\cdot 2 + o_6(x)\cdot 6 + o_7(x)\cdot 1 \\
+       & = 10\cdot 11 + 1\cdot 3 + 1\cdot 2 + 1\cdot 6 + 1\cdot 1 = 10\\
+O_2(x) & = o_1(x)\cdot 11 + o_3(x)\cdot 3 + o_5(x)\cdot 2 + o_6(x)\cdot 6 + o_7(x)\cdot 1 \\
+       & = 10\cdot 11 + 1\cdot 3 + 1\cdot 2 + 1\cdot 6 + 1\cdot 1 = 10\\
+O_3(x) & = o_1(x)\cdot 11 + o_3(x)\cdot 3 + o_5(x)\cdot 2 + o_6(x)\cdot 6 + o_7(x)\cdot 1 \\
+       & = 10\cdot 11 + 4\cdot 3 + 8\cdot 2 + 1\cdot 6 + 1\cdot 1 = 9\\
+O_4(x) & = o_1(x)\cdot 11 + o_3(x)\cdot 3 + o_5(x)\cdot 2 + o_6(x)\cdot 6 + o_7(x)\cdot 1 \\
+       & = 10\cdot 11 + 1\cdot 3 + 2\cdot 2 + 4\cdot 6 + 1\cdot 1 = 11\\
+O_5(x) & = o_1(x)\cdot 11 + o_3(x)\cdot 3 + o_5(x)\cdot 2 + o_6(x)\cdot 6 + o_7(x)\cdot 1 \\
+       & = 10\cdot 11 + 1\cdot 3 + 4\cdot 2 + 8\cdot 6 + 1\cdot 1 = 9\\
+O_6(x) & = o_1(x)\cdot 11 + o_3(x)\cdot 3 + o_5(x)\cdot 2 + o_6(x)\cdot 6 + o_7(x)\cdot 1 \\
+       & = 10\cdot 11 + 1\cdot 3 + 1\cdot 2 + 1\cdot 6 + 1\cdot 1 = 10
+\end{align*}
 
-To create a zk-SNARK for the given instance, the prover begins by computing a valid constructive proof, as outlined in reference \ref{r1cs-constructive-proofs}. This involves producing a suitable witness $W=<W_1,\ldots,W_m>$ such that $(<I_1,\ldots, I_n>; <W_1,\ldots,W_m>)$ is a valid solution to the Rank-1 Constraint System $R$. 
+Теперь, чтобы вычислить элементы $\F_{13}$, заданные этими полиномами, доказывающий должен оценить каждый из этих полиномов на всех шести элементах $T=\{1,2,3,4,5,6\}$ из определения \ref{def:3-fac-zk-circuit}. Это означает, что доказывающий должен вычислить коэффициенты $(a_0,a_1,\ldots,a_5)$ полинома $P(x)=a_0+a_1x+a_2x^2+a_3x^3+a_4x^4+a_5x^5$, который удовлетворяет $P(1)=11$, $P(2)=11$, $P(3)=9$, $P(4)=9$, $P(5)=10$ и $P(6)=10$. Это можно сделать, например, путём решения системы линейных уравнений или с помощью интерполяционной формулы Лагранжа. В любом случае мы получаем следующие полиномы:
+\begin{align*}
+P(x) & = 6x^5 + 8x^4 + 8x^3 + 10x^2 + 7x + 11\\
+R(x) & = 8x^5 + 2x^4 + 7x^3 + 4x^2 + 9x + 11\\
+O(x) & = 6x^5 + 8x^4 + 8x^3 + 10x^2 + 7x + 11
+\end{align*}
 
-After generating the witness, the prover employs the Quadratic Arithmetic Program to compute the polynomial $P_{(I;W)}$, as outlined in reference \ref{polynomial-P-IW}. The prover then divides this polynomial by the target polynomial $T$ of the Quadratic Arithmetic Program. As $P_{(I;W)}$ is derived from a valid solution to the R1CS, as stated in reference \ref{polynomial-P-IW}, it follows that $P_{(I;W)}$ is divisible by $T$. This implies that the division of $P_{(I;W)}$ by $T$ results in another polynomial $H:=P_{(I;W)} / T$, with a degree lower than that of $T$.
+Чтобы вычислить первую составляющую $g^\alpha$ из ссылки \ref{def:groth16-snark}, доказывающий должен сгенерировать два случайных поля элемента $r$ и $s$ из $\F_{13}$. Предположим, что он выбирает $r=2$ и $s=3$. Тогда доказывающий может вычислить первую составляющую $S_1$ следующим образом:
+\begin{align*}
+[\mathbb{A}]_1 & = g^\alpha\cdot g^{P(\tau)} \cdot g^{r\cdot \delta}\\
+               & = 38^{2}\cdot 38^{P(4)}\cdot 38^{2\cdot 7}\\
+               & = 38^{2}\cdot 38^{6\cdot 4^5 + 8\cdot 4^4 + 8\cdot 4^3 + 10\cdot 4^2 + 7\cdot 4 + 11}\cdot 38^{14}\\
+               & = 38^{2}\cdot 38^{6\cdot 10 + 8\cdot 9 + 8\cdot 12 + 10\cdot 3 + 7\cdot 4 + 11}\cdot 38^{14}\\
+               & = 38^{2}\cdot 38^{8}\cdot 38^{1} = 38^{11}\\
+               & = 13
+\end{align*}
 
-The prover then evaluates the polynomial $(H\cdot T)/\delta$ in the exponent of the generator $g_1$ at the secret point $\tau$, as explained in \ref{eq:exp_evaluation-poly}. To see how this can be achieved, let $H(x)$ be the quotient polynomial $P/T$:
+Точно так же вычисляется вторая составляющая $S_1$:
+\begin{align*}
+[\mathbb{B}]_2 & = h^\beta \cdot h^{R(\tau)} \cdot h^{s\cdot \delta}\\
+               & = 27^{5}\cdot 27^{R(4)}\cdot 27^{3\cdot 7}\\
+               & = 27^{5}\cdot 27^{8\cdot 4^5 + 2\cdot 4^4 + 7\cdot 4^3 + 4\cdot 4^2 + 9\cdot 4 + 11}\cdot 27^{21}\\
+               & = 27^{5}\cdot 27^{8\cdot 10 + 2\cdot 9 + 7\cdot 12 + 4\cdot 3 + 9\cdot 4 + 11}\cdot 27^{8}\\
+               & = 27^{5}\cdot 27^{11}\cdot 27^{8} = 27^{11}\\
+               & = 16
+\end{align*}
 
+Наконец, чтобы вычислить третью составляющую $S_1$, доказывающий должен сначала вычислить так называемый \term{факторизующий полином} $T(x)=(x-1)(x-2)(x-3)(x-4)(x-5)(x-6)$, а затем полином $H(x)$, такой что $P(x)\cdot R(x) - O(x) = T(x)\cdot H(x)$. В нашем случае мы получаем:
+\begin{align*}
+T(x) & = (x-1)(x-2)(x-3)(x-4)(x-5)(x-6)\\
+     & = x^6 + 7x^5 + 3x^4 + 11x^3 + 10x^2 + 6x + 5
+\end{align*}
+и, используя алгоритм деления многочленов, мы находим $H(x)=5x^4 + 7x^3 + 9x^2 + 2x + 1$. После этого доказывающий может вычислить третью составляющую $S_1$ следующим образом:
+\begin{align*}
+[\mathbb{C}]_1 & = g^{H(\tau)}\cdot (g^{\beta\cdot P(\tau)+\alpha\cdot R(\tau)+O(\tau)})^1 \cdot (g^r)^\beta \cdot (g^s)^\alpha \cdot g^{r\cdot s\cdot \delta}\\
+               & = 38^{H(4)}\cdot 38^{5\cdot P(4)+2\cdot R(4)+O(4)} \cdot 38^{2\cdot 5}\cdot 38^{3\cdot 2}\cdot 38^{2\cdot 3\cdot 7}\\
+               & = 38^{5\cdot 10 + 7\cdot 9 + 9\cdot 3 + 2\cdot 10 + 1} \cdot 38^{5\cdot 8 + 2\cdot 8 + 8} \cdot 38^{10} \cdot 38^{6} \cdot 38^{16}\\
+               & = 38^{3}\cdot 38^{5}\cdot 38^{10}\cdot 38^{6}\cdot 38^{16} = 38^{7}\\
+               & = 27
+\end{align*}
+Таким образом, вычисляется следующий zk-SNARK:
 \begin{equation}
-H(x) = H_0\cdot x^0 + H_1\cdot x^1 +\ldots + H_k \cdot x^k
+S_{<3\_fac,3\_fac.r1cs,11>} = (13; 16; 27)
 \end{equation}
 
-To evaluate $(H\cdot T)/\delta$ at $\tau$ in the exponent of $g_1$, the prover uses the \concept{Common Reference String} and computes as follows:
-\begin{align*}
-g_1^{\frac{H(\tau)\cdot T(\tau)}{\delta}} 
- &= \Big(g_1^{\frac{\tau^0\cdot T(\tau)}{\delta}}\Big)^{H_0}\cdot \Big(g_1^{\frac{\tau^1\cdot T(\tau)}{\delta}}\Big)^{H_1}\cdots \Big(g_1^{\frac{\tau^k\cdot T(\tau)}{\delta}}\Big)^{H_k}
-\end{align*}
+\begin{example}[Схема 3-факторизации Groth16, Фаза доказывающего]
+\label{ex:3-fac-groth-16-prover-circom}
+Реализацию фазы доказывающего Groth16 zk-SNARK в реальных приложениях можно изучить, рассмотрев нашу реализацию задачи 3-факторизации в Circom из ссылки \ref{ex:3-fac-circom}, ассоциированные R1CS из ссылки \ref{ex:3-fac-r1cs-circom}, параметры из примера \ref{ex:3-fac-groth-16-params-circom} и общую опорную строку из примера \ref{ex:3-fac-groth-16-setup-circom}.
 
-After this has been done, the prover samples two random field elements $r,t\in \F_r$, and uses the \concept{Common Reference String}, the instance variables $I_1$, $\ldots$, $I_n$ and the witness variables $W_1$, $\ldots$, $W_m$ to compute the following curve points:
-\begin{align}
-g_1^W & = \Big( g_1^{\frac{\beta\cdot A_{1+n}(\tau)+\alpha\cdot B_{1+n}(\tau)+C_{1+n}(\tau)}{\delta}}\Big)^{W_1}\cdots \Big(g_1^{\frac{\beta\cdot A_{m+n}(\tau)+\alpha\cdot B_{m+n}(\tau)+C_{m+n}(\tau)}{\delta}}\Big)^{W_m} \label{eq:groth16_prover:g1W} \\
-g_1^A & = g_1^\alpha \cdot g_1^{A_0(\tau)} \cdot \Big(g_1^{A_1(\tau)}\Big)^{I_1}\cdots \Big(g_1^{A_n(\tau)}\Big)^{I_n} \cdot \Big(g_1^{A_{n+1}(\tau)}\Big)^{W_1}\cdots \Big(g_1^{A_{n+m}(\tau)}\Big)^{W_m} \cdot \Big(g_1^\delta\Big)^r \label{eq:groth16_prover:g1A} \\
-g_1^B & = g_1^\beta \cdot g_1^{B_0(\tau)} \cdot \Big(g_1^{B_1(\tau)}\Big)^{I_1}\cdots \Big(g_1^{B_n(\tau)}\Big)^{I_n} \cdot \Big(g_1^{B_{n+1}(\tau)}\Big)^{W_1}\cdots \Big(g_1^{B_{n+m}(\tau)}\Big)^{W_m} \cdot \Big(g_1^\delta\Big)^t \label{eq:groth16_prover:g1B} \\
-g_2^B & = g_2^\beta \cdot g_2^{B_0(\tau)} \cdot \Big(g_2^{B_1(\tau)}\Big)^{I_1}\cdots \Big(g_2^{B_n(\tau)}\Big)^{I_n} \cdot \Big(g_2^{B_{n+1}(\tau)}\Big)^{W_1}\cdots \Big(g_2^{B_{n+m}(\tau)}\Big)^{W_m} \cdot \Big(g_2^\delta\Big)^t \label{eq:groth16_prover:g2B}\\
-g_1^C & = g_1^W\cdot g_1^{\frac{H(\tau)\cdot T(\tau)}{\delta}} \cdot \Big(g_1^A\Big)^t \cdot \Big(g_1^B\Big)^r \cdot \Big(g_1^\delta\Big)^{-r\cdot t} \label{eq:groth16_prover:g1C}
-\end{align}
+Предположим, что доказывающий выбрал $I_1=11$ в качестве своего секретного входа, тогда доказывающий вычисляет следующий JSON-файл свидетеля, содержащий экземпляр и назначение свидетеля $W$ в сигнальной переменной \texttt{three\_fac.in}:
+\\
+\\
+\texttt{\{ "in": 11 \}}
+\\
+\\
+Этот файл используется для генерации полного свидетеля, ассоциированного со схемой 3-факторизации Circom, используя следующую команду:
+\\
+\\
+\texttt{:\$ snarkjs calculatewitness --wasm three\_fac\_js/three\_fac.wasm --input input.json --witness witness.wtns}
+\\
+\\
+В результате генерируется файл свидетеля \fname{witness.wtns}, который включает входы $I_1$ и назначение свидетеля $W=(I_2,I_3,A,B,\mathit{out})$.
 
-During this calculation, the group elements $g_1^{A_j(\tau)}$, $g_1^{B_j(\tau)}$, and $g_2^{B_j(\tau)}$ can be obtained from the Common Reference String and the Quadratic Arithmetic Program associated with the problem, as demonstrated in \ref{eq:exp_evaluation-poly}. These points only need to be computed once, and can be made public and reused for multiple proof generations as they are consistent across all instances and witnesses. The remaining group elements are part of the Common Reference String.
-
-After all these computations have been done, a valid zero-knowledge succinct non-interactive argument of knowledge $\pi$ in the Groth\_16 protocol is given by the following three curve points:
-
-\begin{equation}
-\label{def:groth16-snark}
-\pi = (g_1^A,g_1^C,g_2^B)
-\end{equation}
-
-It can be observed that a Groth\_16 zk-SNARK comprises of three curve points, with two being from the $\G_1$ group and one from the $\G_2$ group. This arrangement is purposeful, as $\G_1$ is typically a torsion group of an elliptic curve over a prime field in typical applications, while $\G_2$ is a subgroup of the full torsion group over an extension field, as explained in section \ref{sec:elliptic_curve_pairings}. Since elements from $\G_1$ require less storage space and computations in $\G_1$ are faster than in $\G_2$, this design is optimal.
-
-The witness in a zk-SNARK is encoded in the exponent of a generator of a secure elliptic curve, making it invisible to anyone except the prover. Additionally, the presence of random field elements $r$ and $t$ randomizes each proof, ensuring that no two proofs correspond to the same witness.
-
-\begin{example}[The $3$-factorization Problem]\label{3-fac-snark-compute} To see how a prover might compute 
-a zk-SNARK, consider the $3$-factorization problem from \examplename{} \ref{ex:3-factorization}, our protocol parameters from \examplename{} \ref{ex:3-fac-groth-16-params} as well as the \concept{Common Reference String} from \eqref{eq:3-fac-groth-16-crs}.
-
-Our task is to compute a zk-SNARK for the instance $I_1=<11>$ and its constructive proof $<W_1,W_2,W_3,W_4>=<2,3,4,6>$ as computed in \examplename{} \ref{ex:3-fac-R1CS-constr-proof}. As we know from \examplename{} \ref{ex:3-fac-QAP}, the associated polynomial $P_{(I;W)}$ of the Quadratic Arithmetic Program from \examplename{} \ref{ex:3-fac-QAP} is given as follows:
-$$
-P_{(I;W)} = x^2 + x + 9
-$$ 
-Since $P_{(I;W)}$ is identical to the target polynomial $T(x)=x^2+x + 9$ in this example, we know from \examplename{} \ref{ex:3-fac-QAP} that the quotient polynomial $H=P/T$ is the constant degree $0$ polynomial:
-$$
-H(x)= H_0 \cdot x^0 = 1 \cdot x^0
-$$
-We therefore use $[\frac{\tau^0\cdot T(\tau)}{\delta}]g_1=(26,34)$ from our \concept{Common Reference String} \eqref{eq:3-fac-groth-16-crs} of the $3$-factorization problem and compute as follows:
-\begin{align*}
-[\frac{H(\tau)\cdot T(\tau)}{\delta}]g_1 &= [H_0](26,34)=[1](26,34)\\
-                                   &= (26,34)
-\end{align*}
-
-In the next step, we have to compute all group elements required for a proper Groth16 zk-SNARK \eqref{def:groth16-snark}. We start with $g_1^W$ \eqref{eq:groth16_prover:g1W}. Using scalar products instead of the exponential notation, and $\oplus$ for the group law on the \curvename{BLS6\_6} curve, we have to compute the point $[W]g_1$:
-\begin{align*}
-[W]g_1 = & \phantom{\oplus} [W_1] g_1^{\frac{\beta\cdot A_{2}(\tau)+\alpha\cdot B_{2}(\tau)+C_{2}(\tau)}{\delta}}
-        \oplus [W_2] g_1^{\frac{\beta\cdot A_{3}(\tau)+\alpha\cdot B_{3}(\tau)+C_{3}(\tau)}{\delta}}        
-         \oplus [W_3] g_1^{\frac{\beta\cdot A_{4}(\tau)+\alpha\cdot B_{4}(\tau)+C_{4}(\tau)}{\delta}}\\        
-         &\oplus [W_4] g_1^{\frac{\beta\cdot A_{5}(\tau)+\alpha\cdot B_{5}(\tau)+C_{5}(\tau)}{\delta}}
-\end{align*}
-
-To compute this point, we have to remember that a prover should not be in possession of the simulation trapdoor, hence, they should not know what $\alpha$, $\beta$, $\delta$ and $\tau$ are. In order to compute this group element, the prover therefore needs the \concept{Common Reference String}. Using the logarithmic order from \ref{BLS6-G1-log} and the witness, we get the following:
-
-\begin{align*}
-[W]g_1 & = [2](33,34)\oplus [3](26,34)\oplus [4](38,28)\oplus [6](27,9) \\
-      & = [2\cdot 2](13,15)\oplus [3\cdot 5](13,15)\oplus [4\cdot 10](13,15)\oplus [6\cdot 7](13,15) \\        
-      & = [2\cdot 2+ 3\cdot 5+4\cdot 10+ 6\cdot 7](13,15) = [10](13,15)\\
-      & = (38,28)
-\end{align*} 
-
-In a next step, we compute $g_1^A$ \eqref{eq:groth16_prover:g1A}. We sample the random point $r=11$ from $\F_{13}$, using scalar products instead of the exponential notation, and $\oplus$ for the group law on the \texttt{BLS6\_6} curve. We then have to compute the following expression:
-
-\begin{align*}
-[A]g_1 = &\phantom{\oplus} [\alpha]g_1 \oplus [A_0(\tau)]g_1 \oplus [I_1][A_1(\tau)]g_1\oplus [W_1][A_2(\tau)]g_1 \oplus [W_2][A_3(\tau)]g_1\\ 
-       & \oplus [W_3][A_4(\tau)]g_1\oplus [W_4][A_5(\tau)]g_1\oplus [r][\delta]g_1
-\end{align*}
-
-Since we don't know what $\alpha$, $\delta$ and $\tau$ are, we look up $[\alpha]g_1$ and $[\delta]g_1$ from the \concept{Common Reference String}. According to \examplename{} \ref{ex:3-fac-groth-16-crs} we have $[A_2(\tau)]g_1=(35,15)$ \eqref{eq:3-fac-A2-g1}, $[A_5(\tau)]g_1=(26,34)$ \eqref{eq:3-fac-A5-g1} and $[A_j(\tau)]g_1=\mathcal{O}$ for all other indices $0\leq j\leq 5$. Since $\mathcal{O}$ is the neutral element on $\G_1$, we get the following:
-\begin{align*}
-[A]g_1 &= (27,34) \oplus \mathcal{O} \oplus [11]\mathcal{O}\oplus [2](35,15) \oplus [3]\mathcal{O} \oplus [4]\mathcal{O}\oplus [6](26,34)\oplus [11](38,15)\\
- &=  (27,34)\oplus [2](35,15)\oplus [6](26,34)\oplus [11](38,15)\\
- &=  [6](13,15)\oplus [2\cdot 9](13,15)\oplus [6\cdot 5](13,15)\oplus [11\cdot 3](13,15)\\ 
- &=  [6+ 2\cdot 9+ 6\cdot 5+ 11\cdot 3](13,15) = [9](13,15)\\
- &= (35,15)
-\end{align*}
-
-In order to compute the two curve points $[B]g_1$ \eqref{eq:groth16_prover:g1B} and $[B]g_2$ \eqref{eq:groth16_prover:g2B}, we sample another random element $t=4$ from $\F_{13}$. Using the scalar product instead of the exponential notation, and $\oplus$ for the group law on the \texttt{BLS6\_6} curve, we have to compute the following expressions:
-
-\begin{align*}
-[B]g_1 = &\phantom{\oplus} [\beta]g_1 \oplus [B_0(\tau)]g_1 \oplus [I_1][B_1(\tau)]g_1\oplus [W_1][B_2(\tau)]g_1 \oplus [W_2][B_3(\tau)]g_1\\ 
-       & \oplus [W_3][B_4(\tau)]g_1\oplus [W_4][B_5(\tau)]g_1\oplus [t][\delta]g_1\\
-[B]g_2 = &\phantom{\oplus} [\beta]g_2 \oplus [B_0(\tau)]g_2 \oplus [I_1][B_1(\tau)]g_2\oplus [W_1][B_2(\tau)]g_2 \oplus [W_2][B_3(\tau)]g_2\\ 
-       & \oplus [W_3][B_4(\tau)]g_2\oplus [W_4][B_5(\tau)]g_2\oplus [t][\delta]g_2\\       
-\end{align*}
-
-Since we don't know what $\beta$, $\delta$ and $\tau$ are, we look up the associated group elements from the \concept{Common Reference String}. Recall from \examplename{} \ref{ex:3-fac-groth-16-crs} that we can evaluate $[B_j(\tau)]g_1$ without knowing the secret evaluation point $\tau$. Since $B_3=A_2$ and $B_4=A_5$, we have $[B_3(\tau)]g_1=(35,15)$, $[B_4(\tau)]g_1=(26,34)$ according to the computation in eq. \eqref{eq:3-fac-A2-g1} and \eqref{eq:3-fac-A5-g1}, and $[B_j(\tau)]g_1=\mathcal{O}$ for all other indices $0\leq j\leq 5$. Since $\mathcal{O}$ is the neutral element on $\G_1$, we get the following:
-\begin{align*}
-[B]g_1 &= (26,34) \oplus \mathcal{O}\oplus [11]\mathcal{O}\oplus [2]\mathcal{O} \oplus [3](35,15) \oplus [4](26,34)\oplus [6]\mathcal{O}\oplus [4](38,15)\\    
-       &= (26,34)\oplus [3](35,15) \oplus [4](26,34)\oplus [4](38,15)\\  
-       &= [5](13,15)\oplus [3\cdot 9](13,15) \oplus [4\cdot 5](13,15)\oplus [4\cdot 3](13,15)\\        
-       &= [5+3\cdot 9+4\cdot 5+4\cdot 3](13,15) = [12](13,15) \\
-       &= (13,28) \\ \\
-[B]g_2 &=(16v^2,28v^3) \oplus \mathcal{O} \oplus [11]\mathcal{O}\oplus [2]\mathcal{O} \oplus [3](37v^2,16v^3)\oplus [4](16v^2,28v^3)\oplus [6]\mathcal{O}\oplus [4](42v^2,16v^3)\\    
-         &=(16v^2,28v^3)\oplus [3](37v^2,16v^3)\oplus [4](16v^2,28v^3)\oplus [4](42v^2,16v^3)\\
-         &=[5](7v^2,16v^3)\oplus [3\cdot 9](7v^2,16v^3)\oplus [4\cdot 5](7v^2,16v^3)\oplus [4\cdot 3](7v^2,16v^3)\\          
-         &=[5+3\cdot 9+4\cdot 5+4\cdot 3](7v^2,16v^3)=[12](7v^2+16v^3)\\
-         &= (7v^2,27v^3)     
-\end{align*}
-
-In a last step, we combine the previous computations to compute the point $[C]g_1$ \eqref{eq:groth16_prover:g1C} in the group $\G_1$ as follows:
-\begin{align*}
-[C]g_1 & = [W]g_1\oplus [\frac{H(s)\cdot T(\tau)}{\delta}]g_1 \oplus [t][A]g_1 \oplus [r][B]g_1 \oplus [-r\cdot t][\delta]g_1\\
-       & = (38,28)\oplus (26,34) \oplus [4](35,15) \oplus [11](13,28) \oplus [-11\cdot 4](38,15)\\       
-       & = [10](13,15)\oplus [5](13,15) \oplus [4\cdot 9](13,15) \oplus [11\cdot 12](13,15) \oplus [-11\cdot 4\cdot 3](13,15)\\    
-       & = [10+5+4\cdot 9+11\cdot 12-11\cdot 4\cdot 3](13,15)=[12](13,15)\\
-       & = (13,28)
-\end{align*}
-Given the instance $I_1=<11>$, we can now combine these computations and see that the following $3$ curve points are a zk-SNARK for the witness $<W_1,W_2,W_3,W_4>=<2,3,4,6>$:
-\begin{equation}
-\label{ex:3-fac-groth-16-snark}
-\pi=((35,15),(13,28),(7v^2,27v^3))
-\end{equation}
-
-We can now publish this zk-SNARK, or send it to a designated verifier. Note that, if we had sampled different values for $r$ and $t$, we would have computed a different zk-SNARK for the same witness. The zk-SNARK, therefore, hides the witness perfectly, which means that it is impossible to reconstruct the witness from the zk-SNARK.
+Для генерации доказательства доказывающий использует команду \texttt{groth16 prove}, используя общую опорную строку \fname{three\_fac\_final.zkey} и полный свидетель:
+\\
+\\
+\texttt{:\$ snarkjs groth16 prove three\_fac\_final.zkey witness.wtns proof.json public.json}
+\\
+\\
+Параметр \texttt{three\_fac\_final.zkey} содержит общую опорную строку, созданную в фазе установки. Файл \fname{proof.json} содержит zk-SNARK $(\mathbb{A},\mathbb{B},\mathbb{C})$, а \fname{public.json} содержит открытую часть экземпляра.
 \end{example}
-\begin{example}[The 3-Factorization Problem in Circom and Snark.js]
-\label{ex:3-fac-groth-16-prover-circom} The performance of the Groth\_16 zk-SNARK prover phase in practical applications can be evaluated by studying our Circom implementation of the $3$-factorization problem \ref{ex:3-fac-circom}, the corresponding parameter set as outlined in example \ref{ex:3-fac-groth-16-params-circom}, and the Common Reference String as described in example \ref{ex:3-fac-groth-16-setup-circom}.
+\begin{exercise}
+Рассмотрите упражнение \ref{ex:baby-jubjub-circom-setupt}. Выберите некоторый секретный вход, затем вычислите соответствующее назначение свидетеля и сгенерируйте zk-SNARK.
+\end{exercise}
+\subsection{Фаза верификации}
+Чтобы понять, как zk-SNARK может быть проверен в фазе проверки, давайте повторно рассмотрим пример задачи 3-факторизации и предположим, что некоторый проверяющий получил zk-SNARK, данный следующим образом:
+\begin{equation}
+S_{<3\_fac,3\_fac.r1cs,11>} = (13; 16; 27)
+\end{equation}
 
-Given an instance $I$, it is established in \ref{r1cs-constructive-proofs} that a constructive proof for the statement "Given instance $I$, there exists a witness $W$ such that $(I;W)$ belongs to the language $\mathcal{L}_R$" requires knowledge of a witness $W$ such that $(I;W)$ is a solution to the R1CS generated from \ref{ex:3-fac-circom}.
+Чтобы проверить этот zk-SNARK, проверяющий должен знать экземпляр $I_1=11$ и общую опорную строку из примера \ref{ex:groth16-crs}. Затем он вычисляет следующее:
+\begin{align*}
+e(\mathbb{A},\mathbb{B}) & = e(13,16) \\
+                           & = e(38^{11},27^{11})\\
+                           & = e(38,27)^{11\cdot 11}\\
+                           & = e(38,27)^{4}\\
+                           & = 9^4 = 9
+\end{align*}
 
-Circom defines an instance as the collection of all public signals, and the witness as the set of all assignments to the circuit that are not public signals. Besides instance and witness, Circom introduces the idea of input signals and a witness generator. This generator calculates the values for both instance and witness based on the provided inputs.
+Чтобы вычислить правую часть парного уравнения, проверяющий должен сначала вычислить элементы $\F_{13}$, заданные полиномами $C_j(x)$ из определения \ref{def:3-fac-qap} при $j\in \{1,2,3,4\}$. Получаем:
+\begin{align*}
+C_1(x) & = c_1(x)\cdot 11 + c_3(x)\cdot 3 + c_5(x)\cdot 2 + c_6(x)\cdot 6 + c_7(x)\cdot 1 \\
+       & = 10\cdot 11 + 1\cdot 3 + 1\cdot 2 + 1\cdot 6 + 1\cdot 1 = 10\\
+C_2(x) & = c_1(x)\cdot 11 + c_3(x)\cdot 3 + c_5(x)\cdot 2 + c_6(x)\cdot 6 + c_7(x)\cdot 1 \\
+       & = 10\cdot 11 + 1\cdot 3 + 1\cdot 2 + 1\cdot 6 + 1\cdot 1 = 10\\
+C_3(x) & = c_1(x)\cdot 11 + c_3(x)\cdot 3 + c_5(x)\cdot 2 + c_6(x)\cdot 6 + c_7(x)\cdot 1 \\
+       & = 10\cdot 11 + 1\cdot 3 + 1\cdot 2 + 1\cdot 6 + 1\cdot 1 = 10\\
+C_4(x) & = c_1(x)\cdot 11 + c_3(x)\cdot 3 + c_5(x)\cdot 2 + c_6(x)\cdot 6 + c_7(x)\cdot 1 \\
+       & = 10\cdot 11 + 1\cdot 3 + 1\cdot 2 + 1\cdot 6 + 1\cdot 1 = 10
+\end{align*}
 
-To further elaborate, we start by selecting arbitrary input values to our problem. Since the circuit is defined over the scalar field $\F_{bn128}$ of the curve $\curvename{alt\_bn128}$, and there are three input signals $x1$, $x2$, and $x3$ present in the circuit, we can use Sage to randomly generate three elements from $\F_{bn128}$. Utilizing the definition of $\curvename{alt\_bn128}$ as outlined in example \ref{BN128}, we obtain:
-\begin{sagecommandline}
-sage: r = bn128.order() 
-sage: Fbn128 = GF(r) # bn128 scalar field field
-sage: x1 = Fbn128.random_element()
-sage: x2 = Fbn128.random_element()
-sage: x3 = Fbn128.random_element()
-\end{sagecommandline} 
-To facilitate the use of these input values with Circom's witness generator program, they must be written into a JSON format file.
-\begin{lstlisting}
-{
-"x1": 266454826700390499788624045644422204835838308568801104096964341478260924069,
-"x2": 17022543691211744762566166588937408281011290768059146405469762658080007243141,
-"x3":2169708499392809782734482748125393322939898426476751716891099115492318742078 
-}
-\end{lstlisting} 
-The file containing the input values can be saved as \fname{input.json}, and the node.js environment can be utilized to run Circom's Javascript/WASM program, \fname{generate\_witness.js}, to generate the witness based on the instance and the R1Cs:
-\\
-\\
-\texttt{:\$ node <PATH\_TO>/generate\_witness.js three\_fac.wasm input.json\\ witness.wtns}
-\\
-\\
-It is important to recognize that in Circom, the witness encompasses both the instance and the witness as defined in our context. In other words, Circom's witness contains both the private and public assignments to the circuit and the solution to the R1Cs. It serves as a constructive proof to the problem.
+Теперь, чтобы вычислить элементы $\F_{13}$, заданные этими полиномами, проверяющий должен оценить каждый из этих полиномов на всех шести элементах $T=\{1,2,3,4,5,6\}$ из определения \ref{def:3-fac-zk-circuit}. Это означает, что проверяющий должен вычислить коэффициенты $(a_0,a_1,\ldots,a_5)$ полинома $C(x)=a_0+a_1x+a_2x^2+a_3x^3+a_4x^4+a_5x^5$, который удовлетворяет $C(1)=10$, $C(2)=10$, $C(3)=10$, $C(4)=10$, $C(5)=10$ и $C(6)=10$. В этом простом случае получаем константный полином $C(x)=10$. Проверяющий затем может вычислить правую часть парного уравнения:
+\begin{align*}
+& e(g^{\alpha},h^{\beta}) \cdot \prod_{j=1}^{4} e(g^{C_j(\tau)},h^{j\cdot \gamma}) \cdot e(\mathbb{C},h^{\delta})\\
+& = e(38^2,27^5) \cdot e(38^{C_1(4)},27^{1\cdot 3})\cdot e(38^{C_2(4)},27^{2\cdot 3})\cdot e(38^{C_3(4)},27^{3\cdot 3})\cdot e(38^{C_4(4)},27^{4\cdot 3}) \cdot e(27,27^7)\\
+& = e(38^2,27^5) \cdot e(38^{10},27^{3})\cdot e(38^{10},27^{6})\cdot e(38^{10},27^{9})\cdot e(38^{10},27^{12}) \cdot e(27,27^7)\\
+& = e(38,27)^{2\cdot 5} \cdot e(38,27)^{10\cdot 3}\cdot e(38,27)^{10\cdot 6}\cdot e(38,27)^{10\cdot 9}\cdot e(38,27)^{10\cdot 12} \cdot e(38,27)^{1\cdot 7}\\
+& = e(38,27)^{10 + 4 + 8 + 12 + 3 + 7} = e(38,27)^{4} = 9
+\end{align*}
+Поскольку обе части парного уравнения равны, проверяющий принимает доказательство как допустимое.
 
-With the obtained witness, we can now use Snark.js to convert the constructive proof into a zk-SNARK, utilizing the Common Reference String from example \ref{ex:3-fac-groth-16-params-circom}:
-\\
-\\
-\texttt{:\$ snarkjs groth16 prove three\_fac\_final.zkey witness.wtns \\ proof.json public.json}
-\\
-\\
-The execution of this command will result in the creation of two files: \fname{proof.json}, containing the actual proof represented by three curve points, and \fname{public.json}, which holds the values of the instance. 
+\begin{example}[Схема 3-факторизации Groth16, Фаза верификации]
+\label{ex:3-fac-groth-16-verify-circom}
+Реализацию фазы верификации Groth16 zk-SNARK в реальных приложениях можно наблюдать, рассматривая реализацию задачи 3-факторизации в Circom из ссылки \ref{ex:3-fac-circom}, ассоциированные R1CS из ссылки \ref{ex:3-fac-r1cs-circom}, параметры из примера \ref{ex:3-fac-groth-16-params-circom}, общую опорную строку из примера \ref{ex:3-fac-groth-16-setup-circom} и zk-SNARK из примера \ref{ex:3-fac-groth-16-prover-circom}.
 
-It's important to understand that in Circom, the instance and input values are distinct entities. The instance contains all public values, including those that are not input values but generated during witness generation. On the other hand, some input values may be designated as private and therefore not included in the instance. 
+Предполагая, что экземпляр, сгенерированный доказывающим, дан как $I_1=11$ и zk-SNARK сохранён в файле \fname{proof.json}, а экземпляр сохранён в файле \fname{public.json}, проверяющий может проверить zk-SNARK, выполнив следующую команду:
+\\
+\\
+\texttt{:\$ snarkjs groth16 verify verification\_key.json public.json proof.json}
+\\
+\\
+Команда \texttt{verify} используется для проверки zk-SNARK, и первый параметр после \texttt{verify} относится к ключу проверки из общей опорной строки, который был экспортирован в конце фазы установки. Второй параметр — это публичный вход, а третий — zk-SNARK.
 \end{example}
 
-\begin{exercise} 
-\label{ex:baby-jubjub-circom-prover}
-Consider exercise \ref{ex:baby-jubjub-circom} and the CRS from exercise \ref{ex:baby-jubjub-circom-setupt}. Use Sage to generate a valid curve point on the Baby-JubJub curve in twisted Edwards form, that is not the neutral element and use this point as input to the circuit. Generate a witness for this input and use Snark.js to compute an instance as well as a zk-SNARK for this witness. 
+\begin{exercise}
+\label{ex:baby-jubjub-circom-verify}
+Рассмотрите упражнение \ref{ex:baby-jubjub-circom-setupt} и zk-SNARK, сгенерированный в упражнении \ref{ex:baby-jubjub-circom-setupt}. Проверьте zk-SNARK.
 \end{exercise}
 
-\subsection{The Verification Phase}
-\label{sec:groth16-verifier}
-The objective of the verification phase in a Groth\_16 zk-SNARK, given a Rank-1 Constraint System $R$, an instance $I = <I_1, \ldots, I_n>$, and a zk-SNARK $\pi$ (as defined in \ref{def:groth16-snark}), is to confirm that $\pi$ constitutes a valid proof. If the simulation trapdoor is no longer present and the proof passes the verification checks, the verifier can be convinced that there exists a witness $W = <W_1, \ldots, W_m>$ such that $(I;W)$ belongs to the language of $R$. 
+\subsection{Симуляция доказательства} Чтобы понять, почему схема Groth16 обеспечивает нулевое разглашение, давайте повторно рассмотрим пример задачи 3-факторизации и предположим, что симулятор узнал секрет параметра $\tau=4$, а также параметры $(\alpha,\beta,\gamma,\delta)=(2,5,3,7)$ из симуляционного люка ссылки \ref{def:groth16-trapdoor}. Кроме того, предположим, что симулятор получил экземпляр $I_1=11$.
 
-To achieve this in the Groth\_16 protocol, we assume that any verifier is able to compute the pairing map $e(\cdot,\cdot)$ efficiently, and has access to the \concept{Common Reference String} used to produce the zk-SNARK $\pi$. In order to verify the zk-SNARK with respect to the instance $<I_1,\ldots, I_n>$, the verifier computes the following curve point:
-\begin{align}\label{eq:groth16_verify}
-g_1^I & = \Big(g_1^{\frac{\beta\cdot A_{0}(\tau)+\alpha\cdot B_{0}(\tau)+C_{0}(\tau)}{\gamma}}\Big)\cdot \Big(g_1^{\frac{\beta\cdot A_{1}(\tau)+\alpha\cdot B_{1}(\tau)+C_{1}(\tau)}{\gamma}}\Big)^{I_1} \cdots \Big(g_1^{\frac{\beta\cdot A_{n}(\tau)+\alpha\cdot B_{n}(\tau)+C_{n}(\tau)}{\gamma}}\Big)^{I_n}
-\end{align}
-With this group element, the verifier is able to verify the zk-SNARK $\pi=(g_1^A,g_1^C,g_2^B)$ by checking the following equation using the pairing map:
+Чтобы смоделировать zk-SNARK для этого экземпляра, симулятор сначала выбирает три случайных элемента $a$, $b$ и $c$ из $\F_{13}$ и вычисляет
+\begin{align*}
+[\mathbb{A}]_1 & = g^{a}\\
+               & = 38^{2} = 10
+\end{align*}
+
+Затем симулятор вычисляет
+\begin{align*}
+[\mathbb{B}]_2 & = h^{b}\\
+               & = 27^{3} = 18
+\end{align*}
+
+Чтобы вычислить третью составляющую, симулятор должен вычислить полиномы $P(x)$, $R(x)$, $O(x)$ и $C(x)$, как описано в фазе доказывающего и фазе верификации. В нашем случае мы получаем:
+\begin{align*}
+P(x) & = 6x^5 + 8x^4 + 8x^3 + 10x^2 + 7x + 11\\
+R(x) & = 8x^5 + 2x^4 + 7x^3 + 4x^2 + 9x + 11\\
+O(x) & = 6x^5 + 8x^4 + 8x^3 + 10x^2 + 7x + 11\\
+C(x) & = 10
+\end{align*}
+
+Затем симулятор вычисляет
+\begin{align*}
+[\mathbb{C}]_1 & = g^{\frac{a\cdot b - (\beta\cdot P(\tau) + \alpha\cdot R(\tau) + O(\tau) + C(\tau))}{\delta}}\\
+               & = 38^{\frac{2\cdot 3 - (5\cdot 8 + 2\cdot 8 + 8 + 10)}{7}}\\
+               & = 38^{\frac{6 - (40 + 16 + 8 + 10)}{7}}\\
+               & = 38^{\frac{6 - 74}{7}} = 38^{\frac{6 - 9}{7}} = 38^{\frac{10}{7}} = 38^{10\cdot 2}\\
+               & = 38^{7} = 27
+\end{align*}
+
+Здесь мы использовали тот факт, что $74 = 9$ в $\F_{13}$, и поскольку $6-9 = -3 = 10$ в $\F_{13}$, мы получаем $10/7 = 10\cdot 2 = 7$ в $\F_{13}$, поскольку $7^{-1}=2$.
+
+Таким образом, симулятор вычисляет следующий zk-SNARK:
 \begin{equation}
-\label{def:groth16-verifier-equation}
-e(g_1^A, g_2^B) = e(g_1^\alpha,g_2^\beta)\cdot e(g_1^I,g_2^\gamma)\cdot e(g_1^C,g_2^\delta)
+S_{<3\_fac,3\_fac.r1cs,11>} = (10; 18; 27)
 \end{equation}
 
-If the equation holds true, the verifier outputs \texttt{accept} and the equation does not hold, the verifier outputs \texttt{reject}.
-
-\begin{remark}
-As stated in section \ref{sec:elliptic_curve_pairings}, computing pairings in secure pairing groups is a computationally expensive. In the Groth\_16 protocol, three pairings are necessary for verifying the zk-SNARK, with the pairing $e(g_1^\alpha,g_2^\beta)$ being independent of the proof and thus can be computed once and included as part of the verifier key.
-
-According to \cite{Groth16}, the minimum number of pairings required for any protocol with similar properties is two. The Groth\_16 protocol therefore represents a near-optimal solution in this regard. The same paper describes an adaptation that only uses two pairings, but it requires more computational overhead. The use of three pairings strikes a balance between efficiency and performance, making the Groth\_16 protocol the most efficient of its kind to date.
-\end{remark}
-
-\begin{example}[The $3$-factorization Problem]
-\label{3-fac-snark-verifier} To see how a verifier might verify  
-a zk-SNARK for some given instance $I$, consider the $3$-factorization problem from \examplename{} \ref{ex:3-factorization}, our protocol parameters from \examplename{} \ref{ex:3-fac-groth-16-params}, the \concept{Common Reference String} from \eqref{ex:3-fac-groth-16-crs} as well as the zk-SNARK $\pi=((35,15),(27,9),(7v^2,27v^3))$ from \examplename{}  \eqref{ex:3-fac-groth-16-snark}, which claims to be an argument of knowledge for a witness for the instance $I_1=<11>$.
-
-In order to verify the zk-SNARK for that instance, we first compute the curve point $g_1^I$ \eqref{eq:groth16_verify}. Using scalar products instead of the exponential notation, and $\oplus$ for the group law on the \texttt{BLS6\_6} curve, we have to compute the point $[I]g_1$ as follows:
-
+Чтобы проверить, что этот zk-SNARK является допустимым, мы вычисляем обе стороны парного уравнения:
 \begin{align*}
-[I]g_1 = & [\frac{\beta\cdot A_{0}(\tau)+\alpha\cdot B_{0}(\tau)+C_{0}(\tau)}{\gamma}]g_1 \oplus [I_1][\frac{\beta\cdot A_{1}(\tau)+\alpha\cdot B_{1}(\tau)+C_{1}(\tau)}{\gamma}]g_1
+e(\mathbb{A},\mathbb{B}) & = e(10,18) = e(38^2,27^3) = e(38,27)^{2\cdot 3} = e(38,27)^6 = 9^6 = 9
 \end{align*}
 
-To compute this point, we have to remember that a verifier should not be in possession of the simulation trapdoor, which means that they should not know what $\alpha$, $\beta$, $\gamma$ and $\tau$ are. In order to compute this group element, the verifier therefore needs the \concept{Common Reference String} (\eqref{eq:3-fac-groth-16-crs}). Using the logarithmic order from \eqref{BLS6-G1-log} and instance $I_1$, we get the following:
-
+и
 \begin{align*}
-[I]g_1 & = [\frac{\beta\cdot A_{0}(\tau)+\alpha\cdot B_{0}(\tau)+C_{0}(\tau)}{\gamma}]g_1 \oplus [I_1][\frac{\beta\cdot A_{1}(\tau)+\alpha\cdot B_{1}(\tau)+C_{1}(\tau)}{\gamma}]g_1\\
-       & = \mathcal{O} \oplus [11](33,9)\\
-       & = [11\cdot 11](13,15) = [4](13,15)\\
-       & = (35,28)
-\end{align*} 
-
-In the next step, we have to compute all the pairings involved in equation \eqref{def:groth16-verifier-equation}. Using the logarithmic order on $\G_1$ \eqref{BLS6-G1-log} and $\G_2$ \eqref{BLS6-G2-log} as well as the bilinearity of the pairing map we get the following:
-
-\begin{align*}
-e([A]g_1,[B]g_2) & = e((35,15),(7v^2,27v^3))
-                   = e([9](13,15),[12](7v^2,16v^3))\\
-               & = e((13,15),(7v^2,16v^3))^{9\cdot 12}\\
-               & = e((13,15),(7v^2,16v^3))^{108}\\
-e([\alpha]g_1,[\beta]g_2) & = e((27,34),(16v^2,28v^3)) 
-                            = e([6](13,15),[5](7v^2,16v^3))\\
-               & = e((13,15),(7v^2,16v^3))^{6\cdot 5}\\
-               & = e((13,15),(7v^2,16v^3))^{30}\\   
-e([I]g_1,[\gamma]g_2) & = e((35,28),(37v^2,27v^3)) 
-                            = e([4](13,15),[4](7v^2,16v^3))\\
-               & = e((13,15),(7v^2,16v^3))^{4\cdot 4}\\
-               & = e((13,15),(7v^2,16v^3))^{16}\\ 
-e([C]g_1,[\delta]g_2) & = e((13,28),(42v^2,16v^3)) 
-                            = e([12](13,15),[3](7v^2,16v^3))\\
-               & = e((13,15),(7v^2,16v^3))^{12\cdot 3}\\
-               & = e((13,15),(7v^2,16v^3))^{36}
-\end{align*}  
-
-In order to check equation \eqref{def:groth16-verifier-equation}, observe that the target group $\G_T$ of the Weil pairing is a finite cyclic group of order $13$. Exponentiation is therefore done in modular $13$ arithmetic. Accordingly, since $\Zmod{108}{13}=4$, we evaluate the left side of equation \eqref{def:groth16-verifier-equation} as follows:
-
-$$
-e([A]g_1,[B]g_2) = e((13,15),(7v^2,16v^3))^{108} =e((13,15),(7v^2,16v^3))^{4}
-$$
-
-Similarly, we evaluate the right side of equation \eqref{def:groth16-verifier-equation} using modular $13$ arithmetic and the exponential law $a^x\cdot a^y = a^{x+y}$:
-
-\begin{align*}
-e([\alpha]g_1,[\beta]g_2)\cdot e([I]g_1,[\gamma]g_2)\cdot e([C]g_1,[\delta]g_2) =\\
-e((13,15),(7v^2,16v^3))^{30}\cdot e((13,15),(7v^2,16v^3))^{16}\cdot e((13,15),(7v^2,16v^3))^{36} =\\
-e((13,15),(7v^2,16v^3))^{4}\cdot e((13,15),(7v^2,16v^3))^{3}\cdot e((13,15),(7v^2,16v^3))^{10} =\\
-e((13,15),(7v^2,16v^3))^{4+3+10} = \\
-e((13,15),(7v^2,16v^3))^{4}
+& e(g^{\alpha},h^{\beta}) \cdot \prod_{j=1}^{4} e(g^{C_j(\tau)},h^{j\cdot \gamma}) \cdot e(\mathbb{C},h^{\delta})\\
+& = e(38^2,27^5) \cdot e(38^{10},27^{3})\cdot e(38^{10},27^{6})\cdot e(38^{10},27^{9})\cdot e(38^{10},27^{12}) \cdot e(27,27^7)\\
+& = e(38,27)^{10 + 4 + 8 + 12 + 3 + 7} = e(38,27)^{4} = 9
 \end{align*}
 
-As we can see, both the left and the right side of equation \eqref{def:groth16-verifier-equation} are identical, which implies that the verification process accepts the zk-SNARK and the verifier outputs \texttt{accept}.
+Поскольку обе части равны, проверяющий принимает доказательство. Однако важно отметить, что этот zk-SNARK был сгенерирован без знания свидетеля $W$. Это демонстрирует, что zk-SNARK не раскрывает никакой информации о свидетеле, поскольку любой zk-SNARK, который может быть сгенерирован с использованием свидетеля, также может быть сгенерирован без него.
+
+\begin{example}[Схема 3-факторизации в Circom и Snark.js, Симуляция]
+\label{ex:3-fac-groth-16-simulator-circom} На момент написания Snark.js не имеет алгоритма для генерации смоделированных доказательств с использованием заданного симуляционного люка.
 \end{example}
 
-\begin{example}[The 3-Factorization Problem in Circom and Snark.js]
-\label{ex:3-fac-groth-16-verifier-circom} The performance of the Groth 16 zk-SNARK verifier phase in practical applications can be evaluated by examining our Circom implementation of the 3-factorization problem \ref{ex:3-fac-circom}, the corresponding parameter set \ref{ex:3-fac-groth-16-params-circom}, the Common Reference String \ref{ex:3-fac-groth-16-setup-circom}, and the generated proof \ref{ex:3-fac-groth-16-prover-circom}.
+%\subsection{Изменяемость доказательства} Как мы видели в предыдущем параграфе, зная некоторый экземпляр $I$, знание симуляционного люка позволяет вычислить допустимый zk-SNARK без знания фактического свидетеля для этого экземпляра. 
 
-As we learned from Example \ref{ex:3-fac-groth-16-setup-circom}, a verifier key can be extracted from the Common Reference String. This is beneficial because the verifier key is much smaller in size compared to the full CRS, making it more efficient to store, for example, on a blockchain.
+%Другой способ построить 
 
-To verify the proof \fname{proof.json} against the instance \fname{public.json}, the verifier utilizes the verification key \fname{verification\_key.json} and employs Snark.js's verification algorithm:
-\\
-\\
-\texttt{:\$ snarkjs groth16 verify verification\_key.json public.json \\ proof.json}
-\\
-\\
-The algorithm either verifies or rejects the Groth\_16 zk-SNARK in relation to the given key and instance. 
-
-The verifier logic in Groth\_16 is simple and consists of a few exponentiations and three pairings, making it suitable for implementation as a smart contract on a blockchain. Circom offers an automation tool for the Solidity language, but a more detailed explanation of this is outside the scope of this book.
-\end{example} 
-
-\begin{exercise} 
-\label{ex:baby-jubjub-circom-verifier}
-Consider exercise \ref{ex:baby-jubjub-circom}, the CRS from exercise \ref{ex:baby-jubjub-circom-setupt} as well as the instance and zk-SNARK from exercise \ref{ex:baby-jubjub-circom-prover} and verify the zk-SNARK against the instance.
-\end{exercise}
-
-\subsection{Proof Simulation}
-\label{sec:proof_simulation} During the setup phase, a Common Reference String is created along with a simulation trapdoor (as defined in equation \eqref{def:groth16-trapdoor}), which must be discarded at the end of the setup phase. In this section, we will highlight the potential issues with having knowledge of the simulation trapdoor and how it can be used to generate zk-SNARKs without any knowledge of a valid witness.
-
-To clarify, let $I$ be an instance of a R1CS language $L_R$. A zk-SNARK for $L_R$ is considered to be "forged" or "simulated" if it passes verification, but its generation does not require the presence of a witness $W$ such that $(I;W)$ is a word in $L_R$.
-
-To understand how simulated zk-SNARKs can be produced, consider a scenario where an attacker has access to the proper Groth\_16 parameters, a Quadratic Arithmetic Program of the problem, a Common Reference String, and its corresponding simulation trapdoor $\Tau$:
-
-\begin{equation}
-\Tau = (\alpha,\beta,\gamma,\delta,\tau)
-\end{equation}
-
-Given some instance $I$, the forger's task is to generate a zk-SNARK for this instance that passes the verification process, without having access to any other zk-SNARKs for this instance and without knowledge of a valid witness $W$.
-
-To achieve this in the Groth\_16 protocol, the forger can use the simulation trapdoor in combination with the QAP and two arbitrary field elements $A$ and $B$ from the scalar field $\F_r$ of the pairing groups to compute $g_1^C$ for the instance $<I_1,\ldots,I_n>$ as follows:
-
-\begin{equation}
-\label{def:groth16-simulated-proof}
-g_1^C = g_1^{\frac{A\cdot B}{\delta}}\cdot g_1^{-\frac{\alpha\cdot \beta}{\delta}}\cdot g_1^{-\frac{\beta A_0(\tau) + \alpha B_0(\tau)+ C_0(\tau)}{\delta}}\cdot \Big(g_1^{-\frac{\beta A_1(\tau) + \alpha B_1(\tau)+ C_1(\tau)}{\delta}}\Big)^{I_1}\cdots \Big(g_1^{-\frac{\beta A_n(\tau) + \alpha B_n(\tau)+ C_n(\tau)}{\delta}}\Big)^{I_n}
-\end{equation}
-
-The forger then publishes the zk-SNARK $\pi_{forged} = (g_1^A, g_1^C, g_2^B)$, which will pass the verification process and is computable without the existence of a witness $<W_1,\ldots,W_m>$.
-
-To see that the simulation trapdoor is necessary and sufficient to compute the simulated proof $\pi_{forged}$, first observe that both generators $g_1$ and $g_2$ are known to the forger, as they are part of the \concept{Common Reference String}, encoded as $g_1^{\tau^0}$ and $g_2^{\tau^0}$. The forger is therefore able to compute $g_1^{A\cdot B}$. Moreover, since the forger knows $\alpha$, $\beta$, $\delta$ and $\tau$ from the trapdoor, they are able to compute all factors in the computation of $g_1^C$.
-
-If, on the other hand, the simulation trapdoor is unknown, it is not possible to compute $g_1^C$, since, for example, the computational Diffie-Hellman assumption makes the derivation of $g_1^{\alpha\cdot \beta}$ from $g_1^\alpha$ and $g_1^\beta$ infeasible.
-
-\begin{example}[The $3$-factorization Problem]
-\label{3-fac-snark-simulator}
-To see how a forger might simulate a zk-SNARK for some given instance $I$, consider the $3$-factorization problem from  \examplename{} \ref{ex:3-factorization}, our protocol parameters from \eqref{ex:3-fac-groth-16-params}, the \concept{Common Reference String} from \examplename{} \ref{ex:3-fac-groth-16-crs} and the simulation trapdoor $\Tau = (6,5,4,3,2)$ of that CRS.
-
-In order to forge a zk-SNARK for instance $I_1=<11>$, we don't need a constructive proof for the associated Rank-1 Constraint System, which implies that we don't have to execute the circuit $C_{3.fac}(\F_{13})$ from \examplename{} \ref{ex:3-fac-zk-circuit}. Instead, we have to choose $2$ arbitrary elements $A$ and $B$ from $\F_{13}$, and compute $g_1^A$, $g_2^B$ and $g_1^C$ as defined in \ref{def:groth16-simulated-proof}. We choose $A=9$ and $B=3$, and, since $\delta^{-1}=3$, we compute as follows:
-
-\begin{align*}
-[A]g_1 =& [9](13,15) = (35,15)\\
-[B]g_2 =& [3](7v^2,16v^3) = (42v^2,16v^3)\\
-[C]g_1 =& [\frac{A\cdot B}{\delta}]g_1\oplus 
-           [-\frac{\alpha\cdot\beta}{\delta}]g_1\oplus 
-      [-\frac{\beta A_0(\tau) + \alpha B_0(\tau)+ C_0(\tau)}{\delta}]g_1\oplus\\
-      &[I_1][-\frac{\beta A_1(\tau) + \alpha B_1(\tau)+ C_1(\tau)}{\delta}]g_1\\      
-     = & [(9\cdot 3)\cdot 9 ](13,15)\oplus 
-      [-(6\cdot 5)\cdot 9](13,15)\oplus 
-      [0](13,15)\oplus 
-      [11][-(7\cdot 2 + 4)\cdot 9](13,15)\\      
-     = &[9](13,15)\oplus [3](13,15)\oplus [12](13,15)= [11](13,15)\\       
-     = &(33,9)
-\end{align*}
-
-This is all we need to generate our forged proof for the $3$-factorization problem. We publish the simulated zk-SNARK:
-$$
-\pi_{fake}=((35,15),(33,9),(42v^2,16v^3))
-$$
-
-Despite the fact that this zk-SNARK was generated without knowledge of a proper witness, it is indistinguishable from a zk-SNARK that proves knowledge of a proper witness. 
-
-To see that, we show that our forged SNARK passes the verification process. In order to verify $\pi_{fake}$, we proceed as in \secname{} \ref{sec:groth16-verifier} and compute the curve point $g_1^I$ for the instance $I_1=<11>$. Since the instance is the same as in \examplename{} \eqref{ex:3-fac-groth-16-snark}, we can parallel the computation from that example:
-
-\begin{align*}
-[I]g_1 & = [\frac{\beta\cdot A_{0}(\tau)+\alpha\cdot B_{0}(\tau)+C_{0}(\tau)}{\gamma}]g_1 \oplus [I_1][\frac{\beta\cdot A_{1}(\tau)+\alpha\cdot B_{1}(\tau)+C_{1}(\tau)}{\gamma}]g_1\\
-       & = (35,28)
-\end{align*} 
-In a next step we have to compute all the pairings involved in equation \eqref{def:groth16-verifier-equation}. Using the logarithmic order on $\G_1$ \eqref{BLS6-G1-log} and $\G_2$ \eqref{BLS6-G2-log} as well as the bilinearity of the pairing map we get
-\begin{align*}
-e([A]g_1,[B]g_2) & = e((35,15),(42v^2,16v^3))
-                   = e([9](13,15),[3](7v^2,16v^3))\\
-               & = e((13,15),(7v^2,16v^3))^{9\cdot 3}\\ 
-               & = e((13,15),(7v^2,16v^3))^{27}\\
-e([\alpha]g_1,[\beta]g_2) & = e((27,34),(16v^2,28v^3)) 
-                            = e([6](13,15),[5](7v^2,16v^3))\\
-               & = e((13,15),(7v^2,16v^3))^{6\cdot 5}\\
-               & = e((13,15),(7v^2,16v^3))^{30}\\   
-e([I]g_1,[\gamma]g_2) & = e((35,28),(37v^2,27v^3)) 
-                            = e([4](13,15),[4](7v^2,16v^3))\\
-               & = e((13,15),(7v^2,16v^3))^{4\cdot 4}\\
-               & = e((13,15),(7v^2,16v^3))^{16}\\ 
-e([C]g_1,[\delta]g_2) & = e((33,9),(42v^2,16v^3)) 
-                            = e([11](13,15),[3](7v^2,16v^3))\\
-               & = e((13,15),(7v^2,16v^3))^{11\cdot 3}\\
-               & = e((13,15),(7v^2,16v^3))^{33}\\                                             
-\end{align*}  
-
-In order to check equation \eqref{def:groth16-verifier-equation}, observe that the target group $\G_T$ of the Weil pairing is a finite cyclic group of order $13$. Exponentiation is therefore done in modular $13$ arithmetics. Using this, we evaluate the left side of the verifier equation as follows:
-$$
-e([A]g_1,[B]g_2) = e((13,15),(7v^2,16v^3))^{27} =e((13,15),(7v^2,16v^3))^{1}
-$$
-since $\Zmod{27}{13}=1$. Similarly, we evaluate the right side of the verification equation using modular $13$ arithmetics and the exponential law $a^x\cdot a^y = a^{x+y}$. We get
-\begin{align*}
-e([\alpha]g_1,[\beta]g_2)\cdot e([I]g_1,[\gamma]g_2)\cdot e([C]g_1,[\delta]g_2) =\\
-e((13,15),(7v^2,16v^3))^{30}\cdot e((13,15),(7v^2,16v^3))^{16}\cdot e((13,15),(7v^2,16v^3))^{33} =\\
-e((13,15),(7v^2,16v^3))^{4}\cdot e((13,15),(7v^2,16v^3))^{3}\cdot e((13,15),(7v^2,16v^3))^{7} =\\
-e((13,15),(7v^2,16v^3))^{4+3+7} = \\
-e((13,15),(7v^2,16v^3))^{1}
-\end{align*}
-
-As we can see, both the left and the right side of the verifier equation are identical, which implies that the verification process accepts the simulated proof. $\pi_{fake}$ therefore convinces the verifier that a witness to the $3$-factorization problem exists. However, no such witness was really necessary to generate the proof.
-\end{example}
-
-\begin{example}[The 3-Factorization Problem in Circom and Snark.js]
-\label{ex:3-fac-groth-16-simulator-circom} As of the time of writing, Snark.js does not have an algorithm to generate simulated proofs using a given simulation trapdoor.
-\end{example}
-
-%\subsection{Proof Mutability} As we have seen in the previous paragraph, given some instance $I$, knowledge of the simulation trapdoor allows for the computation of a valid zk-SNARK without knowledge of an actual witness for that instance. 
-
-%Another way to construct 
-
-%To see this, let $\pi=(g_1^A, g_1^C, g_2^B)$ be a zk-Snark for some instance $I$ in the Groth16 protocol. Then for any non zero field element $a\in\F_r$, another proof $\pi'$ is given by
+%Чтобы увидеть это, пусть $\pi=(g_1^A, g_1^C, g_2^B)$ — zk-SNARK для некоторого экземпляра $I$ в протоколе Groth16. Тогда для любого ненулевого элемента поля $a\in\F_r$ другое доказательство $\pi'$ задаётся следующим образом:
 %\begin{equation}
 %\pi=\Big(\Big(g_1^A\Big)^a, \Big(g_1^C\Big)^a, \Big(g_2^B\Big)^{a^2}\Big)
 %\end{equation}  
-%To see this recall from XXX\sme{add reference} that a verifier checks the validity of any given SNARK by computing the equation $e(g_1^A, e_2^B) = e(g_1^\alpha,g_2^\beta)\cdot e(g_1^I,g_2^\gamma)\cdot e(g_1^C,g_2^\delta)$. However, if that equation holds true for the proof $\pi$ it it also satisfied for $\pi'$, since
+%Чтобы увидеть это, вспомним из XXX\sme{добавить ссылку}, что проверяющий проверяет допустимость любого заданного SNARK, вычисляя уравнение $e(g_1^A, e_2^B) = e(g_1^\alpha,g_2^\beta)\cdot e(g_1^I,g_2^\gamma)\cdot e(g_1^C,g_2^\delta)$. Однако, если это уравнение выполняется для доказательства $\pi$, оно также выполняется для $\pi'$, поскольку
 %\begin{align*}
 %e(g_1^A, e_2^B) & = e(g_1^\alpha,g_2^\beta)\cdot e(g_1^I,g_2^\gamma)\cdot e(g_1^C,g_2^\delta) & \Leftrightarrow\\
-%\Big(e(g_1^A, e_2^B)\Big^{a^2} &= \Big(e(g_1^\alpha,g_2^\beta)\cdot e(g_1^I,g_2^\gamma)\cdot e(g_1^C,g_2^\delta)\Big^{a^2} & \Leftrightarrow\\  
-%e((g_1^A)^a, (e_2^B)^a) &= \Big(e(g_1^\alpha,g_2^\beta)\cdot e(g_1^I,g_2^\gamma)\cdot e(g_1^C,g_2^\delta)\Big^a & \Leftrightarrow\\ 
+%\Big(e(g_1^A, e_2^B)\Big)^{a^2} &= \Big(e(g_1^\alpha,g_2^\beta)\cdot e(g_1^I,g_2^\gamma)\cdot e(g_1^C,g_2^\delta)\Big)^{a^2} & \Leftrightarrow\\  
+%e((g_1^A)^a, (e_2^B)^a) &= \Big(e(g_1^\alpha,g_2^\beta)\cdot e(g_1^I,g_2^\gamma)\cdot e(g_1^C,g_2^\delta)\Big)^a & \Leftrightarrow\\ 
 %\end{align*} 
 
 
@@ -750,23 +603,22 @@ As we can see, both the left and the right side of the verifier equation are ide
 
 
 
-
-% ========================= For version 2
+% ========================= Для версии 2
 
 
 \begin{comment}
-% Unfortunately too much for the first version of the book. Will finish that
-% another time ... With a better pend and paper hash function.
-\begin{example}[Player exchangeable multi party ceremony for the factorization snark] In this example, we want to simulate a real world player exchangeable multi party ceremony for our factorization snark XXX\sme{add reference} as explained in XXX\sme{add reference}.
+% К сожалению, слишком много для первой версии книги. Закончу это
+% в другой раз ... С лучшей ручкой и бумажной хэш-функцией.
+\begin{example}[Церемония многостороннего вычисления с обменом участников для схемы факторизации] В этом примере мы хотим смоделировать реальную церемонию многостороннего вычисления с обменом участников для нашей схемы факторизации XXX\sme{добавить ссылку}, как объяснено в XXX\sme{добавить ссылку}.
 
-We use our TinyMD5 hash function XXX\sme{add reference} to hash to $\mathbb{G}_2$.
+Мы используем нашу хэш-функцию TinyMD5 XXX\sme{добавить ссылку} для хэширования в $\mathbb{G}_2$.
 
 
-We assume that we have a coordinator $Alice$ together with three parties $Bob$, $Carol$ and $Dave$ that want to contribute their randomness to the protocol. Since the degree $n$ of the target polynomial is $2$, we need to compute the \concept{Common Reference String}
+Мы предполагаем, что у нас есть координатор $Alice$ вместе с тремя сторонами $Bob$, $Carol$ и $Dave$, которые хотят внести свою случайность в протокол. Поскольку степень $n$ целевого полинома равна $2$, нам нужно вычислить \concept{общую опорную строку} (Common Reference String)
 $$
 CRS= \left\{\right\}
 $$
-For contributor $j>0$ in phase $l$ to compute the proof of knowledge XXX\sme{add reference}, we need to define the $transcript_{l,j-1}$ of the previous round. We define it as sha256 of $MPC_{l,j-1}$. To be more precise, we define
+Для того чтобы участник $j>0$ на фазе $l$ вычислил доказательство знания XXX\sme{добавить ссылку}, нам нужно определить $transcript_{l,j-1}$ предыдущего раунда. Мы определяем его как sha256 от $MPC_{l,j-1}$. Более точно, мы определяем
 $$
 transcript_{1,j-1}= 
 MD5(
@@ -774,10 +626,10 @@ MD5(
 [\beta]g_1 [\beta]g_2[\beta \cdot s]g_1'
 )
 $$
-The only thing actually important about the transcript, is that it is publicly available data, that is not accessible for anyone before the MPC-data of round $j-1$ in phase $l$ exists.
+Единственное, что на самом деле важно относительно транскрипта, — это то, что это публично доступные данные, которые не доступны никому до тех пор, пока не существуют данные MPC раунда $j-1$ на фазе $l$.
 
-We start with the first round usually called the 'powers of tau' EXPLAIN THAT TERM...
-The computation is initialized With $s=1$, $\alpha=1$, $\beta=1$. Hence the computation starts with the following data
+Мы начинаем с первого раунда, обычно называемого ``степенями тау'' (powers of tau) ОБЪЯСНИТЬ ЭТОТ ТЕРМИН...
+Вычисление инициализируется с $s=1$, $\alpha=1$, $\beta=1$. Следовательно, вычисление начинается со следующих данных
 $$
 MPC_{1,0}= \left\{
 \begin{array}{lcl}
@@ -790,22 +642,22 @@ MPC_{1,0}= \left\{
 \end{array}
 \right\}
 $$
-Then 
+Тогда 
 \begin{multline*}
 transcript_{1,0}=\\ 
 MD5('(13,15)(7v^2,16v^3)(13,15)(13,15)(13,15)(13,15)(7v^2,16v^3)(13,15)') =\\ f2baea4d3dba5eef5c63bb210920e7d9
 \end{multline*}
-We obtain that hash by computing
+Мы получаем этот хэш, вычисляя
 
 $printf '\%s' "(13,15)(7v\textasciicircum 2,16v\textasciicircum 3)(13,15)(13,15)(13,15)(13,15)(7v\textasciicircum 2,16v\textasciicircum 3)(13,15)" | md5sum$
 % note the actual code is printf '%s' "(13,15)(7v^2,16v^3)(13,15)(13,15)(13,15)(13,15)(7v^2,16v^3)(13,15)" | md5sum
 
-Everyone agreed that the MPC starts on the 21.03.2020 and everyone can contribute for exactly a year until the 20.03.2021. 
+Все согласились, что MPC начинается 21.03.2020, и каждый может внести вклад в течение ровно года до 20.03.2021. 
 
 
   
-It then proceeds in a round robin style, starting with Bob, who obtains that data in $MPC_{1,0}$ and then computes his contribution. Lets assume that $Bob$ is honest and that bought 
-a 13-sided dice (PICTURE OF 13-SIDED DICE) to randomly find three secret field values from our prime field $\F_{13}$. He though the dice and got $\alpha = 4$, $\beta=8$ and $s= 2$. He then updates $MPC_{1,0}$:  
+Затем оно продолжается в стиле round robin, начиная с Bob, который получает эти данные в $MPC_{1,0}$, а затем вычисляет свой вклад. Допустим, что $Bob$ честен и купил 
+13-гранный кубик (ИЗОБРАЖЕНИЕ 13-ГРАННОГО КУБИКА), чтобы случайным образом найти три секретных значения поля из нашего простого поля $\F_{13}$. Он бросил кубик и получил $\alpha = 4$, $\beta=8$ и $s= 2$. Затем он обновляет $MPC_{1,0}$:  
 $$
 MPC_{1,1}= \left\{
 \begin{array}{lclcl}
@@ -818,7 +670,7 @@ MPC_{1,1}= \left\{
 \end{array}
 \right\}
 $$
-In addition, we compute as follows:
+В дополнение мы вычисляем следующим образом:
 $$
 POK_{1,1} \left\{
 \begin{array}{lcl}
@@ -828,7 +680,7 @@ y_{\beta} &=& POK(8, f2baea4d3dba5eef5c63bb210920e7d9) = ((26,9),(16v^2 , 28v^3)
 \end{array}
 \right\}
 $$
-since $[s]g_1 = (33,34)$, $[\alpha] g_1 = (35,28)$ and $[\beta] g_1 = (26,9)$. as well as 
+поскольку $[s]g_1 = (33,34)$, $[\alpha] g_1 = (35,28)$ и $[\beta] g_1 = (26,9)$. а также 
 \begin{align*}
 TinyMD5_{2}('(33,34)f2baea4d3dba5eef5c63bb210920e7d9') =\\ H_2(MD5('(33,34)f2baea4d3dba5eef5c63bb210920e7d9').trunc(3))=\\ H_2(2066b3b6b6d97c46c3ac6ee2ccd23ad9.trunc(3))= H_2(ad9) = \\
 H_2(101 011 011 001)=\\
@@ -863,7 +715,7 @@ H_2(101 011 011 001)=\\
 [3+6+8+5](7v^2 , 16v^3)=
 (37v^2 , 16v^3 )
 \end{align*}
-So we get $[2](37v^2 , 16v^3 )= (16v^2 , 28v^3 )$
+Таким образом, мы получаем $[2](37v^2 , 16v^3 )= (16v^2 , 28v^3 )$
 
 ===================
 
@@ -897,7 +749,7 @@ H_2(000 101 100 011)=\\
 [8+2+3+6](7v^2 , 16v^3)=
 (17v^2 , 28v^3 )
 \end{align*}
-So we get $[4](17v^2 , 28v^3 )= (10v^2 , 15v^3 )$
+Таким образом, мы получаем $[4](17v^2 , 28v^3 )= (10v^2 , 15v^3 )$
 
 \begin{align*}
 TinyMD5_{2}('(26,9)f2baea4d3dba5eef5c63bb210920e7d9') =\\ H_2(MD5('(26,9)f2baea4d3dba5eef5c63bb210920e7d9').trunc(3))=\\ H_2(b87b632f7027ad78cadc2452beb30e9a.trunc(3))= H_2(e9a) = \\
@@ -929,19 +781,19 @@ H_2(111 010 011 010)=\\
 [2+4+8+11](7v^2 , 16v^3)=
 (7v^2 , 27v^3 )
 \end{align*}
-So we get $[8](17v^2 , 28v^3 )= (16v^2 , 28v^3 )$
+Таким образом, мы получаем $[8](17v^2 , 28v^3 )= (16v^2 , 28v^3 )$
 
-So Bob publishes $MPC_{1,1}$ as well as $POK_{1,1}$ and after that its Carols turn. Lets also assume that Carrol is honest. So Carol looks at Bobs data and compute the transcript according to our rules
+Таким образом, Bob публикует $MPC_{1,1}$, а также $POK_{1,1}$, и после этого наступает очередь Carol. Допустим также, что Carol честна. Carol смотрит на данные Bob и вычисляет транскрипт в соответствии с нашими правилами
 \begin{multline*}
 transcript_{1,1}=\\ 
 MD5('
 (33,34)(10v^2,28v^3)(35,28)(35,28)(26,9)(26,9)(16v^2,15v^3)(38,15)') =\\ fe72e18b90014062682a77136944e362
 \end{multline*}
-We obtain that hash by computing
+Мы получаем этот хэш, вычисляя
 
 $printf '\%s' "(33,34)(10v^2,28v^3)(35,28)(35,28)(26,9)(26,9)(16v^2,15v^3)(38,15)" | md5sum$
 
-Carol then computes here contribution. Since she is honest she chooses randomly three secret field values from our prime field $\F_{13}$, by invoking her computer. She found $\alpha = 3$, $\beta=4$ and $s= 9$ and updates $MPC_{1,1}$:  
+Carol затем вычисляет свой вклад. Поскольку она честна, она случайным образом выбирает три секретных значения поля из нашего простого поля $\F_{13}$, используя свой компьютер. Она нашла $\alpha = 3$, $\beta=4$ и $s= 9$ и обновляет $MPC_{1,1}$:  
 $$
 MPC_{1,2}= \left\{
 \begin{array}{lclcl}
@@ -954,7 +806,7 @@ MPC_{1,2}= \left\{
 \end{array}
 \right\}
 $$
-In addition, we compute as follows:
+В дополнение мы вычисляем следующим образом:
 $$
 POK_{1,2} \left\{
 \begin{array}{lcl}
@@ -995,7 +847,7 @@ H_2(001 101 010 100)=\\
 [4+2+9+3](7v^2 , 16v^3)=
 (16v^2 , 28v^3 )
 \end{align*}
-So we get $[9](16v^2 , 28v^3 )= (17v^2 , 28v^3 )$
+Таким образом, мы получаем $[9](16v^2 , 28v^3 )= (17v^2 , 28v^3 )$
 
 \begin{align*}
 TinyMD5_{2}('(38,15)fe72e18b90014062682a77136944e362') =\\ H_2(MD5('(38,15)fe72e18b90014062682a77136944e362').trunc(3))=\\ H_2(cc4da0c02c4c1b15e72d6cc6430206ab.trunc(3))= H_2(6ab) = \\
@@ -1027,7 +879,7 @@ H_2(011 010 101 011)=\\
 [7+4+7+6](7v^2 , 16v^3)=
 (10v^2 , 15v^3)
 \end{align*}
-So we get $[3](10v^2 , 15v^3 )= (17v^2 , 15v^3 )$
+Таким образом, мы получаем $[3](10v^2 , 15v^3 )= (17v^2 , 15v^3 )$
 
 \begin{align*}
 TinyMD5_{2}('(35,28)fe72e18b90014062682a77136944e362') =\\ H_2(MD5('(35,28)fe72e18b90014062682a77136944e362').trunc(3))=\\ H_2(502323bc55c75f7189fad7999c9f1708.trunc(3))= H_2(708) = \\
@@ -1059,11 +911,11 @@ H_2(011 100 001 000)=\\
 [7+10+11+7](7v^2 , 16v^3)=
 (37v^2 , 16v^3)
 \end{align*}
-So we get $[4](37v^2 , 16v^3 )= (42v^2 , 27v^3 )$
+Таким образом, мы получаем $[4](37v^2 , 16v^3 )= (42v^2 , 27v^3 )$
 
-Dave thinks he can outsmart the system, Since he is the last to contribute, he just makes up an entirely new $MPC$ that does not contain any randomness from the previous contributors. He thinks he can do that because, no one can distinguish his $MPC_{1,3}$ from a correct one. If this is done in a smart way, he will even be able to compute the correct $POK$s. 
+Dave думает, что может обхитрить систему. Поскольку он последний, кто вносит вклад, он просто придумывает совершенно новый $MPC$, который не содержит никакой случайности от предыдущих участников. Он думает, что может сделать это, потому что никто не может отличить его $MPC_{1,3}$ от правильного. Если это сделано разумно, он даже сможет вычислить правильные $POK$.
 
-So Dave choses $s=12$, $\alpha=11$ and $\beta=10$ and he will keep those values, hoping to be able to use them later to forge false proofs in the factorization snark. He then compute  
+Таким образом, Dave выбирает $s=12$, $\alpha=11$ и $\beta=10$ и сохранит эти значения, надеясь использовать их позже для подделки ложных доказательств в схеме факторизации. Затем он вычисляет  
 $$
 MPC_{1,3}= \left\{
 \begin{array}{lcl}
@@ -1076,7 +928,7 @@ MPC_{1,3}= \left\{
 \end{array}
 \right\}
 $$
-Dave does not delete $s$, $\alpha$ and $\beta$, because if this is accepted as phase one of the \concept{Common Reference String} computation, Dave controls already $3/4$-th of the cheating key to forge proofs. So Dave is careful to get the proofs of knowledge right. He computes the transcript of Carols contribution as 
+Dave не удаляет $s$, $\alpha$ и $\beta$, потому что если это будет принято как фаза один вычисления \concept{общей опорной строки} (Common Reference String), Dave уже контролирует 3/4 мошеннического ключа для подделки доказательств. Таким образом, Dave тщательно следит за тем, чтобы доказательства знания были правильными. Он вычисляет транскрипт вклада Carol как 
 
 \begin{multline*}
 transcript_{1,2}=\\ 
@@ -1084,7 +936,7 @@ MD5('
 (26,34)(16v^2,28v^3)(13,28)(13,28)(26,9)(27,34)(17v^2,28v^3)(35,28)') =\\ c8e6308fffd47009f5f65e773ae4b499
 \end{multline*}
 
-We obtain that hash by computing
+Мы получаем этот хэш, вычисляя
 
 $printf '\%s' "(26,34)(16v^2,28v^3)(13,28)(13,28)(26,9)(27,34)(17v^2,28v^3)(35,28)" | md5sum$
 

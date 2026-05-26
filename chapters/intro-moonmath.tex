@@ -1,203 +1,203 @@
-\chapter{Introduction}
-% Note: I want to avoid using links or \term{}'s or anything like this here. This is just an introduction. All the terms are defined later. Lets be as little formal as possible here
-In the field of cryptography, \textit{zero-knowledge proofs} or \textit{zero-knowledge protocols} are a class of protocols that enable a party, known as the prover, to demonstrate the truth of a statement to other parties, referred to as verifiers, without revealing any information beyond the statement's veracity. This book is intended to provide a comprehensive introduction to the mathematical foundations and implementations of these proof systems, aimed at individuals with limited prior exposure to this area of research.
+\chapter{Введение}
+% Примечание: я хочу избежать использования ссылок, \term{} и чего-либо подобного здесь. Это просто введение. Все термины определены позже. Давайте будем как можно менее формальными
+В области криптографии \textit{доказательства с нулевым разглашением} (zero-knowledge proofs) или \textit{протоколы с нулевым разглашением} (zero-knowledge protocols) — это класс протоколов (protocols), которые позволяют стороне, известной как доказывающий (prover), продемонстрировать истинность утверждения другим сторонам, называемым проверяющими (verifiers), не раскрывая никакой информации, кроме самого факта истинности утверждения. Цель этой книги — дать всестороннее введение в математические основы (mathematical foundations) и реализации (implementations) этих систем доказательств, предназначенное для людей с ограниченным предыдущим опытом в этой области исследований.
 
-Of particular significance in this context are \textit{zero-knowledge succinct, non-interactive arguments of knowledge} (zk-SNARKs), which possess the advantage of being much smaller in size than the original data required to establish the truth of a statement, and verifiers can be conveyed through a single message from the prover.
+Особого значения в этом контексте приобретают \textit{краткие неинтерактивные аргументы знания с нулевым разглашением} (zero-knowledge succinct, non-interactive arguments of knowledge, zk-SNARKs), которые обладают преимуществом: их размер значительно меньше исходных данных, необходимых для установления истинности утверждения, а проверяющему (verifier) достаточно одного сообщения от доказывающего (prover).
 
-From a practical standpoint, zk-SNARKs are intriguing because they allow for the honest computation of data to be proven publicly without disclosing the inputs to the computation, through the transmission of a concise transaction to a verifier embodied as a smart contract on a public blockchain. This facilitates the public verification of computation, improves the scalability of blockchain technology, and enhances the privacy of transactions.
+С практической точки зрения zk-SNARKs представляют интерес, поскольку они позволяют публично доказать честность вычисления (computation) данных, не раскрывая входные данные (inputs) вычисления, путём передачи краткой транзакции (transaction) проверяющему (verifier), воплощённому в виде смарт-контракта (smart contract) в публичном блокчейне (blockchain). Это облегчает публичную проверку вычислений, повышает масштабируемость (scalability) технологии блокчейн (blockchain) и улучшает конфиденциальность (privacy) транзакций (transactions).
 
-Based on this interconnection between blockchains and zk-SNARKs, growing interest in blockchain technology has elevated the need for a more nuanced and complete understanding of zero-knowledge protocols, their real-world applications and implementations, and the development of standards in this field. This is crucial for ensuring that developers can produce secure and high-quality code.
+На основе этой взаимосвязи между блокчейнами (blockchains) и zk-SNARKs растущий интерес к технологии блокчейн (blockchain) повысил потребность в более тонком и полном понимании протоколов (protocols) с нулевым разглашением, их реальных приложений и реализаций (implementations), а также разработки стандартов в этой области. Это имеет решающее значение для обеспечения того, чтобы разработчики (developers) могли создавать безопасный и высококачественный код.
 
-However, the intricacies of zero-knowledge proofs are complicated and require an in-depth comprehension of several mathematical and computer-theoretical disciplines, as well as familiarity with alternative computational models and programming paradigms. Unfortunately resources are often scattered across blog posts, github libraries and mathematical papers and as a result zk-SNARKs remain somewhat elusive or ''magical'' and are therefore sometimes coined as ''moon math''. This poses a barrier to entry and deters developers from exploring or incorporating them in their projects, hindering the widespread adoption of this technology and societies evolution towards web3.
+Однако тонкости доказательств с нулевым разглашением (zero-knowledge proofs) сложны и требуют глубокого понимания нескольких математических и компьютерно-теоретических дисциплин, а также знакомства с альтернативными моделями вычислений и парадигмами программирования. К сожалению, ресурсы часто разбросаны по блогам, библиотекам на GitHub и математическим статьям, и в результате zk-SNARKs остаются в некоторой степени неуловимыми или ``магическими'', поэтому их иногда называют ``moon math''. Это создаёт барьер для входа и отпугивает разработчиков (developers) от изучения или внедрения их в свои проекты, препятствуя широкому распространению этой технологии и эволюции общества в направлении web3.
 
-The 'MoonMath Manual to zk-SNARKs' aims to change this, designed specifically for individuals with limited prior exposure to cryptography. The manual aims to bridge knowledge gaps by providing a hands-on, practical approach to explaining abstract concepts using simple pen-and-paper calculations. As readers work through the manual, they will gain an understanding of the mathematics underlying zk-SNARKs, which will provide them with the necessary foundation for further exploration.
+``Руководство MoonMath по zk-SNARKs'' призвано изменить это положение; оно разработано специально для людей с ограниченным предыдущим опытом в криптографии (cryptography). Руководство стремится восполнить пробелы в знаниях, предлагая практический подход к объяснению абстрактных понятий с помощью простых вычислений ручкой и бумагой (pen-and-paper). По мере изучения руководства читатели получат понимание математики, лежащей в основе zk-SNARKs, что даст им необходимый фундамент для дальнейшего изучения.
 
-\section{Target Audience}
-The primary focus of this book are software and smart contract developers who aim to acquire a thorough understanding of the workings of zk-SNARKs, in order to be able to develop high quality, high security code, or who want to close some knowledge gaps. The book is suitable for both novice and experienced readers, as concepts are gradually introduced in a structured and logical manner, ensuring that the information is easily comprehensible.
+\section{Целевая аудитория}
+Основной фокус этой книги — на разработчиков программного обеспечения и смарт-контрактов (smart contract developers), которые стремятся получить глубокое понимание работы zk-SNARKs, чтобы иметь возможность разрабатывать высококачественный и высокозащищённый код, или которые хотят восполнить некоторые пробелы в знаниях. Книга подходит как для начинающих, так и для опытных читателей, поскольку концепции постепенно вводятся структурированным и логичным образом, обеспечивая лёгкость восприятия информации.
 
-While the book is accessible to a wide range of readers, it is expected that the reader has a basic knowledge of programming and an interest in logical thinking and strategic problem solving. An enthusiasm for the subject matter is also necessary, as the details of zero-knowledge proofs can be complex. 
-
-
-\section{About the Book}
-How much mathematics do you need to understand and implement zero-knowledge proofs? Of course, the answer is contingent upon the desired level of comprehension and the security demands of the application. It is possible to implement zero-knowledge proofs without any understanding of the underlying mathematics; however, to read a seminal paper, to grasp the intricacies of a proof system, or to develop secure and high-quality zk-SNARKs, some mathematical knowledge is indispensable.
-
-Without a solid grounding in mathematics, someone who is interested in learning the concepts of zero-knowledge proofs, but who has never seen or dealt with, say, a prime field, or an elliptic curve, may quickly become overwhelmed. This is not so much due to the complexity of the mathematics needed, but rather because of the vast amount of technical jargon, unknown terms, and obscure symbols that quickly makes a text unreadable, even though the concepts themselves are not actually that complicated. As a result, the reader might either lose interest, or pick up some incoherent bits and pieces of knowledge that, in the worst case scenario, result in immature and non-secure implementations. 
-
-Significant portions of this book are dedicated to providing a comprehensive explanation of the mathematical foundations necessary for comprehending the fundamental concepts underlying zk-SNARK development. For readers who lack familiarity with basic number theory and elliptic curves, we strongly encourage dedicated study of the relevant chapters until they are able to solve a minimum of several exercises in each chapter. A deliberate focus on working through examples in detail is encouraged.
-
-The book starts at a very basic level, and only assume preexisting knowledge of fundamental concepts like high school integer arithmetic. It then progresses to demonstrate that there are numbers and mathematical structures that, although initially appearing very different from what was learned in high school, are actually analogous at a deeper level. This is exemplified through a variety of examples throughout the book.
-
-It is important to emphasize that the mathematics presented in this book is informal, incomplete, and optimized to facilitate efficient comprehension of zero-knowledge concepts. The design choice is to include only the minimum required theory, prioritizing a profusion of numerical examples. We believe that this informal, example-driven approach facilitates easier digestion of the material for beginners.
-
-As a novice, it is suggested that one first computes a simple toy zk-SNARK using pen and paper, before venturing into the development of high-security real-world zk-SNARKs. However, to derive these toy examples, some mathematical preparation is necessary. This book therefore aims to guide the inexperienced reader towards the essential mathematical concepts, providing exercises that are intended to be worked through independently. Each section includes a list of progressively challenging exercises to aid in memorization and application of the concepts.
+Несмотря на то что книга доступна широкому кругу читателей, предполагается, что читатель обладает базовыми знаниями программирования и интересом к логическому мышлению и стратегическому решению задач. Необходим также энтузиазм по отношению к предмету, поскольку детали доказательств с нулевым разглашением (zero-knowledge proofs) могут быть сложными. 
 
 
-\section{Reading This Book}
-The MoonMath Manual is intended to provide a comprehensive introduction to topics relevant to beginners in mathematics and cryptography. As such, there are multiple ways to read the book. The most straightforward approach is to follow the chapters in a linear order. This method is recommended for readers who have limited prior knowledge of mathematics and cryptography. The book begins with fundamental concepts such as natural numbers, prime numbers, and operations on these sets in various arithmetics. Subsequently, the book progresses to cover algebraic structures, including groups, rings, prime fields, and elliptic curves.
+\section{О книге}
+Как много математики нужно, чтобы понимать и реализовывать (implement) доказательства с нулевым разглашением (zero-knowledge proofs)? Конечно, ответ зависит от желаемого уровня понимания и требований к безопасности приложения. Возможно реализовать доказательства с нулевым разглашением (zero-knowledge proofs), не понимая лежащей в основе математики; однако чтобы прочитать основополагающую статью, постичь тонкости системы доказательств или разработать безопасные и высококачественные zk-SNARKs, некоторые математические знания необходимы.
 
-Throughout the book, examples are introduced and gradually expanded upon with the incorporation of new knowledge from subsequent chapters. This incremental approach allows for the development of simple, yet full-fledged cryptographic systems that can be computed by hand, in order to provide a detailed illustration of each step.
+Без прочной математической подготовки тот, кто заинтересован в изучении концепций доказательств с нулевым разглашением (zero-knowledge proofs), но никогда не видел и не имел дела, скажем, с простым полем или эллиптической кривой, может быстро почувствовать себя перегруженным. Дело не столько в сложности необходимой математики, сколько в огромном количестве технического жаргона, незнакомых терминов и непонятных символов, которые быстро делают текст нечитаемым, даже если сами концепции на самом деле не так уж сложны. В результате читатель может либо потерять интерес, либо подхватить некоторые несвязные кусочки знаний, которые в худшем случае приводят к незрелым и небезопасным реализациям (implementations). 
 
-For readers interested in understanding elliptic curves as they pertain to zero-knowledge proving systems, a starting point could be the introduction to the $BLS6_6$ curve in \secname{} \ref{BLS6}. The $BLS6_6$ curve was specifically designed for the purpose of hand calculations, as the size of cryptographic elliptic curves often prohibits this type of computation. It is a pairing-friendly curve with all necessary properties to perform pairing-based computations without the aid of a computer, which can help to clarify the intricacies of the system. Additionally, the book includes a derivation of the \curvename{Tiny-jubjub} curve \ref{TJJ13-twisted-edwards}, which can be used for EdDSA calculations in circuits over $BLS6_6$.
+Значительная часть этой книги посвящена всестороннему объяснению математических основ (mathematical foundations), необходимых для понимания фундаментальных концепций, лежащих в основе разработки zk-SNARKs. Читателям, не знакомым с основами теории чисел и эллиптическими кривыми, мы настоятельно рекомендуем тщательно изучить соответствующие главы (chapters), пока они не смогут решить как минимум несколько упражнений (exercises) в каждой главе (chapter). Настоятельно рекомендуется целенаправленно внимательно разбирать примеры (examples).
 
-Readers interested in building a simple, pen-and-paper zk-SNARK from scratch may want to start with the examples related to the 3-factorization problem. In \examplename{} \ref{ex:3-factorization}, we introduce the 3-factorization problem as a statement in a formal language. If this is too abstract, the reader might start in \examplename{} \ref{ex:3-fac-zk-circuit}, where we describe the 3-factorization problem as an algebraic circuit. In \examplename{} \ref{ex:3-fac-zk-circuit_2} we execute the circuit. In \examplename{} \ref{ex:L-3fac-zk}, we introduce the concept of instance and witness into the problem in order to achieve various levels of zero knowledge later on. In \examplename{} \ref{ex:3-factorization-r1cs} we transform the circuit into an associated Rank-1 Constraint System and in \examplename{} \ref{ex:3-fac-R1CS-constr-proof} we compute a constructive proof for the problem. In \examplename{} \ref{ex:3-fac-QAP} we transform that constraint system into a Quadratic Arithmetic Program in and show how constructive proofs are transformed into polynomial divisibility problems. In \examplename{} \ref{ex:3-fac-groth-16-params}, we  use the result of those examples to derive a Groth16 zk-SNARK for the 3-factorization problem. In \ref{def:groth16-crs}, we compute the prover and the verifier key. In \examplename{} \ref{3-fac-snark-compute}, we compute a zk-SNARK and in \examplename{} \ref{3-fac-snark-verifier}, we verify that zk-SNARK. In \examplename{}, \ref{3-fac-snark-simulator} we show how to simulate proofs. 
+Книга начинается с очень базового уровня и предполагает лишь наличие предварительных знаний фундаментальных концепций, таких как арифметика целых чисел в объёме средней школы. Затем она постепенно показывает, что существуют числа и математические структуры, которые, хотя поначалу кажутся совсем непохожими на то, что изучалось в школе, на более глубоком уровне на самом деле аналогичны. Это иллюстрируется разнообразными примерами (examples) по всей книге.
 
-Readers desiring to implement a zk-SNARK in a practical programming language should begin with our Circom implementation of the 3-factorization problem, as described in \ref{ex:3-fac-circom}. The derivation of the corresponding Groth\_16 parameter set is outlined in \ref{ex:3-fac-groth-16-params-circom}, and the calculation of the associated Common Reference String is addressed in \ref{ex:3-fac-groth-16-setup-circom}. In \ref{ex:3-fac-groth-16-prover-circom}, we demonstrate the generation of a proof for randomly selected input values, which is then verified in \ref{ex:3-fac-groth-16-verifier-circom}. This illustration may serve as a starting point for a more in-depth understanding of the underlying mechanisms.
+Важно подчеркнуть, что математика, представленная в этой книге, неформальна, неполна и оптимизирована для облегчения эффективного понимания концепций с нулевым разглашением. Выбор в пользу включения только минимально необходимой теории с приоритетом обилия числовых примеров (examples) сделан намеренно. Мы считаем, что такой неформальный, основанный на примерах (example-driven) подход облегчает усвоение материала для начинающих.
 
-Individuals seeking to enhance their comprehension of the process by which high-level programs are compiled into representations that are amenable to analysis by zero-knowledge proof systems may benefit from a review of Chapter \ref{chap:circuit-compilers}, in which we develop a toy language equipped with a "brain-compiler" that converts high-level code into graphical circuit representations. The crucial representations, such as the R1CS, are detailed in Section \ref{sec:R1CS}, and the fundamental principles of constructive proofs, witnesses, and instances are elucidated in \ref{sec:formal-languages}.
+Начинающему рекомендуется сначала вычислить простой учебный zk-SNARK с помощью ручки и бумаги (pen-and-paper), прежде чем приступать к разработке высокозащищённых zk-SNARKs для реального мира. Однако для вывода таких учебных примеров (examples) необходима некоторая математическая подготовка. Поэтому эта книга ставит целью направить неопытного читателя к основным математическим концепциям, предоставляя упражнения (exercises), которые предназначены для самостоятельной работы. Каждый раздел (section) включает список постепенно усложняющихся упражнений (exercises), чтобы помочь запомнить и применить концепции.
+
+
+\section{Как читать эту книгу}
+Руководство MoonMath предназначено для всестороннего введения в темы, актуальные для начинающих в математике и криптографии (cryptography). Поэтому существует несколько способов чтения книги. Наиболее прямолинейный подход — следовать главам (chapters) в линейном порядке. Этот метод рекомендуется читателям с ограниченными предварительными знаниями математики и криптографии (cryptography). Книга начинается с фундаментальных концепций, таких как натуральные числа, простые числа и операции над этими множествами в различных арифметиках. Затем книга переходит к алгебраическим структурам, включая группы, кольца, простые поля и эллиптические кривые.
+
+На протяжении всей книги вводятся примеры (examples), которые постепенно расширяются за счёт включения новых знаний из последующих глав (chapters). Такой поэтапный подход позволяет развивать простые, но полноценные криптографические системы, которые можно вычислять вручную, чтобы дать подробную иллюстрацию каждого шага.
+
+Читателям, интересующимся пониманием эллиптических кривых в контексте систем доказательств с нулевым разглашением, отправной точкой может служить введение в кривую $BLS6_6$ в \secname{} \ref{BLS6}. Кривая $BLS6_6$ была специально разработана для вычислений вручную, поскольку размер криптографических эллиптических кривых часто делает невозможными такие вычисления. Это кривая, дружественная к спариванию (pairing-friendly), обладающая всеми необходимыми свойствами для выполнения вычислений на основе спаривания без помощи компьютера, что может помочь прояснить тонкости системы. Кроме того, в книге приводится вывод кривой \curvename{Tiny-jubjub} \ref{TJJ13-twisted-edwards}, которая может использоваться для вычислений EdDSA в схемах над $BLS6_6$.
+
+Читателям, заинтересованным в построении простого zk-SNARK с нуля с помощью ручки и бумаги (pen-and-paper), стоит начать с примеров (examples), связанных с задачей 3-факторизации. В \examplename{} \ref{ex:3-factorization} мы вводим задачу 3-факторизации как утверждение в формальном языке. Если это слишком абстрактно, читатель может начать с \examplename{} \ref{ex:3-fac-zk-circuit}, где мы описываем задачу 3-факторизации как алгебраическую схему. В \examplename{} \ref{ex:3-fac-zk-circuit_2} мы выполняем схему. В \examplename{} \ref{ex:L-3fac-zk} мы вводим в задачу концепции instance (публичный вход) и witness (свидетель), чтобы впоследствии достичь различных уровней нулевого разглашения. В \examplename{} \ref{ex:3-factorization-r1cs} мы преобразуем схему в соответствующую систему ограничений ранга 1 (Rank-1 Constraint System), а в \examplename{} \ref{ex:3-fac-R1CS-constr-proof} вычисляем конструктивное доказательство для задачи. В \examplename{} \ref{ex:3-fac-QAP} мы преобразуем эту систему ограничений в квадратичную арифметическую программу (Quadratic Arithmetic Program) и показываем, как конструктивные доказательства превращаются в задачи о делимости многочленов. В \examplename{} \ref{ex:3-fac-groth-16-params} мы используем результат этих примеров (examples) для вывода Groth16 zk-SNARK для задачи 3-факторизации. В \ref{def:groth16-crs} мы вычисляем ключ доказывающего (prover) и ключ проверяющего (verifier). В \examplename{} \ref{3-fac-snark-compute} мы вычисляем zk-SNARK, а в \examplename{} \ref{3-fac-snark-verifier} — проверяем этот zk-SNARK. В \examplename{} \ref{3-fac-snark-simulator} мы показываем, как моделировать доказательства. 
+
+Читателям, желающим реализовать (implement) zk-SNARK на практическом языке программирования, следует начать с нашей реализации (implementation) на Circom задачи 3-факторизации, как описано в \ref{ex:3-fac-circom}. Вывод соответствующего набора параметров Groth\_16 изложен в \ref{ex:3-fac-groth-16-params-circom}, а вычисление связанной общей эталонной строки (Common Reference String) рассмотрено в \ref{ex:3-fac-groth-16-setup-circom}. В \ref{ex:3-fac-groth-16-prover-circom} мы демонстрируем генерацию доказательства для случайно выбранных входных значений, которое затем проверяется в \ref{ex:3-fac-groth-16-verifier-circom}. Эта иллюстрация может служить отправной точкой для более глубокого понимания лежащих в основе механизмов.
+
+Лица, стремящиеся углубить своё понимание процесса, посредством которого высокоуровневые программы компилируются в представления, пригодные для анализа системами доказательств с нулевым разглашением, могут извлечь пользу из изучения главы (Chapter) \ref{chap:circuit-compilers}, в которой мы развиваем игрушечный язык, оснащённый ``мозг-компилятором'' (brain-compiler), преобразующим высокоуровневый код в графические представления схем. Ключевые представления, такие как R1CS, подробно рассмотрены в разделе (Section) \ref{sec:R1CS}, а фундаментальные принципы конструктивных доказательств, свидетелей (witnesses) и входных данных (instances) изложены в \ref{sec:formal-languages}.
 
 
 
-\section{Contributions}Due to the significance and rapid advancement of the field of zero knowledge proofing systems, providing comprehensive coverage of relevant topics within the MoonMath Manual represents a substantial challenge. Hence, the community's contributions are greatly appreciated.
+\section{Вклад}Учитывая значимость и стремительное развитие области систем доказательств с нулевым разглашением (zero-knowledge proofing systems), всестороннее освещение соответствующих тем в Руководстве MoonMath представляет собой серьёзную задачу. Поэтому вклад сообщества крайне ценится.
 
-If you would like to contribute to the development of the MoonMath Manual, we encourage you to submit your adapted material or original content to Least Authority. For those interested in making substantial contributions to the MoonMath Manual, we suggest reaching out directly to Least Authority at mmm@leastauthority.com. For further information, please refer to our license.
+Если вы хотите внести вклад в развитие Руководства MoonMath, мы призываем вас направлять ваши адаптированные материалы или оригинальный контент в Least Authority. Тем, кто заинтересован в существенном вкладе в Руководство MoonMath, мы предлагаем связаться непосредственно с Least Authority по адресу mmm@leastauthority.com. Для получения дополнительной информации, пожалуйста, обратитесь к нашей лицензии.
 
-%rest is commented out
+%остальное закомментировано
 
 \begin{comment}
-\section{The Zoo of Zero-Knowledge Proofs}
+\section{Зоопарк доказательств с нулевым разглашением}
 
-{First, a list of zero-knowledge proof systems:
+{Сначала список систем доказательств с нулевым разглашением:
 
 \begin{enumerate}
 	\item Pinocchio (2013): \href{https://eprint.iacr.org/2013/279.pdf}{{Paper}}
 	\begin{itemize}[label={--}]
-		\item Notes: trusted setup
+		\item Примечания: trusted setup
 	\end{itemize}
 
 	\item BCGTV (2013): \href{https://eprint.iacr.org/2013/507.pdf}{{Paper}}
 	\begin{itemize}[label={--}]
-		\item Notes: trusted setup, implementation
+		\item Примечания: trusted setup, implementation
 	\end{itemize}
 
 	\item BCTV (2013): \href{https://eprint.iacr.org/2013/879.pdf}{{Paper}}
 	\begin{itemize}[label={--}]
-		\item Notes: trusted setup, implementation
+		\item Примечания: trusted setup, implementation
 	\end{itemize}
 
 	\item Groth16 (2016): 	\href{https://eprint.iacr.org/2016/260.pdf}{Paper}
 	\begin{itemize}[label={--}]
-		\item Notes: trusted setup
-		\item Other resources: \href{https://www.gakonst.com/zksummit2019.pdf}{Talk in 2019 by Georgios Konstantopoulos}
+		\item Примечания: trusted setup
+		\item Другие ресурсы: \href{https://www.gakonst.com/zksummit2019.pdf}{Talk in 2019 by Georgios Konstantopoulos}
 	\end{itemize}
 
 	\item GM17 (207): 	\href{https://eprint.iacr.org/2017/540.pdf}{Paper}
 	\begin{itemize}[label={--}]
-		\item Notes: trusted setup
-		\item Other resources: later \href{https://eprint.iacr.org/2018/187}{Simulation extractability in ROM, 2018}
+		\item Примечания: trusted setup
+		\item Другие ресурсы: позже \href{https://eprint.iacr.org/2018/187}{Simulation extractability in ROM, 2018}
 	\end{itemize}
 
 	\item Bulletproofs (2017): \href{https://eprint.iacr.org/2017/1066.pdf}{Paper}
 	\begin{itemize}[label={--}]
-		\item Notes: no trusted setup
-		\item Other resources: \href{https://eprint.iacr.org/2016/263.pdf}{Polynomial Commitment Scheme on DL, 2016} and \href{https://www.iacr.org/archive/asiacrypt2010/6477178/6477178.pdf}{KZG10, Polynomial Commitment Scheme on Pairings, 2010}
+		\item Примечания: no trusted setup
+		\item Другие ресурсы: \href{https://eprint.iacr.org/2016/263.pdf}{Polynomial Commitment Scheme on DL, 2016} и \href{https://www.iacr.org/archive/asiacrypt2010/6477178/6477178.pdf}{KZG10, Polynomial Commitment Scheme on Pairings, 2010}
 	\end{itemize}
 
 	\item Ligero (2017): \href{https://acmccs.github.io/papers/p2087-amesA.pdf}{Paper}
 	\begin{itemize}[label={--}]
-		\item Notes: no trusted setup
-		\item Other resources: 
+		\item Примечания: no trusted setup
+		\item Другие ресурсы: 
 	\end{itemize}
 
 	\item Hyrax (2017): \href{https://eprint.iacr.org/2017/1132.pdf}{Paper}
 	\begin{itemize}[label={--}]
-		\item Notes: no trusted setup
-		\item Other resources: 
+		\item Примечания: no trusted setup
+		\item Другие ресурсы: 
 	\end{itemize}
 
 	\item STARKs (2018): \href{https://eprint.iacr.org/2018/046.pdf}{Paper}
 	\begin{itemize}[label={--}]
-		\item Notes: no trusted setup 
-		\item Other resources: 
+		\item Примечания: no trusted setup 
+		\item Другие ресурсы: 
 	\end{itemize}
 
 	\item Aurora (2018): \href{https://eprint.iacr.org/2018/828.pdf}{Paper}
 	\begin{itemize}[label={--}]
-		\item Notes: transparent SNARK
-		\item Other resources:
+		\item Примечания: transparent SNARK
+		\item Другие ресурсы:
 	\end{itemize}
 
 	\item Sonic (2019): \href{https://eprint.iacr.org/2019/099.pdf}{Paper}
 	\begin{itemize}[label={--}]
-		\item Notes: SNORK - SNARK with universal and updateable trusted setup, PCS-based
-		\item Other resources: \href{https://www.benthamsgaze.org/2019/02/07/introducing-sonic-a-practical-zk-snark-with-a-nearly-trustless-setup/}{Blog post by Mary Maller from 2019} and \href{https://eprint.iacr.org/2018/280}{work on updateable and universal setup from 2018}
+		\item Примечания: SNORK — SNARK с универсальной и обновляемой доверенной настройкой (universal and updateable trusted setup), основанный на PCS
+		\item Другие ресурсы: \href{https://www.benthamsgaze.org/2019/02/07/introducing-sonic-a-practical-zk-snark-with-a-nearly-trustless-setup/}{Blog post by Mary Maller from 2019} и \href{https://eprint.iacr.org/2018/280}{work on updateable and universal setup from 2018}
 	\end{itemize}
 
 	\item Libra (2019): \href{https://eprint.iacr.org/2019/317}{Paper}
 	\begin{itemize}[label={--}]
-		\item Notes: trusted setup
-		\item Other resources:
+		\item Примечания: trusted setup
+		\item Другие ресурсы:
 	\end{itemize}
 
 	\item Spartan (2019): \href{https://eprint.iacr.org/2019/550.pdf}{Paper}
 	\begin{itemize}[label={--}]
-		\item Notes: transparent SNARK
-		\item Other resources:
+		\item Примечания: transparent SNARK
+		\item Другие ресурсы:
 	\end{itemize}
 
 	\item PLONK (2019): \href{https://eprint.iacr.org/2019/953.pdf}{Paper}
 	\begin{itemize}[label={--}]
-		\item Notes: SNORK, PCS-based
-		\item Other resources: \href{https://www.plonk.cafe/t/welcome-to-discussion-of-plonk-related-research/24}{Discussion on Plonk systems} and \href{https://github.com/Fluidex/awesome-plonk}{Awesome Plonk list}
+		\item Примечания: SNORK, основанный на PCS
+		\item Другие ресурсы: \href{https://www.plonk.cafe/t/welcome-to-discussion-of-plonk-related-research/24}{Discussion on Plonk systems} и \href{https://github.com/Fluidex/awesome-plonk}{Awesome Plonk list}
 	\end{itemize}
 
 	\item Halo (2019): \href{https://eprint.iacr.org/2019/1021}{Paper}
 	\begin{itemize}[label={--}]
-		\item Notes: no trusted setup, PCS-based, recursive
-		\item Other resources: 
+		\item Примечания: no trusted setup, основанный на PCS, рекурсивный
+		\item Другие ресурсы: 
 	\end{itemize}
 
 	\item Marlin (2019): \href{https://eprint.iacr.org/2019/1047.pdf}{Paper}
 	\begin{itemize}[label={--}]
-		\item Notes: SNORK, PCS-based
-		\item Other resources: \href{https://github.com/arkworks-rs/marlin}{Rust Github}
+		\item Примечания: SNORK, основанный на PCS
+		\item Другие ресурсы: \href{https://github.com/arkworks-rs/marlin}{Rust Github}
 	\end{itemize}
 
 	\item Fractal (2019): \href{https://eprint.iacr.org/2019/1076.pdf}{Paper}
 	\begin{itemize}[label={--}]
-		\item Notes: Recursive, transparent SNARK
-		\item Other resources: 
+		\item Примечания: рекурсивный, transparent SNARK
+		\item Другие ресурсы: 
 	\end{itemize}
 
 	\item SuperSonic (2019): \href{https://eprint.iacr.org/2019/1229.pdf}{Paper}
 	\begin{itemize}[label={--}]
-		\item Notes: transparent SNARK, PCS-based
-		\item Other resources: \href{https://eprint.iacr.org/2021/358}{Attack on DARK compiler in 2021}
+		\item Примечания: transparent SNARK, основанный на PCS
+		\item Другие ресурсы: \href{https://eprint.iacr.org/2021/358}{Attack on DARK compiler in 2021}
 	\end{itemize}
 
-	\item Redshift (2019): \href{https://eprint.iacr.org/2019/1400}{Paper}
+	\item Redshift (2019): \href{https://eprint.iacr.org/2019/1400.pdf}{Paper}
 	\begin{itemize}[label={--}]
-		\item Notes: SNORK, PCS-based
-		\item Other resources: 
+		\item Примечания: SNORK, основанный на PCS
+		\item Другие ресурсы: 
 	\end{itemize}
 
 
 
 \end{enumerate}
 
-\textbf{Other resources on the zoo: } \href{https://github.com/matter-labs/awesome-zero-knowledge-proofs}{Awesome ZKP list on Github}, \href{https://zkp.science/}{ZKP community} with the \href{https://docs.zkproof.org/reference.pdf}{reference document}
+\textbf{Другие ресурсы по зоопарку: } \href{https://github.com/matter-labs/awesome-zero-knowledge-proofs}{Awesome ZKP list on Github}, \href{https://zkp.science/}{ZKP community} with the \href{https://docs.zkproof.org/reference.pdf}{reference document}
 
 }
 
-\paragraph{To Do List}
+\paragraph{Список дел}
 \begin{itemize}
-	\item Make table for prover time, verifier time, and proof size
-	\item Think of categories - \textit{Achieved Goals}: Trusted setup or not, Post-quantum or not, \dots
-	\item Think of categories - \textit{Mathematical background}: Polynomial commitment scheme, \dots
-	\item \dots while we discuss the points above, we should also discuss a common notation/language for all these things. (E.g. transparent SNARK/no trusted setup/STARK)
+	\item Составить таблицу для времени доказывающего (prover), времени проверяющего (verifier) и размера доказательства
+	\item Подумать о категориях — \textit{Достигнутые цели}: trusted setup или нет, постквантовый или нет, \dots
+	\item Подумать о категориях — \textit{Математическая подготовка}: polynomial commitment scheme, \dots
+	\item \dots пока мы обсуждаем пункты выше, следует также обсудить общую нотацию/язык для всего этого. (Например, transparent SNARK/no trusted setup/STARK)
 \end{itemize}
 
-\paragraph{Points to cover while writing}
+\paragraph{Вопросы, которые следует осветить при написании}
 \begin{itemize}
-	\item Make a historical overview over the "discovery" of the different ZKP systems
-	\item Make reader understand what paper is build on what result etc. - the tree of publications!
-	\item Make reader understand the different terminology, e.g. SNARK/SNORK/STARK, PCS, R1CS, updateable, universal, $\dots$
-	\item Make reader understand the mathematical assumptions - and what this means for the zoo.
-	\item Where will the development/evolution go? What are bottlenecks?
+	\item Сделать исторический обзор ``открытия'' различных систем ZKP
+	\item Помочь читателю понять, какая статья основана на каком результате и т.д. — дерево публикаций!
+	\item Помочь читателю понять различную терминологию, например SNARK/SNORK/STARK, PCS, R1CS, updateable, universal, $\dots$
+	\item Помочь читателю понять математические предпосылки — и что это означает для зоопарка.
+	\item Куда пойдёт развитие/эволюция? Какие узкие места?
 \end{itemize}
 
 \vspace*{1em}
 {\footnotesize
-\hspace*{-1em}\textbf{Other topics I fell into while compiling this list}
+\hspace*{-1em}\textbf{Другие темы, на которые я наткнулся при составлении этого списка}
 \begin{itemize}
 	\item Vector commitments: \url{https://eprint.iacr.org/2020/527.pdf}
 	\item Snarkl: \url{http://ace.cs.ohio.edu/~gstewart/papers/snaarkl.pdf}
@@ -206,4 +206,3 @@ If you would like to contribute to the development of the MoonMath Manual, we en
 }
 
 \end{comment}
-

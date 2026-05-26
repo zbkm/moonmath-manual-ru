@@ -37,11 +37,10 @@
 %fonts
 % tempora provides Times-like font with cyrillic support
 \usepackage{tempora}
-% use times style for mathmode, too
-\usepackage{newtxmath}
 \usepackage[T2A,T1]{fontenc}
 \usepackage[utf8]{inputenc}
 \usepackage[russian]{babel}
+\AtBeginDocument{\shorthandoff{"}}
 
 % integer long division
 \usepackage{longdivision}
@@ -49,6 +48,8 @@
 \usepackage{polynom}
 
 \usepackage{amssymb,amsmath,amsthm,mathrsfs,xspace}
+% use times style for mathmode, too
+\usepackage{newtxmath}
 \usepackage{polydiv}
 \usepackage{amscd}
 \usepackage[all]{xy}
@@ -140,6 +141,7 @@ backgroundcolor= \color{white},
 
 %	Macros
 % Fields and categories
+\let\C\relax
 \newcommand{\C}{\mathbb{C}}
 \newcommand{\G}{\mathbb{G}}
 \newcommand{\Prim}{\mathbb{P}}

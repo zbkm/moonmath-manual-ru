@@ -12,35 +12,45 @@
 
 Проходя через руководство, читатели постигнут математические концепции, которые используются не только в SNARKs, но и в других доказательствах с нулевым разглашением и в криптографии вообще.
 
-== Пожертвования
-Если вы хотите поддержать непрерывное создание подобного контента, пожалуйста, пожертвуйте через один из следующих каналов или свяжитесь с Least Authority для дополнительных вариантов:
-
-- Bitcoin: bc1q0d8pf6tgqq6j0gzv5yf259usvh6zfjsuuq39d7
-- Ethereum: 0x470E2902CC34A8b2A1E1890325cA0564593a5eDB
-- ZCash: t1JyQ9X4VDkiZSdNF2XLXPU5CHTT33saunf 
-- PayPal: https://www.paypal.com/donate/?hosted_button_id=6FBFT8XC8UTYL
+== Оригинал
+Оригинальное английское издание находится в репозитории https://github.com/LeastAuthority/moonmath-manual[LeastAuthority/moonmath-manual].
 
 == Скачать
-Вы можете скачать последнюю версию руководства MoonMath https://github.com/LeastAuthority/moonmath-manual/releases/latest/download/main-moonmath.pdf[здесь].
+Последнюю собранную версию руководства можно скачать https://github.com/zbkm/moonmath-manual-ru/releases/latest/download/main-moonmath.pdf[здесь].
 
 == Инструкции по сборке
 
 === Требования
+* Docker
 
-* Установленный дистрибутив LaTeX
-* Установленный Latexmk
-* Установленный Docker
+=== Локальная сборка
 
-=== Шаги
+. Склонируйте репозиторий:
++
+[source,bash]
+git clone https://github.com/zbkm/moonmath-manual-ru.git
+cd moonmath-manual-ru
 
-Чтобы собрать PDF-документ руководства MoonMath, выполните следующие шаги:
+. Запустите сборку последовательно:
++
+[source,bash]
+----
+# Pass 1–2: генерация .sage и разрешение перекрёстных ссылок
+docker run --rm -v "$PWD:/workdir" -w /workdir texlive/texlive:latest pdflatex --shell-escape main-moonmath.tex
+docker run --rm -v "$PWD:/workdir" -w /workdir texlive/texlive:latest pdflatex --shell-escape main-moonmath.tex
 
-. `git clone https://github.com/LeastAuthority/moonmath-manual.git` (скачать исходники)
-. `cd moonmath-manual` (перейти в папку moonmath-manual)
-. `./install_sagetex_sty.sh` (установить `sagetex.sty`)
-. `pdflatex main-moonmath.tex` (создать файлы SageMath из документа)
-. `./generate_sagetex_files.sh` (запустить SageMath 9.3 для выходных файлов)
-. `latexmk -pdf main-moonmath.tex` (собрать main-moonmath.pdf)
+# SageMath: вычисление блоков кода и графиков
+docker run --rm \
+  -v "$PWD:/workdir" \
+  -v "$PWD/patches/sagetex.py:/home/sage/sage/local/var/lib/sage/venv-python3.12/lib/python3.12/site-packages/sagetex.py" \
+  -w /workdir \
+  sagemath/sagemath:latest \
+  sage main-moonmath.sagetex.sage
+
+# Pass 3–4: вставка результатов и финальные ссылки
+docker run --rm -v "$PWD:/workdir" -w /workdir texlive/texlive:latest pdflatex --shell-escape main-moonmath.tex
+docker run --rm -v "$PWD:/workdir" -w /workdir texlive/texlive:latest pdflatex --shell-escape main-moonmath.tex
+----
 
 == О русском переводе
 Данный репозиторий содержит полный перевод MoonMath Manual на русский язык. Перевод выполнен с сохранением всех математических формул, примеров кода SageMath и структуры оригинального издания. При первом упоминании каждого специального термина даётся русский перевод с английским оригиналом в скобках.
